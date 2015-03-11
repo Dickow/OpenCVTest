@@ -1,10 +1,12 @@
 package test;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -12,19 +14,27 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
-import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
-import org.opencv.ml.CvStatModel;
 
 public class ContourTest {
-	private static int ballSize = 30;
+	public int ballSize = 30;
+	public int iLowH = 145;
+	public int iHighH = 180;
 
-	public static void main(String[] args) {
+	public int iLowS = 0;
+	public int iHighS = 255;
+
+	public int iLowV = 0;
+	public int iHighV = 255;
+	
+	public Image outImg;
+
+	public void run() {
 
 		// Load the library
-
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		
 		/*
 		 * // get a picture from the webcam and save it VideoCapture
 		 * videoCapture = new VideoCapture(1); if (!videoCapture.isOpened()) {
@@ -69,57 +79,69 @@ public class ContourTest {
 		}
 
 		// find the robot with color scan
-		int iLowH = 145;
-		int iHighH = 180;
-
-		int iLowS = 0;
-		int iHighS = 255;
-
-		int iLowV = 0;
-		int iHighV = 255;
 
 		Highgui.imwrite("contoursOut2.jpg", image);
+		while (true) {
+			Mat imgOriginal = Highgui.imread("robotFind.jpg");
 
-		int lastX = -1;
-		int lastY = -1;
+			Mat imgHSV = new Mat();
 
-		Mat imgTmp = Highgui.imread("robotFind.jpg");
-		Mat imgLines = new Mat(imgTmp.size(), CvType.CV_8UC3);
-		Mat imgOriginal = Highgui.imread("robotFind.jpg");
+			Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
 
-		Mat imgHSV = new Mat();
+			Mat imgThresholded = new Mat();
 
-		Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
-		
-		Mat imgThresholded = new Mat(); 
-		
-		Core.inRange(imgHSV,new Scalar(iLowH,iLowS,iLowV), new Scalar(iHighH,iHighS,iHighV), imgThresholded);
-		
-		//morphological opening (removes small objects from the foreground)
-		Imgproc.erode(imgThresholded, imgThresholded,Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5,5)));
-		Imgproc.dilate(imgThresholded, imgThresholded,Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5,5)));
-		
-		//morphological closing (removes small holes from the foreground)
-		Imgproc.erode(imgThresholded, imgThresholded,Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5,5)));
-		Imgproc.dilate(imgThresholded, imgThresholded,Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5,5)));
-		
-		Moments oMoments = Imgproc.moments(imgThresholded, true);
-		
-		double dM01 = oMoments.get_m01();
-		double dM10 = oMoments.get_m10();
-		double dArea = oMoments.get_m00();
-		
-		 // if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero 
-		if (dArea > 10000)
-		{
-		//calculate the position of the ball
-		double posX = dM10 / dArea;
-		double posY = dM01 / dArea;
-		 System.out.println("posX = " + posX);
-		 System.out.println("posY = " + posY);
+			Core.inRange(imgHSV, new Scalar(iLowH, iLowS, iLowV), new Scalar(
+					iHighH, iHighS, iHighV), imgThresholded);
+
+			// morphological opening (removes small objects from the foreground)
+			Imgproc.erode(imgThresholded, imgThresholded, Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+			Imgproc.dilate(imgThresholded, imgThresholded, Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+
+			// morphological closing (removes small holes from the foreground)
+			Imgproc.erode(imgThresholded, imgThresholded, Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+			Imgproc.dilate(imgThresholded, imgThresholded, Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+
+			Moments oMoments = Imgproc.moments(imgThresholded, true);
+
+			double dM01 = oMoments.get_m01();
+			double dM10 = oMoments.get_m10();
+			double dArea = oMoments.get_m00();
+
+			// if the area <= 10000, I consider that the there are no object in
+			// the image and it's because of the noise, the area is not zero
+			if (dArea > 10000) {
+				// calculate the position of the ball
+				double posX = dM10 / dArea;
+				double posY = dM01 / dArea;
+				System.out.println("posX = " + posX);
+				System.out.println("posY = " + posY);
+			}
+			outImg = toBufferedImage(imgThresholded);
+			Highgui.imwrite("imgThresholded.jpg", imgThresholded);
 		}
-		Highgui.imwrite("imgThresholded.jpg", imgThresholded); 
-
 	}
+	
+	public Image toBufferedImage(Mat m){
+        int type = BufferedImage.TYPE_BYTE_GRAY;
+        if ( m.channels() > 1 ) {
+            type = BufferedImage.TYPE_3BYTE_BGR;
+        }
+        int bufferSize = m.channels()*m.cols()*m.rows();
+        byte [] b = new byte[bufferSize];
+        m.get(0,0,b); // get all the pixels
+        BufferedImage image = new BufferedImage(m.cols(),m.rows(), type);
+        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        System.arraycopy(b, 0, targetPixels, 0, b.length);  
+        return image;
+
+    }
 }
 // }
