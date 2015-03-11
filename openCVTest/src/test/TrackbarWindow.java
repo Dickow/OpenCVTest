@@ -1,7 +1,6 @@
 package test;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -69,6 +67,7 @@ public class TrackbarWindow {
 		frame.getContentPane().add(imgPanel, BorderLayout.CENTER);
 
 		imageProcess = new ContourTest();
+		new Thread(imageProcess).start();
 
 		// set the Labels
 		lowerH = new JLabel("lower H : " + imageProcess.iLowH);
@@ -131,21 +130,33 @@ public class TrackbarWindow {
 			if (e.getSource() == lowerHSlider) {
 				lowerH.setText("lower H : " + lowerHSlider.getValue());
 				imageProcess.iLowH = lowerHSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperHSlider) {
-				lowerH.setText("lower H : " + lowerHSlider.getValue());
-				imageProcess.iLowH = lowerHSlider.getValue();
+				upperH.setText("upper H : " + upperHSlider.getValue());
+				imageProcess.iHighH = upperHSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerSSlider) {
-				lowerH.setText("lower H : " + lowerHSlider.getValue());
-				imageProcess.iLowH = lowerHSlider.getValue();
+				lowerS.setText("lower S : " + lowerSSlider.getValue());
+				imageProcess.iLowS = lowerSSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperSSlider) {
-				lowerH.setText("lower H : " + lowerHSlider.getValue());
-				imageProcess.iLowH = lowerHSlider.getValue();
+				upperS.setText("upper S : " + upperSSlider.getValue());
+				imageProcess.iHighS = upperSSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerVSlider) {
-				lowerH.setText("lower H : " + lowerHSlider.getValue());
-				imageProcess.iLowH = lowerHSlider.getValue();
+				lowerV.setText("lower V : " + lowerVSlider.getValue());
+				imageProcess.iLowV = lowerVSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperVSlider) {
-				lowerH.setText("lower H : " + lowerHSlider.getValue());
-				imageProcess.iLowH = lowerHSlider.getValue();
+				upperV.setText("upper V : " + upperVSlider.getValue());
+				imageProcess.iHighV = upperVSlider.getValue();
+				imgLabel.removeAll();
+				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			}
 
 		}

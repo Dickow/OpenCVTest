@@ -17,7 +17,7 @@ import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-public class ContourTest {
+public class ContourTest implements Runnable {
 	public int ballSize = 30;
 	public int iLowH = 145;
 	public int iHighH = 180;
@@ -125,6 +125,7 @@ public class ContourTest {
 				System.out.println("posY = " + posY);
 			}
 			outImg = toBufferedImage(imgThresholded);
+			System.out.println("the image is set");
 			Highgui.imwrite("imgThresholded.jpg", imgThresholded);
 		}
 	}
