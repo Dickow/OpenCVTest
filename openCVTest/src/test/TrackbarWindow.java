@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -13,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -25,6 +28,7 @@ public class TrackbarWindow {
 	private JLabel lowerH, upperH, lowerS, upperS, lowerV, upperV, imgLabel;
 	private ContourTest imageProcess;
 	private SlideListener slideListener = new SlideListener();
+	private boolean imageIsSet = false;
 
 	/**
 	 * Launch the application.
@@ -112,14 +116,33 @@ public class TrackbarWindow {
 		trackPanel.add(upperV);
 		trackPanel.add(upperVSlider);
 
-		// add an image to the top panel
-		if (imageProcess.outImg != null) {
-			imgLabel = new JLabel(new ImageIcon(imageProcess.outImg));
-		} else {
-			imgLabel = new JLabel(new ImageIcon(ImageIO.read(new File(
-					"robotFind.jpg"))));
-		}
-		imgPanel.add(imgLabel);
+		// setup a timer to update frame continuously
+		int delay = 100; // milliseconds
+		ActionListener taskPerformer = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				// add an image to the top panel
+				if (imageProcess.outImg != null) {
+					imgLabel.removeAll();
+					imgLabel.setIcon((new ImageIcon(imageProcess.outImg)));
+					System.out.println("input image");
+				} else {
+					try {
+						if (!imageIsSet) {
+							imgLabel = new JLabel(new ImageIcon(
+									ImageIO.read(new File("cameraInput.jpg"))));
+							imgPanel.add(imgLabel);
+							System.out.println("new image");
+							imageIsSet = true;
+						}
+					} catch (IOException e) {
+						System.out
+								.println("could not read standard image fatal error");
+					}
+				}
+
+			}
+		};
+		new Timer(delay, taskPerformer).start();
 
 	}
 
@@ -130,33 +153,33 @@ public class TrackbarWindow {
 			if (e.getSource() == lowerHSlider) {
 				lowerH.setText("lower H : " + lowerHSlider.getValue());
 				imageProcess.iLowH = lowerHSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperHSlider) {
 				upperH.setText("upper H : " + upperHSlider.getValue());
 				imageProcess.iHighH = upperHSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerSSlider) {
 				lowerS.setText("lower S : " + lowerSSlider.getValue());
 				imageProcess.iLowS = lowerSSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperSSlider) {
 				upperS.setText("upper S : " + upperSSlider.getValue());
 				imageProcess.iHighS = upperSSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerVSlider) {
 				lowerV.setText("lower V : " + lowerVSlider.getValue());
 				imageProcess.iLowV = lowerVSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperVSlider) {
 				upperV.setText("upper V : " + upperVSlider.getValue());
 				imageProcess.iHighV = upperVSlider.getValue();
-				imgLabel.removeAll();
-				imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			}
 
 		}
