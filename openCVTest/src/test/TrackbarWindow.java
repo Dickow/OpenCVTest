@@ -25,7 +25,8 @@ public class TrackbarWindow {
 	private JPanel trackPanel, imgPanel;
 	private JSlider lowerHSlider, upperHSlider, lowerSSlider, upperSSlider,
 			lowerVSlider, upperVSlider;
-	private JLabel lowerH, upperH, lowerS, upperS, lowerV, upperV, imgLabel;
+	private JLabel lowerH, upperH, lowerS, upperS, lowerV, upperV, imgLabel,
+			imgLabel2;
 	private ContourTest imageProcess;
 	private SlideListener slideListener = new SlideListener();
 	private boolean imageIsSet = false;
@@ -116,6 +117,11 @@ public class TrackbarWindow {
 		trackPanel.add(upperV);
 		trackPanel.add(upperVSlider);
 
+		setupTimer();
+
+	}
+
+	private void setupTimer() {
 		// setup a timer to update frame continuously
 		int delay = 100; // milliseconds
 		ActionListener taskPerformer = new ActionListener() {
@@ -123,14 +129,19 @@ public class TrackbarWindow {
 				// add an image to the top panel
 				if (imageProcess.outImg != null) {
 					imgLabel.removeAll();
-					imgLabel.setIcon((new ImageIcon(imageProcess.outImg)));
+					imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+					imgLabel2.removeAll();
+					imgLabel2.setIcon(new ImageIcon(imageProcess.outImg2));
 					System.out.println("input image");
 				} else {
 					try {
 						if (!imageIsSet) {
 							imgLabel = new JLabel(new ImageIcon(
 									ImageIO.read(new File("cameraInput.jpg"))));
+							imgLabel2 = new JLabel(new ImageIcon(
+									ImageIO.read(new File("cameraInput.jpg"))));
 							imgPanel.add(imgLabel);
+							imgPanel.add(imgLabel2);
 							System.out.println("new image");
 							imageIsSet = true;
 						}
@@ -143,7 +154,6 @@ public class TrackbarWindow {
 			}
 		};
 		new Timer(delay, taskPerformer).start();
-
 	}
 
 	private class SlideListener implements ChangeListener {

@@ -20,16 +20,16 @@ import org.opencv.imgproc.Moments;
 
 public class ContourTest implements Runnable {
 	public int ballSize = 30;
-	public int iLowH = 145;
-	public int iHighH = 180;
+	public int iLowH = 26;
+	public int iHighH = 39;
 
-	public int iLowS = 0;
-	public int iHighS = 255;
+	public int iLowS = 64;
+	public int iHighS = 196;
 
 	public int iLowV = 0;
-	public int iHighV = 255;
+	public int iHighV = 195;
 
-	public Image outImg;
+	public Image outImg, outImg2;
 
 	public void run() {
 
@@ -43,10 +43,9 @@ public class ContourTest implements Runnable {
 			System.out.println(" webcam was found: " + videoCapture.toString());
 		}
 		Mat frame = new Mat();
-		
+
 		while (true) {
 
-			videoCapture.read(frame);
 			videoCapture.read(frame);
 			Highgui.imwrite("cameraInput.jpg", frame);
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
@@ -121,16 +120,21 @@ public class ContourTest implements Runnable {
 
 			// if the area <= 10000, I consider that the there are no object in
 			// the image and it's because of the noise, the area is not zero
-			if (dArea > 10000) {
+			if (dArea > 100) {
 				// calculate the position of the ball
 				double posX = dM10 / dArea;
 				double posY = dM01 / dArea;
 				System.out.println("posX = " + posX);
 				System.out.println("posY = " + posY);
+				Core.circle(image, new Point(posX,posY), (int)Math.sqrt(dArea/3.14), new Scalar(255,255,255));
 			}
+
+			// Highgui.imwrite("imgThresholded.jpg", imgThresholded);
+
+			// convert to buffered image to show on the screen
+			outImg2 = toBufferedImage(image);
 			outImg = toBufferedImage(imgThresholded);
 			System.out.println("the image is set");
-			Highgui.imwrite("imgThresholded.jpg", imgThresholded);
 		}
 	}
 

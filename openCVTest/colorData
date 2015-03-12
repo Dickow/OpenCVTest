@@ -1,5 +1,5 @@
 Purple color lowerH = 121; upperH = 158; lowerS = 0; upperS = 255; lowerV = 74
 upperV = 250
 
-Tennis bold lowerH = 30; upperH = 39; lowerS = 64; upperS = 200; 
-lowerV = 25; upperV = 161;
+Tennis bold lowerH = 26; upperH = 39; lowerS = 64; upperS = 196; 
+lowerV = 0; upperV = 195;
