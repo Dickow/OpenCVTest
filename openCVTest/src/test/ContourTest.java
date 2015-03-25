@@ -35,7 +35,7 @@ public class ContourTest implements Runnable {
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(1);
+		VideoCapture videoCapture = new VideoCapture(0);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -48,17 +48,22 @@ public class ContourTest implements Runnable {
 
 			videoCapture.read(frame);
 			Highgui.imwrite("cameraInput.jpg", frame);
+			
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			Mat image = Highgui.imread("cameraInput.jpg",
-					Imgproc.COLOR_BGR2GRAY);
+			Mat image = Highgui.imread("cameraTest.jpg");
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
-			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(5, 5), 0);
+			Highgui.imwrite("gray.jpg", imageHSV); 
+			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
+			
+			
+			Highgui.imwrite("blurred.jpg", imageBlurr); 
 
 			Mat circles = new Mat();
 			Imgproc.HoughCircles(imageBlurr, circles,
-					Imgproc.CV_HOUGH_GRADIENT, 1, 20, 46, 23, 5, 20);
+					Imgproc.CV_HOUGH_GRADIENT, 1, 10, 200,10, 0, 10);
+			
 
 			if (!circles.empty()) {
 				int radius;
@@ -83,7 +88,7 @@ public class ContourTest implements Runnable {
 
 			// find the robot with color scan
 
-			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
+			Mat imgOriginal = Highgui.imread("cameraTest.jpg");
 
 			Mat imgHSV = new Mat();
 

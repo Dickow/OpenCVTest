@@ -138,9 +138,9 @@ public class TrackbarWindow {
 					try {
 						if (!imageIsSet) {
 							imgLabel = new JLabel(new ImageIcon(
-									ImageIO.read(new File("cameraInput.jpg"))));
+									ImageIO.read(new File("cameraTest.jpg"))));
 							imgLabel2 = new JLabel(new ImageIcon(
-									ImageIO.read(new File("cameraInput.jpg"))));
+									ImageIO.read(new File("cameraTest.jpg"))));
 							imgPanel.add(imgLabel);
 							imgPanel.add(imgLabel2);
 							System.out.println("new image");
