@@ -70,6 +70,7 @@ public class TrackbarWindow {
 		imgPanel = new JPanel(new FlowLayout());
 		frame.getContentPane().add(trackPanel, BorderLayout.SOUTH);
 		frame.getContentPane().add(imgPanel, BorderLayout.CENTER);
+		
 
 		imageProcess = new ContourTest();
 		new Thread(imageProcess).start();

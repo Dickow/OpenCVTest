@@ -4,13 +4,10 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
@@ -19,24 +16,26 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 public class ContourTest implements Runnable {
-	public int ballSize = 30;
-	public int iLowH = 26;
-	public int iHighH = 39;
+	public int ballSize = 5;
+	public int iLowH = 29;
+	public int iHighH = 62;
 
-	public int iLowS = 64;
-	public int iHighS = 196;
+	public int iLowS = 41;
+	public int iHighS = 145;
 
-	public int iLowV = 0;
-	public int iHighV = 195;
+	public int iLowV = 112;
+	public int iHighV = 200;
 
 	public Image outImg, outImg2;
+
+	public ArrayList<NodeObjects> objects;
 
 	public void run() {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(0);
+		VideoCapture videoCapture = new VideoCapture(1);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -45,6 +44,7 @@ public class ContourTest implements Runnable {
 		Mat frame = new Mat();
 
 		while (true) {
+			objects = new ArrayList<NodeObjects>();
 
 			videoCapture.read(frame);
 			Highgui.imwrite("cameraInput.jpg", frame);
@@ -53,37 +53,35 @@ public class ContourTest implements Runnable {
 					Imgproc.COLOR_BGR2GRAY);
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
-			Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
 			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(5, 5), 0);
-			Imgproc.adaptiveThreshold(imageBlurr, imageA, 255,
-					Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 7, 5);
-			Highgui.imwrite("contoursOut1.jpg", imageBlurr);
-			Highgui.imwrite("contoursOut3.jpg", imageA);
-			List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-			Imgproc.findContours(imageA, contours, new Mat(),
-					Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-			for (int i = 0; i < contours.size(); i++) {
-				if (Imgproc.contourArea(contours.get(i)) > 50) {
-					Rect rect = Imgproc.boundingRect(contours.get(i));
-					System.out.println(rect.area());
-					if (rect.height > ballSize && rect.width > ballSize
-							&& rect.height < 100 && rect.width < 100
-							|| rect.height > 30 && rect.width > 30
-							&& rect.height < 50 && rect.width < 50) {
-						Core.rectangle(image, new Point(rect.x, rect.y),
-								new Point(rect.x + rect.width, rect.y
-										+ rect.height), new Scalar(0, 0, 255));
-						System.out.println("rect x : " + rect.x + " rect y : "
-								+ rect.y);
+			Mat circles = new Mat();
+			Imgproc.HoughCircles(imageBlurr, circles,
+					Imgproc.CV_HOUGH_GRADIENT, 1, 20, 46, 23, 5, 20);
+
+			if (!circles.empty()) {
+				int radius;
+				Point pt;
+
+				System.out.println("found circle");
+				for (int i = 0; i <= circles.cols(); i++) {
+
+					double[] coordinate = circles.get(0, i);
+					if (coordinate == null) {
+						break;
 					}
+					pt = new Point(Math.round(coordinate[0]),
+							Math.round(coordinate[1]));
+					radius = (int) Math.round(coordinate[2]);
+
+					Core.circle(image, pt, radius, new Scalar(0, 0, 0));
+					objects.add(new NodeObjects(Math.round(coordinate[0]), Math
+							.round(coordinate[1]), "ball"));
 				}
 			}
 
 			// find the robot with color scan
-
-			// Highgui.imwrite("contoursOut2.jpg", image);
 
 			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
 
@@ -124,12 +122,13 @@ public class ContourTest implements Runnable {
 				// calculate the position of the ball
 				double posX = dM10 / dArea;
 				double posY = dM01 / dArea;
-				System.out.println("posX = " + posX);
-				System.out.println("posY = " + posY);
-				Core.circle(image, new Point(posX,posY), (int)Math.sqrt(dArea/3.14), new Scalar(255,255,255));
+				// System.out.println("posX = " + posX);
+				// System.out.println("posY = " + posY);
+				Core.circle(image, new Point(posX, posY),
+						(int) Math.sqrt(dArea / 3.14),
+						new Scalar(255, 255, 255));
+				objects.add(new NodeObjects(posX, posY, "robotFront"));
 			}
-
-			// Highgui.imwrite("imgThresholded.jpg", imgThresholded);
 
 			// convert to buffered image to show on the screen
 			outImg2 = toBufferedImage(image);
