@@ -4,16 +4,22 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+
+import com.sun.javafx.geom.Vec2f;
 
 public class ContourTest implements Runnable {
 	public int ballSize = 5;
@@ -29,13 +35,15 @@ public class ContourTest implements Runnable {
 	public Image outImg, outImg2;
 
 	public ArrayList<NodeObjects> objects;
+	public ArrayList<Point> lineCoordinates;
+	private Mat image;
 
 	public void run() {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(1);
+		VideoCapture videoCapture = new VideoCapture(0);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -44,32 +52,60 @@ public class ContourTest implements Runnable {
 		Mat frame = new Mat();
 
 		while (true) {
+			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
 
 			videoCapture.read(frame);
 			Highgui.imwrite("cameraInput.jpg", frame);
-			
+
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			Mat image = Highgui.imread("cameraInput.jpg");
+			image = Highgui.imread("cameraTest.jpg");
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
+			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
 			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
-			Highgui.imwrite("gray.jpg", imageHSV); 
+			Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
-			
-			
-			Highgui.imwrite("blurred.jpg", imageBlurr); 
 
+			/*
+			 * Find the lines representing the edge of the field
+			 */
+
+			Mat src = Highgui.imread("cameraTest.jpg", 0);
+			Mat dst = new Mat();
+			// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
+			// Highgui.imwrite("wtf1.jpg",dst);
+			Imgproc.cvtColor(src, dst, Imgproc.COLOR_GRAY2BGR);
+			Highgui.imwrite("wtf2.jpg", dst);
+			Imgproc.Canny(dst, dst, 50, 200, 3, false);
+
+			Mat lines = new Mat();
+
+			Imgproc.HoughLinesP(dst, lines, 1, Math.PI / 180, 50, 360, 350);
+
+			for (int x = 0; x < lines.cols(); x++) {
+				double[] vec = lines.get(0, x);
+				double x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
+				Point start = new Point(x1, y1);
+				Point end = new Point(x2, y2);
+				lineCoordinates.add(start);
+				lineCoordinates.add(end);
+				// Core.line(image, start, end, new Scalar(255,0,0), 3);
+
+			}
+			drawApproxLines();
+
+			/*
+			 * Find the circles in the image
+			 */
 			Mat circles = new Mat();
 			Imgproc.HoughCircles(imageBlurr, circles,
-					Imgproc.CV_HOUGH_GRADIENT, 1, 10, 200,10, 0, 10);
-			
+					Imgproc.CV_HOUGH_GRADIENT, 1, 10, 200, 10, 0, 10);
 
 			if (!circles.empty()) {
 				int radius;
 				Point pt;
 
-				System.out.println("found circle");
 				for (int i = 0; i <= circles.cols(); i++) {
 
 					double[] coordinate = circles.get(0, i);
@@ -88,7 +124,7 @@ public class ContourTest implements Runnable {
 
 			// find the robot with color scan
 
-			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
+			Mat imgOriginal = Highgui.imread("cameraTest.jpg");
 
 			Mat imgHSV = new Mat();
 
@@ -138,8 +174,13 @@ public class ContourTest implements Runnable {
 			// convert to buffered image to show on the screen
 			outImg2 = toBufferedImage(image);
 			outImg = toBufferedImage(imgThresholded);
-			System.out.println("the image is set");
+
+			for (int i = 0; i < objects.size(); i++) {
+				System.out.println(objects.get(i).toString());
+			}
+			System.out.println("*****************************************");
 		}
+
 	}
 
 	/**
@@ -163,5 +204,94 @@ public class ContourTest implements Runnable {
 		return image;
 
 	}
+
+	private void drawApproxLines() {
+		Rect topLeftRect = new Rect(new Point(0, 0), new Point(100, 100));
+		Rect topRightRect = new Rect(new Point(540, 0), new Point(640, 100));
+		Rect bottomLeftRect = new Rect(new Point(0, 380), new Point(100, 480));
+		Rect bottomRightRect = new Rect(new Point(540, 380),
+				new Point(640, 480));
+
+		Point lineTopLeft;
+		Point lineTopRight;
+		Point lineBottomLeft;
+		Point lineBottomRight;
+		int count = 0;
+		int x = 0;
+		int y = 0;
+		// find all the points closest to top left corner
+		for (int i = 0; i < lineCoordinates.size(); i++) {
+			if (lineCoordinates.get(i).inside(topLeftRect)) {
+				count++;
+				x += lineCoordinates.get(i).x;
+				y += lineCoordinates.get(i).y;
+			}
+		}
+		x /= count;
+		y /= count;
+		lineTopLeft = new Point(x, y);
+
+		x = 0;
+		y = 0;
+		count = 0;
+
+		// find all the points closest to top right corner
+		for (int i = 0; i < lineCoordinates.size(); i++) {
+			if (lineCoordinates.get(i).inside(topRightRect)) {
+				count++;
+				x += lineCoordinates.get(i).x;
+				y += lineCoordinates.get(i).y;
+			}
+		}
+		x /= count;
+		y /= count;
+		lineTopRight = new Point(x, y);
+		x = 0;
+		y = 0;
+		count = 0;
+
+		// find all the points closest to bottom left corner
+		for (int i = 0; i < lineCoordinates.size(); i++) {
+			if (lineCoordinates.get(i).inside(bottomLeftRect)) {
+				count++;
+				x += lineCoordinates.get(i).x;
+				y += lineCoordinates.get(i).y;
+			}
+		}
+		x /= count;
+		y /= count;
+		lineBottomLeft = new Point(x, y);
+		x = 0;
+		y = 0;
+		count = 0;
+
+		// find all the points closest to bottom right corner
+		for (int i = 0; i < lineCoordinates.size(); i++) {
+			if (lineCoordinates.get(i).inside(bottomRightRect)) {
+				count++;
+				x += lineCoordinates.get(i).x;
+				y += lineCoordinates.get(i).y;
+			}
+		}
+		x /= count;
+		y /= count;
+		lineBottomRight = new Point(x, y);
+
+		// draw lines
+		// Core.rectangle(image, new Point(0, 0), new Point(100, 100), new
+		// Scalar(
+		// 255, 0, 0), 3);
+		// Core.rectangle(image, new Point(540, 0), new Point(640, 100),
+		// new Scalar(255, 0, 0), 3);
+		// Core.rectangle(image, new Point(0, 380), new Point(100, 480),
+		// new Scalar(255, 0, 0), 3);
+		// Core.rectangle(image, new Point(540, 380), new Point(640, 480),
+		// new Scalar(255, 0, 0), 3);
+		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
+		Core.line(image, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
+		Core.line(image, lineBottomLeft, lineBottomRight,
+				new Scalar(0, 0, 255), 3);
+		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
+				3);
+	}
 }
-// }
