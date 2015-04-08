@@ -35,7 +35,7 @@ public class ContourTest implements Runnable {
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(0);
+		VideoCapture videoCapture = new VideoCapture(1);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -50,7 +50,7 @@ public class ContourTest implements Runnable {
 			Highgui.imwrite("cameraInput.jpg", frame);
 			
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			Mat image = Highgui.imread("cameraTest.jpg");
+			Mat image = Highgui.imread("cameraInput.jpg");
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
@@ -88,7 +88,7 @@ public class ContourTest implements Runnable {
 
 			// find the robot with color scan
 
-			Mat imgOriginal = Highgui.imread("cameraTest.jpg");
+			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
 
 			Mat imgHSV = new Mat();
 
