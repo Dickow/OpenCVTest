@@ -276,17 +276,14 @@ public class ContourTest implements Runnable {
 		x /= count;
 		y /= count;
 		lineBottomRight = new Point(x, y);
-
+		
+		// add the corners to the list of objects that we have to take into consideration
+		objects.add(new NodeObjects(lineTopLeft.x, lineTopLeft.y, "LinePoint"));
+		objects.add(new NodeObjects(lineTopRight.x, lineTopRight.y, "LinePoint"));
+		objects.add(new NodeObjects(lineBottomLeft.x, lineBottomLeft.y, "LinePoint"));
+		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y, "LinePoint"));
+		
 		// draw lines
-		// Core.rectangle(image, new Point(0, 0), new Point(100, 100), new
-		// Scalar(
-		// 255, 0, 0), 3);
-		// Core.rectangle(image, new Point(540, 0), new Point(640, 100),
-		// new Scalar(255, 0, 0), 3);
-		// Core.rectangle(image, new Point(0, 380), new Point(100, 480),
-		// new Scalar(255, 0, 0), 3);
-		// Core.rectangle(image, new Point(540, 380), new Point(640, 480),
-		// new Scalar(255, 0, 0), 3);
 		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
 		Core.line(image, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
 		Core.line(image, lineBottomLeft, lineBottomRight,
