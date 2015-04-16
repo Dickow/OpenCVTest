@@ -56,5 +56,11 @@ public class Pathfinding {
 		return Math.sqrt(Math.pow((first.getX() - second.getX()), 2) + Math.pow((first.getY() - second.getY()), 2));
 	}
 	
+	private double findRotationAngle(NodeObjects robotFront, NodeObjects robotMiddle, NodeObjects ball){
+		
+		
+		return (Double) null;
+	}
+	
 	
 }
