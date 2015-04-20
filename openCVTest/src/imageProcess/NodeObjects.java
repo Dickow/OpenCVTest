@@ -1,4 +1,4 @@
-package test;
+package imageProcess;
 
 public class NodeObjects {
 	private String type; 

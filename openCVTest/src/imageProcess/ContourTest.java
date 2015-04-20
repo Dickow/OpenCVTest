@@ -1,4 +1,4 @@
-package test;
+package imageProcess;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -22,6 +22,7 @@ import org.opencv.imgproc.Moments;
 import com.sun.javafx.geom.Vec2f;
 
 public class ContourTest implements Runnable {
+	Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
 	public int iLowH = 29;
 	public int iHighH = 62;
@@ -121,7 +122,22 @@ public class ContourTest implements Runnable {
 							.round(coordinate[1]), "ball"));
 				}
 			}
-
+			
+			// add the robot for testing
+			objects.add(new NodeObjects(500, 300, "FrontRobot"));
+			objects.add(new NodeObjects(500, 340, "BackRobot"));
+			Core.circle(image, new Point(500, 300),
+					(int) Math.sqrt(49),
+					new Scalar(255, 255, 255));
+			Core.circle(image, new Point(500, 340),
+					(int) Math.sqrt(49),
+					new Scalar(255, 255, 255));
+			
+			// draw a test triangle delete when done TODO
+			Core.line(image, new Point(500,300), new Point(476, 250), new Scalar(255,255,0));
+			Core.line(image, new Point(500,300), new Point(500, 320), new Scalar(255,255,0));
+			Core.line(image, new Point(500,320), new Point(476, 250), new Scalar(255,255,0));
+			
 			// find the robot with color scan
 
 			Mat imgOriginal = Highgui.imread("cameraTest.jpg");
@@ -179,7 +195,9 @@ public class ContourTest implements Runnable {
 				System.out.println(objects.get(i).toString());
 			}
 			System.out.println("*****************************************");
+			pathfinder.run(objects);
 		}
+		
 
 	}
 
