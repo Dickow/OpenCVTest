@@ -6,19 +6,19 @@ import java.io.IOException;
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
-
 public class BTConnector {
-	private final int TURNLEFT = 1,TURNRIGHT = 2,FORWARD = 3,BACKWARDS = 4,STOP = 5,OPEN = 6,CLOSE = 7, DELIVER = 8;
+	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
+			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8;
 	private NXTConnector conn;
 	private DataOutputStream dos;
-	
+
 	/**
-	 * create a new BTConnector, it creates a connection to the nxt device
-	 * use the public functions to communicate with the robot.
+	 * create a new BTConnector, it creates a connection to the nxt device use
+	 * the public functions to communicate with the robot.
 	 */
 	public BTConnector() {
 		conn = new NXTConnector();
-		
+
 		conn.addLogListener(new NXTCommLogListener() {
 
 			public void logEvent(String message) {
@@ -33,7 +33,7 @@ public class BTConnector {
 			}
 
 		});
-		
+
 		// Connect to any NXT over Bluetooth
 		boolean connected = conn.connectTo("btspp://");
 
@@ -42,54 +42,105 @@ public class BTConnector {
 			System.exit(1);
 		}
 		dos = new DataOutputStream(conn.getOutputStream());
-		
-		
-		
+
 	}
-	
-	public void rotateRobotRight(double angle){
-		try{
-		dos.writeInt(TURNRIGHT);
-		dos.writeInt((int)angle);
-		dos.flush();
-		
-		}catch(IOException e){
+
+	/**
+	 * rotate the robot right
+	 * 
+	 * @param angle
+	 */
+	public void rotateRobotRight(double angle) {
+		try {
+			dos.writeInt(TURNRIGHT);
+			dos.writeInt((int) angle);
+			dos.flush();
+
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void rotateRobotLeft(double angle){
-		
+
+	/**
+	 * rotate the robot to the left
+	 * 
+	 * @param angle
+	 */
+	public void rotateRobotLeft(double angle) {
+
 		try {
 			dos.writeInt(TURNLEFT);
-			dos.writeInt((int)angle);
+			dos.writeInt((int) angle);
 			dos.flush();
-			
+
 			System.out.println("written to robot");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public void robotForward(double distance){
-		
+
+	/**
+	 * tell the robot to go forward for a given distance
+	 * 
+	 * @param distance
+	 */
+	public void robotForward(double distance) {
+		try {
+			dos.writeInt(FORWARD);
+			dos.writeInt((int) distance);
+			dos.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	public void robotBackwards(double distance){
-		
+
+	/**
+	 * tell the robot to go backwards for a given distance
+	 * 
+	 * @param distance
+	 */
+	public void robotBackwards(double distance) {
+		try {
+			dos.writeInt(BACKWARDS);
+			dos.writeInt((int) distance);
+			dos.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	public void openRobotArms(){
-		
+
+	/**
+	 * tell the robot to open it's arms
+	 */
+	public void openRobotArms() {
+		try {
+			dos.writeInt(OPEN);
+			dos.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
-	
-	public void closeRobotArms(){
-		
+
+	/**
+	 * tell the robot to close it's arms
+	 */
+	public void closeRobotArms() {
+		try {
+			dos.writeInt(CLOSE);
+			dos.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	public void deliverBall(){
-		
+
+	/**
+	 * tell the robot to open the arms while going forward this is used to
+	 * deliver the ball to the goal.
+	 */
+	public void deliverBall() {
+
 	}
 }
