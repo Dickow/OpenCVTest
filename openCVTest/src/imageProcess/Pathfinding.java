@@ -1,14 +1,18 @@
 package imageProcess;
 
+import geometry.Vector;
+
 import java.util.ArrayList;
 
 import robotCommunication.BTConnector;
 
 public class Pathfinding {
+	// TODO
 	private BTConnector robot = new BTConnector();
 	// index of robot points in the objects
 	private int robotFrontIndex;
 	private int robotBackIndex;
+	private int testInt = 0;
 
 	// coordinate of the middle of the robot
 	private NodeObjects robotMiddle;
@@ -16,7 +20,6 @@ public class Pathfinding {
 	private NodeObjects robotBack;
 
 	public void run(ArrayList<NodeObjects> objects) {
-		double tmpLength;
 		robotFrontIndex = findFront(objects);
 		robotBackIndex = findBack(objects);
 		// robot coordinates
@@ -54,24 +57,43 @@ public class Pathfinding {
 
 	private double findRotationAngle(NodeObjects robotFront,
 			NodeObjects robotMiddle, NodeObjects dest) {
+		//
+		// // define the lenghts needed to calculate the angle
+		// double frontToMiddle, middleToBall, frontToBall;
+		// frontToMiddle = calcLength(robotFront, robotMiddle);
+		// middleToBall = calcLength(robotMiddle, dest);
+		// frontToBall = calcLength(robotFront, dest);
+		// /*
+		// * frontToMiddle = c middleToBall = b frontToBall = a
+		// */
+		// double a = frontToBall;
+		// double b = middleToBall;
+		// double c = frontToMiddle;
+		//
+		// // the angles in the triangle
+		// double A, B, C;
+		//
+		// // TODO figure out which one of the angles is the right one
+		// A = Math.acos((b * b + c * c - a * a) / (2.0 * b * c)) * 180 /
+		// Math.PI;
+		// B = Math.asin((Math.sin(Math.toRadians(A)) * c) / b);
+		// C = 180 - (A + B);
+		//
+		// return A;
 
-		// define the lenghts needed to calculate the angle
-		double frontToMiddle, middleToBall, frontToBall;
-		frontToMiddle = calcLength(robotMiddle, robotFront);
-		middleToBall = calcLength(robotMiddle, dest);
-		frontToBall = calcLength(robotFront, dest);
-		// the angles in the triangle
-		double A, B, C;
+		Vector vector1 = new Vector(robotFront.getX() - dest.getX(),
+				robotFront.getY() - dest.getY());
+		Vector vector2 = new Vector(robotMiddle.getX() - dest.getX(),
+				robotMiddle.getY() - dest.getY());
 
-		// TODO figure out which one of the angles is the right one
-		A = Math.acos((frontToMiddle * frontToMiddle + frontToBall
-				* frontToBall - middleToBall * middleToBall)
-				/ (2.0 * frontToMiddle * frontToBall));
-		B = Math.asin((Math.sin(Math.toRadians(A)) * frontToMiddle)
-				/ middleToBall);
-		C = 180 - (A + B);
+		double ang = Math
+				.toDegrees(Math.acos((vector1.dX * vector2.dX + vector1.dY
+						* vector2.dY)
+						/ (Math.sqrt(Math.pow(vector1.dX, 2)
+								+ Math.pow(vector1.dY, 2)) * Math.sqrt(Math
+								.pow(vector2.dX, 2) + Math.pow(vector2.dY, 2)))));
+		return 180 - ang;
 
-		return A;
 	}
 
 	/**
@@ -86,11 +108,14 @@ public class Pathfinding {
 		double rotationAngle = findRotationAngle(robotFront, robotMiddle, dest);
 		System.out.println("rotation Angle = " + rotationAngle);
 		// if the rotation angle is very small we need not rotate the robot
-			double lengthToDest = calcLength(robotFront, dest);
-			robot.rotateRobotLeft(rotationAngle);
-		
+		double lengthToDest = calcLength(robotFront, dest);
 
-		
+		if (testInt == 0) {
+			// TODO
+			robot.rotateRobotLeft(rotationAngle);
+			testInt++;
+		}
+
 	}
 
 	int findFront(ArrayList<NodeObjects> objects) {

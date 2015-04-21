@@ -134,9 +134,9 @@ public class ContourTest implements Runnable {
 					new Scalar(255, 255, 255));
 			
 			// draw a test triangle delete when done TODO
-			Core.line(image, new Point(500,300), new Point(476, 250), new Scalar(255,255,0));
+			Core.line(image, new Point(500,300), new Point(190, 49), new Scalar(255,255,0));
 			Core.line(image, new Point(500,300), new Point(500, 320), new Scalar(255,255,0));
-			Core.line(image, new Point(500,320), new Point(476, 250), new Scalar(255,255,0));
+			Core.line(image, new Point(500,320), new Point(190, 49), new Scalar(255,255,0));
 			
 			// find the robot with color scan
 

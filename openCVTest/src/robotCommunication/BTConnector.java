@@ -8,7 +8,7 @@ import lejos.pc.comm.NXTConnector;
 
 
 public class BTConnector {
-	private final int TURNLEFT = 0,TURNRIGHT = 1,FORWARD = 2,BACKWARDS = 3,STOP = 4,OPEN = 5,CLOSE = 6, DELIVER = 7;
+	private final int TURNLEFT = 1,TURNRIGHT = 2,FORWARD = 3,BACKWARDS = 4,STOP = 5,OPEN = 6,CLOSE = 7, DELIVER = 8;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	
@@ -48,7 +48,14 @@ public class BTConnector {
 	}
 	
 	public void rotateRobotRight(double angle){
+		try{
+		dos.writeInt(TURNRIGHT);
+		dos.writeInt((int)angle);
+		dos.flush();
 		
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void rotateRobotLeft(double angle){
@@ -56,6 +63,9 @@ public class BTConnector {
 		try {
 			dos.writeInt(TURNLEFT);
 			dos.writeInt((int)angle);
+			dos.flush();
+			
+			System.out.println("written to robot");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
