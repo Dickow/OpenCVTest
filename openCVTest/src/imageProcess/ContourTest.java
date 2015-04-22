@@ -22,7 +22,7 @@ import org.opencv.imgproc.Moments;
 import com.sun.javafx.geom.Vec2f;
 
 public class ContourTest implements Runnable {
-	Pathfinding pathfinder = new Pathfinding();
+	//private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
 	public int iLowH = 29;
 	public int iHighH = 62;
@@ -44,7 +44,7 @@ public class ContourTest implements Runnable {
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(0);
+		VideoCapture videoCapture = new VideoCapture(1);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -60,7 +60,7 @@ public class ContourTest implements Runnable {
 			Highgui.imwrite("cameraInput.jpg", frame);
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			image = Highgui.imread("cameraTest.jpg");
+			image = Highgui.imread("cameraInput.jpg");
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
@@ -72,7 +72,7 @@ public class ContourTest implements Runnable {
 			 * Find the lines representing the edge of the field
 			 */
 
-			Mat src = Highgui.imread("cameraTest.jpg", 0);
+			Mat src = Highgui.imread("cameraInput.jpg", 0);
 			Mat dst = new Mat();
 			// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
 			// Highgui.imwrite("wtf1.jpg",dst);
@@ -124,23 +124,23 @@ public class ContourTest implements Runnable {
 			}
 			
 			// add the robot for testing
-			objects.add(new NodeObjects(500, 300, "FrontRobot"));
-			objects.add(new NodeObjects(500, 340, "BackRobot"));
-			Core.circle(image, new Point(500, 300),
-					(int) Math.sqrt(49),
-					new Scalar(255, 255, 255));
-			Core.circle(image, new Point(500, 340),
-					(int) Math.sqrt(49),
-					new Scalar(255, 255, 255));
-			
-			// draw a test triangle delete when done TODO
-			Core.line(image, new Point(500,300), new Point(190, 49), new Scalar(255,255,0));
-			Core.line(image, new Point(500,300), new Point(500, 320), new Scalar(255,255,0));
-			Core.line(image, new Point(500,320), new Point(190, 49), new Scalar(255,255,0));
+//			objects.add(new NodeObjects(500, 300, "FrontRobot"));
+//			objects.add(new NodeObjects(500, 340, "BackRobot"));
+//			Core.circle(image, new Point(500, 300),
+//					(int) Math.sqrt(49),
+//					new Scalar(255, 255, 255));
+//			Core.circle(image, new Point(500, 340),
+//					(int) Math.sqrt(49),
+//					new Scalar(255, 255, 255));
+//			
+//			// draw a test triangle delete when done TODO
+//			Core.line(image, new Point(500,300), new Point(190, 49), new Scalar(255,255,0));
+//			Core.line(image, new Point(500,300), new Point(500, 320), new Scalar(255,255,0));
+//			Core.line(image, new Point(500,320), new Point(190, 49), new Scalar(255,255,0));
 			
 			// find the robot with color scan
 
-			Mat imgOriginal = Highgui.imread("cameraTest.jpg");
+			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
 
 			Mat imgHSV = new Mat();
 
@@ -195,7 +195,7 @@ public class ContourTest implements Runnable {
 				System.out.println(objects.get(i).toString());
 			}
 			System.out.println("*****************************************");
-			pathfinder.run(objects);
+			//pathfinder.run(objects);
 		}
 		
 

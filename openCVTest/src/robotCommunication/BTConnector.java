@@ -8,7 +8,7 @@ import lejos.pc.comm.NXTConnector;
 
 public class BTConnector {
 	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
-			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8;
+			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 
@@ -89,8 +89,9 @@ public class BTConnector {
 	public void robotForward(double distance) {
 		try {
 			dos.writeInt(FORWARD);
-			dos.writeInt((int) distance);
+			dos.writeDouble(distance);
 			dos.flush();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -104,8 +105,9 @@ public class BTConnector {
 	public void robotBackwards(double distance) {
 		try {
 			dos.writeInt(BACKWARDS);
-			dos.writeInt((int) distance);
+			dos.writeDouble(distance);
 			dos.flush();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -142,5 +144,14 @@ public class BTConnector {
 	 */
 	public void deliverBall() {
 
+	}
+	
+	public void robotCalibrate(){
+		try{
+			dos.writeInt(CALIBRATE);
+			dos.flush(); 
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 }

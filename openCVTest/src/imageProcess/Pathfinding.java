@@ -13,7 +13,10 @@ public class Pathfinding {
 	private int robotFrontIndex;
 	private int robotBackIndex;
 	private int testInt = 0;
-
+	private boolean gotBall = false;
+	private int calibrating = 0;
+	private double distanceCalibration = 0;
+	private double xCalibration, yCalibration;
 	// coordinate of the middle of the robot
 	private NodeObjects robotMiddle;
 	private NodeObjects robotFront;
@@ -98,7 +101,8 @@ public class Pathfinding {
 
 	/**
 	 * find the appropriate instruction to give the robot, considering all the
-	 * coordinates and the closest ball that we have to drive to.
+	 * coordinates and the closest ball that we have to drive to. contains all
+	 * the routing information
 	 * 
 	 * @param dest
 	 * @return
@@ -106,14 +110,35 @@ public class Pathfinding {
 	private void instructRobot(NodeObjects dest) {
 		// find the length to the objects
 		double rotationAngle = findRotationAngle(robotFront, robotMiddle, dest);
-		System.out.println("rotation Angle = " + rotationAngle);
 		// if the rotation angle is very small we need not rotate the robot
 		double lengthToDest = calcLength(robotFront, dest);
+		if (calibrating == 0) {
+			xCalibration = robotFront.getX();
+			yCalibration = robotFront.getY();
+			robot.robotCalibrate();
+			calibrating++;
+		} else if (calibrating == 1) {
+			distanceCalibration = calcDifference(xCalibration, yCalibration,
+					robotFront.getX(), robotFront.getY());
+			calibrating++;
+		} else {
+			if (!gotBall) {
+				// sequence to get to ball
+				if (rotationAngle > 4) {
+					if (dest.getX() - robotFront.getX() < 0) {
+						robot.rotateRobotLeft(rotationAngle);
+					} else {
+						robot.rotateRobotRight(rotationAngle);
+					}
+				} else if (lengthToDest > 20) {
+					// calculate how many degrees the motor should be rotated
+					robot.robotForward(lengthToDest/distanceCalibration);
+				} else if (lengthToDest <= 20) {
+					robot.openRobotArms();
+				}
+			} else {
 
-		if (testInt == 0) {
-			// TODO
-			robot.rotateRobotLeft(rotationAngle);
-			testInt++;
+			}
 		}
 
 	}
@@ -148,6 +173,10 @@ public class Pathfinding {
 	private double calcLength(NodeObjects first, NodeObjects second) {
 		return Math.sqrt(Math.pow((first.getX() - second.getX()), 2)
 				+ Math.pow((first.getY() - second.getY()), 2));
+	}
+
+	private double calcDifference(double x1, double y1, double x2, double y2) {
+		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 
 	NodeObjects calcMiddleRobotCoord() {
