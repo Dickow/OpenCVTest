@@ -25,8 +25,11 @@ public class TrackbarWindow {
 	private JPanel trackPanel, imgPanel;
 	private JSlider lowerHSlider, upperHSlider, lowerSSlider, upperSSlider,
 			lowerVSlider, upperVSlider;
+	private JSlider lowerHSlider2, upperHSlider2, lowerSSlider2, upperSSlider2,
+			lowerVSlider2, upperVSlider2;
 	private JLabel lowerH, upperH, lowerS, upperS, lowerV, upperV, imgLabel,
 			imgLabel2;
+	private JLabel lowerH2, upperH2, lowerS2, upperS2, lowerV2, upperV2;
 	private ContourTest imageProcess;
 	private SlideListener slideListener = new SlideListener();
 	private boolean imageIsSet = false;
@@ -70,7 +73,6 @@ public class TrackbarWindow {
 		imgPanel = new JPanel(new FlowLayout());
 		frame.getContentPane().add(trackPanel, BorderLayout.SOUTH);
 		frame.getContentPane().add(imgPanel, BorderLayout.CENTER);
-		
 
 		imageProcess = new ContourTest();
 		new Thread(imageProcess).start();
@@ -117,6 +119,49 @@ public class TrackbarWindow {
 		trackPanel.add(lowerVSlider);
 		trackPanel.add(upperV);
 		trackPanel.add(upperVSlider);
+
+		// set the Labels of the blue color find
+		lowerH2 = new JLabel("lower H : " + imageProcess.iLowH2);
+		upperH2 = new JLabel("upper H : " + imageProcess.iHighH2);
+
+		lowerS2 = new JLabel("lower S : " + imageProcess.iLowS2);
+		upperS2 = new JLabel("upper S : " + imageProcess.iHighS2);
+
+		lowerV2 = new JLabel("lower V : " + imageProcess.iLowV2);
+		upperV2 = new JLabel("upper V : " + imageProcess.iHighV2);
+
+		// set the Sliders
+		lowerHSlider2 = new JSlider(0, 255, imageProcess.iLowH2);
+		lowerHSlider2.addChangeListener(slideListener);
+		upperHSlider2 = new JSlider(0, 255, imageProcess.iHighH2);
+		upperHSlider2.addChangeListener(slideListener);
+
+		lowerSSlider2 = new JSlider(0, 255, imageProcess.iLowS2);
+		lowerSSlider2.addChangeListener(slideListener);
+		upperSSlider2 = new JSlider(0, 255, imageProcess.iHighS2);
+		upperSSlider2.addChangeListener(slideListener);
+
+		lowerVSlider2 = new JSlider(0, 255, imageProcess.iLowV2);
+		lowerVSlider2.addChangeListener(slideListener);
+		upperVSlider2 = new JSlider(0, 255, imageProcess.iHighV2);
+		upperVSlider2.addChangeListener(slideListener);
+
+		// add all the components to the panel
+
+		trackPanel.add(lowerH2);
+		trackPanel.add(lowerHSlider2);
+		trackPanel.add(upperH2);
+		trackPanel.add(upperHSlider2);
+
+		trackPanel.add(lowerS2);
+		trackPanel.add(lowerSSlider2);
+		trackPanel.add(upperS2);
+		trackPanel.add(upperSSlider2);
+
+		trackPanel.add(lowerV2);
+		trackPanel.add(lowerVSlider2);
+		trackPanel.add(upperV2);
+		trackPanel.add(upperVSlider2);
 
 		setupTimer();
 
@@ -189,6 +234,38 @@ public class TrackbarWindow {
 			} else if (e.getSource() == upperVSlider) {
 				upperV.setText("upper V : " + upperVSlider.getValue());
 				imageProcess.iHighV = upperVSlider.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			}
+			// second part of the sliders
+			if (e.getSource() == lowerHSlider2) {
+				lowerH2.setText("lower H : " + lowerHSlider2.getValue());
+				imageProcess.iLowH2 = lowerHSlider2.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			} else if (e.getSource() == upperHSlider2) {
+				upperH2.setText("upper H : " + upperHSlider2.getValue());
+				imageProcess.iHighH2 = upperHSlider2.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			} else if (e.getSource() == lowerSSlider2) {
+				lowerS2.setText("lower S : " + lowerSSlider2.getValue());
+				imageProcess.iLowS2 = lowerSSlider2.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			} else if (e.getSource() == upperSSlider2) {
+				upperS2.setText("upper S : " + upperSSlider2.getValue());
+				imageProcess.iHighS2 = upperSSlider2.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			} else if (e.getSource() == lowerVSlider2) {
+				lowerV2.setText("lower V : " + lowerVSlider2.getValue());
+				imageProcess.iLowV2 = lowerVSlider2.getValue();
+				// imgLabel.removeAll();
+				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
+			} else if (e.getSource() == upperVSlider2) {
+				upperV2.setText("upper V : " + upperVSlider2.getValue());
+				imageProcess.iHighV2 = upperVSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			}

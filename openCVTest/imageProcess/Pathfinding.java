@@ -12,7 +12,6 @@ public class Pathfinding {
 	// index of robot points in the objects
 	private int robotFrontIndex;
 	private int robotBackIndex;
-	private int testInt = 0;
 	private boolean gotBall = false;
 	private int calibrating = 0;
 	private double distanceCalibration = 0;
@@ -26,13 +25,20 @@ public class Pathfinding {
 		robotFrontIndex = findFront(objects);
 		robotBackIndex = findBack(objects);
 		// robot coordinates
-		robotFront = objects.get(robotFrontIndex);
-		robotBack = objects.get(robotBackIndex);
+		try {
+			robotFront = objects.get(robotFrontIndex);
+			robotBack = objects.get(robotBackIndex);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return;
+		}
 		robotMiddle = calcMiddleRobotCoord();
 
 		int min_index = findClosestBall(objects);
-		instructRobot(objects.get(min_index));
-
+		try {
+			instructRobot(objects.get(min_index));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return;
+		}
 	}
 
 	/**
@@ -145,7 +151,7 @@ public class Pathfinding {
 
 	int findFront(ArrayList<NodeObjects> objects) {
 		for (int i = 0; i < objects.size(); i++) {
-			if (objects.get(i).getType().equals("FrontRobot")) {
+			if (objects.get(i).getType().equals("robotFront")) {
 				return i;
 			}
 
@@ -155,7 +161,7 @@ public class Pathfinding {
 
 	int findBack(ArrayList<NodeObjects> objects) {
 		for (int i = 0; i < objects.size(); i++) {
-			if (objects.get(i).getType().equals("BackRobot")) {
+			if (objects.get(i).getType().equals("robotBack")) {
 				return i;
 			}
 

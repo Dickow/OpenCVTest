@@ -4,5 +4,5 @@ upperV = 250
 Tennis bold lowerH = 26; upperH = 39; lowerS = 64; upperS = 196; 
 lowerV = 0; upperV = 195;
 
-blue color lowerH = 101; upperH = 138; lowerS = 119;
-upperS = 248; lowerV = 0; upperV = 150;
+blue color lowerH = 96; upperH = 136; lowerS = 173;
+upperS = 255; lowerV = 119; upperV = 255;

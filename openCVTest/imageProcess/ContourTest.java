@@ -6,12 +6,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -21,25 +18,24 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-import com.sun.javafx.geom.Vec2f;
-
 public class ContourTest implements Runnable {
-	// private Pathfinding pathfinder = new Pathfinding();
+	private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
-	public int iLowH = 101;
-	public int iLowH2 = 127;
+
+	public int iLowH = 0;
+	public int iLowH2 = 133;
 
 	public int iHighH = 138;
 	public int iHighH2 = 255;
 
-	public int iLowS = 39;
-	public int iLowS2 = 39;
+	public int iLowS = 173;
+	public int iLowS2 = 145;
 
 	public int iHighS = 255;
 	public int iHighS2 = 255;
 
 	public int iLowV = 119;
-	public int iLowV2 = 119;
+	public int iLowV2 = 51;
 
 	public int iHighV = 255;
 	public int iHighV2 = 255;
@@ -55,7 +51,7 @@ public class ContourTest implements Runnable {
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(1);
+		VideoCapture videoCapture = new VideoCapture(0);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
@@ -105,14 +101,14 @@ public class ContourTest implements Runnable {
 				// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 			}
-			// drawApproxLines();
+			// drawApproxLines(); TODO
 
 			/*
 			 * Find the circles in the image
 			 */
 			Mat circles = new Mat();
 			Imgproc.HoughCircles(imageBlurr, circles,
-					Imgproc.CV_HOUGH_GRADIENT, 1, 10, 200, 10, 0, 10);
+					Imgproc.CV_HOUGH_GRADIENT, 1, 50, 200, 10, 0, 10);
 
 			if (!circles.empty()) {
 				int radius;
@@ -173,7 +169,7 @@ public class ContourTest implements Runnable {
 
 			Core.inRange(imgHSV, new Scalar(iLowH2, iLowS2, iLowV2),
 					new Scalar(iHighH2, iHighS2, iHighV2), imgThresholded2);
-			
+
 			// check for both the front and back of the robot.
 			for (int j = 0; j < robotMats.length; j++) {
 
@@ -204,12 +200,10 @@ public class ContourTest implements Runnable {
 				// if the area <= 10000, I consider that the there are no object
 				// in
 				// the image and it's because of the noise, the area is not zero
-				if (dArea > 100) {
+				if (dArea > 50) {
 					// calculate the position of the ball
 					double posX = dM10 / dArea;
 					double posY = dM01 / dArea;
-					// System.out.println("posX = " + posX);
-					// System.out.println("posY = " + posY);
 					Core.circle(image, new Point(posX, posY), (int) Math
 							.sqrt(dArea / 3.14), new Scalar(255, 255, 255));
 					// add the robot objects to the ArrayList for pathfinding
@@ -228,7 +222,9 @@ public class ContourTest implements Runnable {
 					System.out.println(objects.get(i).toString());
 				}
 				System.out.println("*****************************************");
-				// pathfinder.run(objects);
+				if (objects.size() > 0) {
+					pathfinder.run(objects);
+				}
 			}
 		}
 
