@@ -2,6 +2,7 @@ package imageProcess;
 
 import geometry.Vector;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import robotCommunication.BTConnector;
@@ -187,10 +188,13 @@ public class Pathfinding {
 
 	NodeObjects calcMiddleRobotCoord() {
 
+
 		double x = robotFront.getX() - robotBack.getX();
 		double y = robotFront.getY() - robotBack.getY();
 
 		return new NodeObjects(x, y, "MiddleRobot");
 	}
 
+
+	
 }

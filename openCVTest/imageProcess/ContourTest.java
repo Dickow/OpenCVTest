@@ -19,7 +19,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 public class ContourTest implements Runnable {
-	private Pathfinding pathfinder = new Pathfinding();
+	//private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
 
 	public int iLowH = 0;
@@ -67,7 +67,7 @@ public class ContourTest implements Runnable {
 			Highgui.imwrite("cameraInput.jpg", frame);
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			image = Highgui.imread("cameraInput.jpg");
+			image = Highgui.imread("cameraTest2.jpg");
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
@@ -79,7 +79,7 @@ public class ContourTest implements Runnable {
 			 * Find the lines representing the edge of the field
 			 */
 
-			Mat src = Highgui.imread("cameraInput.jpg", 0);
+			Mat src = Highgui.imread("cameraTest2.jpg", 0);
 			Mat dst = new Mat();
 			// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
 			// Highgui.imwrite("wtf1.jpg",dst);
@@ -108,7 +108,7 @@ public class ContourTest implements Runnable {
 			 */
 			Mat circles = new Mat();
 			Imgproc.HoughCircles(imageBlurr, circles,
-					Imgproc.CV_HOUGH_GRADIENT, 1, 50, 200, 10, 0, 10);
+					Imgproc.CV_HOUGH_GRADIENT, 1, 50, 200, 50, 5, 10);
 
 			if (!circles.empty()) {
 				int radius;
@@ -150,7 +150,7 @@ public class ContourTest implements Runnable {
 
 			// find the robot with color scan
 
-			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
+			Mat imgOriginal = Highgui.imread("cameraTest2.jpg");
 
 			Mat imgHSV = new Mat();
 
@@ -223,7 +223,7 @@ public class ContourTest implements Runnable {
 				}
 				System.out.println("*****************************************");
 				if (objects.size() > 0) {
-					pathfinder.run(objects);
+					//pathfinder.run(objects);
 				}
 			}
 		}
