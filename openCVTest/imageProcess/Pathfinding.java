@@ -132,7 +132,7 @@ public class Pathfinding {
 					}
 				} else if (lengthToDest > 20) {
 					// calculate how many degrees the motor should be rotated
-					robot.robotForward(lengthToDest/distanceCalibration);
+					robot.robotForward(lengthToDest / distanceCalibration);
 				} else if (lengthToDest <= 20) {
 					robot.openRobotArms();
 				}

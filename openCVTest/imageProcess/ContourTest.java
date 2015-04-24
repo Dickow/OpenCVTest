@@ -1,5 +1,7 @@
 package imageProcess;
 
+import imageProcess.NodeObjects;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -22,16 +24,25 @@ import org.opencv.imgproc.Moments;
 import com.sun.javafx.geom.Vec2f;
 
 public class ContourTest implements Runnable {
-	//private Pathfinding pathfinder = new Pathfinding();
+	// private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
-	public int iLowH = 29;
-	public int iHighH = 62;
+	public int iLowH = 101;
+	public int iLowH2 = 127;
 
-	public int iLowS = 41;
-	public int iHighS = 145;
+	public int iHighH = 138;
+	public int iHighH2 = 255;
 
-	public int iLowV = 112;
-	public int iHighV = 200;
+	public int iLowS = 39;
+	public int iLowS2 = 39;
+
+	public int iHighS = 255;
+	public int iHighS2 = 255;
+
+	public int iLowV = 119;
+	public int iLowV2 = 119;
+
+	public int iHighV = 255;
+	public int iHighV2 = 255;
 
 	public Image outImg, outImg2;
 
@@ -94,7 +105,7 @@ public class ContourTest implements Runnable {
 				// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 			}
-			drawApproxLines();
+			// drawApproxLines();
 
 			/*
 			 * Find the circles in the image
@@ -122,82 +133,104 @@ public class ContourTest implements Runnable {
 							.round(coordinate[1]), "ball"));
 				}
 			}
-			
+
 			// add the robot for testing
-//			objects.add(new NodeObjects(500, 300, "FrontRobot"));
-//			objects.add(new NodeObjects(500, 340, "BackRobot"));
-//			Core.circle(image, new Point(500, 300),
-//					(int) Math.sqrt(49),
-//					new Scalar(255, 255, 255));
-//			Core.circle(image, new Point(500, 340),
-//					(int) Math.sqrt(49),
-//					new Scalar(255, 255, 255));
-//			
-//			// draw a test triangle delete when done TODO
-//			Core.line(image, new Point(500,300), new Point(190, 49), new Scalar(255,255,0));
-//			Core.line(image, new Point(500,300), new Point(500, 320), new Scalar(255,255,0));
-//			Core.line(image, new Point(500,320), new Point(190, 49), new Scalar(255,255,0));
-			
+			// objects.add(new NodeObjects(500, 300, "FrontRobot"));
+			// objects.add(new NodeObjects(500, 340, "BackRobot"));
+			// Core.circle(image, new Point(500, 300),
+			// (int) Math.sqrt(49),
+			// new Scalar(255, 255, 255));
+			// Core.circle(image, new Point(500, 340),
+			// (int) Math.sqrt(49),
+			// new Scalar(255, 255, 255));
+			//
+			// // draw a test triangle delete when done TODO
+			// Core.line(image, new Point(500,300), new Point(190, 49), new
+			// Scalar(255,255,0));
+			// Core.line(image, new Point(500,300), new Point(500, 320), new
+			// Scalar(255,255,0));
+			// Core.line(image, new Point(500,320), new Point(190, 49), new
+			// Scalar(255,255,0));
+
 			// find the robot with color scan
 
 			Mat imgOriginal = Highgui.imread("cameraInput.jpg");
 
 			Mat imgHSV = new Mat();
 
+			Mat[] robotMats = new Mat[2];
+
 			Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
 
+			// we have two parts of the robot we want to find
 			Mat imgThresholded = new Mat();
+			Mat imgThresholded2 = new Mat();
+			robotMats[0] = imgThresholded;
+			robotMats[1] = imgThresholded2;
 
 			Core.inRange(imgHSV, new Scalar(iLowH, iLowS, iLowV), new Scalar(
 					iHighH, iHighS, iHighV), imgThresholded);
 
-			// morphological opening (removes small objects from the foreground)
-			Imgproc.erode(imgThresholded, imgThresholded, Imgproc
-					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
-							new Size(5, 5)));
-			Imgproc.dilate(imgThresholded, imgThresholded, Imgproc
-					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
-							new Size(5, 5)));
+			Core.inRange(imgHSV, new Scalar(iLowH2, iLowS2, iLowV2),
+					new Scalar(iHighH2, iHighS2, iHighV2), imgThresholded2);
+			
+			// check for both the front and back of the robot.
+			for (int j = 0; j < robotMats.length; j++) {
 
-			// morphological closing (removes small holes from the foreground)
-			Imgproc.erode(imgThresholded, imgThresholded, Imgproc
-					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
-							new Size(5, 5)));
-			Imgproc.dilate(imgThresholded, imgThresholded, Imgproc
-					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
-							new Size(5, 5)));
+				// morphological opening (removes small objects from the
+				// foreground)
+				Imgproc.erode(robotMats[j], robotMats[j], Imgproc
+						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
+								5, 5)));
+				Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
+						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
+								5, 5)));
 
-			Moments oMoments = Imgproc.moments(imgThresholded, true);
+				// morphological closing (removes small holes from the
+				// foreground)
+				Imgproc.erode(robotMats[j], robotMats[j], Imgproc
+						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
+								5, 5)));
+				Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
+						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
+								5, 5)));
 
-			double dM01 = oMoments.get_m01();
-			double dM10 = oMoments.get_m10();
-			double dArea = oMoments.get_m00();
+				Moments oMoments = Imgproc.moments(robotMats[j], true);
 
-			// if the area <= 10000, I consider that the there are no object in
-			// the image and it's because of the noise, the area is not zero
-			if (dArea > 100) {
-				// calculate the position of the ball
-				double posX = dM10 / dArea;
-				double posY = dM01 / dArea;
-				// System.out.println("posX = " + posX);
-				// System.out.println("posY = " + posY);
-				Core.circle(image, new Point(posX, posY),
-						(int) Math.sqrt(dArea / 3.14),
-						new Scalar(255, 255, 255));
-				objects.add(new NodeObjects(posX, posY, "robotFront"));
+				double dM01 = oMoments.get_m01();
+				double dM10 = oMoments.get_m10();
+				double dArea = oMoments.get_m00();
+
+				// if the area <= 10000, I consider that the there are no object
+				// in
+				// the image and it's because of the noise, the area is not zero
+				if (dArea > 100) {
+					// calculate the position of the ball
+					double posX = dM10 / dArea;
+					double posY = dM01 / dArea;
+					// System.out.println("posX = " + posX);
+					// System.out.println("posY = " + posY);
+					Core.circle(image, new Point(posX, posY), (int) Math
+							.sqrt(dArea / 3.14), new Scalar(255, 255, 255));
+					// add the robot objects to the ArrayList for pathfinding
+					if (j == 0) {
+						objects.add(new NodeObjects(posX, posY, "robotBack"));
+					} else {
+						objects.add(new NodeObjects(posX, posY, "robotFront"));
+					}
+				}
+
+				// convert to buffered image to show on the screen
+				outImg2 = toBufferedImage(image);
+				outImg = toBufferedImage(robotMats[j]);
+
+				for (int i = 0; i < objects.size(); i++) {
+					System.out.println(objects.get(i).toString());
+				}
+				System.out.println("*****************************************");
+				// pathfinder.run(objects);
 			}
-
-			// convert to buffered image to show on the screen
-			outImg2 = toBufferedImage(image);
-			outImg = toBufferedImage(imgThresholded);
-
-			for (int i = 0; i < objects.size(); i++) {
-				System.out.println(objects.get(i).toString());
-			}
-			System.out.println("*****************************************");
-			//pathfinder.run(objects);
 		}
-		
 
 	}
 
@@ -294,13 +327,16 @@ public class ContourTest implements Runnable {
 		x /= count;
 		y /= count;
 		lineBottomRight = new Point(x, y);
-		
-		// add the corners to the list of objects that we have to take into consideration
+
+		// add the corners to the list of objects that we have to take into
+		// consideration
 		objects.add(new NodeObjects(lineTopLeft.x, lineTopLeft.y, "LinePoint"));
 		objects.add(new NodeObjects(lineTopRight.x, lineTopRight.y, "LinePoint"));
-		objects.add(new NodeObjects(lineBottomLeft.x, lineBottomLeft.y, "LinePoint"));
-		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y, "LinePoint"));
-		
+		objects.add(new NodeObjects(lineBottomLeft.x, lineBottomLeft.y,
+				"LinePoint"));
+		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y,
+				"LinePoint"));
+
 		// draw lines
 		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
 		Core.line(image, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
