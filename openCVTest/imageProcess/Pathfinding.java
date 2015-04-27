@@ -67,29 +67,6 @@ public class Pathfinding {
 
 	private double findRotationAngle(NodeObjects robotFront,
 			NodeObjects robotMiddle, NodeObjects dest) {
-		//
-		// // define the lenghts needed to calculate the angle
-		// double frontToMiddle, middleToBall, frontToBall;
-		// frontToMiddle = calcLength(robotFront, robotMiddle);
-		// middleToBall = calcLength(robotMiddle, dest);
-		// frontToBall = calcLength(robotFront, dest);
-		// /*
-		// * frontToMiddle = c middleToBall = b frontToBall = a
-		// */
-		// double a = frontToBall;
-		// double b = middleToBall;
-		// double c = frontToMiddle;
-		//
-		// // the angles in the triangle
-		// double A, B, C;
-		//
-		// // TODO figure out which one of the angles is the right one
-		// A = Math.acos((b * b + c * c - a * a) / (2.0 * b * c)) * 180 /
-		// Math.PI;
-		// B = Math.asin((Math.sin(Math.toRadians(A)) * c) / b);
-		// C = 180 - (A + B);
-		//
-		// return A;
 
 		Vector vector1 = new Vector(robotFront.getX() - dest.getX(),
 				robotFront.getY() - dest.getY());
@@ -119,16 +96,9 @@ public class Pathfinding {
 		double rotationAngle = findRotationAngle(robotFront, robotMiddle, dest);
 		// if the rotation angle is very small we need not rotate the robot
 		double lengthToDest = calcLength(robotFront, dest);
-		if (calibrating == 0) {
-			xCalibration = robotFront.getX();
-			yCalibration = robotFront.getY();
-			robot.robotCalibrate();
-			calibrating++;
-		} else if (calibrating == 1) {
-			distanceCalibration = calcDifference(xCalibration, yCalibration,
-					robotFront.getX(), robotFront.getY());
-			calibrating++;
-		} else {
+		double frontToBackDistance = calcLength(robotFront, robotBack);
+
+		if (calibratingDone()) {
 			if (!gotBall) {
 				// sequence to get to ball
 				if (rotationAngle > 4) {
@@ -139,9 +109,15 @@ public class Pathfinding {
 					}
 				} else if (lengthToDest > 20) {
 					// calculate how many degrees the motor should be rotated
-					robot.robotForward(lengthToDest / distanceCalibration);
-				} else if (lengthToDest <= 20) {
+					// use a relative less distance, which is the distance
+					// between front and back of robot divided by 2
+					robot.robotForward((lengthToDest - frontToBackDistance / 2)
+							/ distanceCalibration);
+				}
+				/* we are just assuming we catched the ball could be optimized */
+				else if (lengthToDest <= frontToBackDistance / 2) {
 					robot.openRobotArms();
+					gotBall = true;
 				}
 			} else {
 
@@ -188,13 +164,33 @@ public class Pathfinding {
 
 	NodeObjects calcMiddleRobotCoord() {
 
-
 		double x = robotFront.getX() - robotBack.getX();
 		double y = robotFront.getY() - robotBack.getY();
 
 		return new NodeObjects(x, y, "MiddleRobot");
 	}
 
+	/**
+	 * calibrate the robot to find out how much the motors should be rotated.
+	 * return false if it's not done, true if it is done
+	 * 
+	 * @return boolean
+	 */
+	private boolean calibratingDone() {
+		if (calibrating == 0) {
+			xCalibration = robotFront.getX();
+			yCalibration = robotFront.getY();
+			robot.robotCalibrate();
+			calibrating++;
+			return false;
+		} else if (calibrating == 1) {
+			distanceCalibration = calcDifference(xCalibration, yCalibration,
+					robotFront.getX(), robotFront.getY());
+			calibrating++;
+			return true;
+		} else {
+			return true;
+		}
+	}
 
-	
 }

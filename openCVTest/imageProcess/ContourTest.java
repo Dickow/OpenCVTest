@@ -19,7 +19,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 public class ContourTest implements Runnable {
-	//private Pathfinding pathfinder = new Pathfinding();
+	// private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
 
 	public int iLowH = 0;
@@ -75,60 +75,9 @@ public class ContourTest implements Runnable {
 			Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
 
-			/*
-			 * Find the lines representing the edge of the field
-			 */
+			identifyLines();
 
-			Mat src = Highgui.imread("cameraTest2.jpg", 0);
-			Mat dst = new Mat();
-			// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
-			// Highgui.imwrite("wtf1.jpg",dst);
-			Imgproc.cvtColor(src, dst, Imgproc.COLOR_GRAY2BGR);
-			Highgui.imwrite("wtf2.jpg", dst);
-			Imgproc.Canny(dst, dst, 50, 200, 3, false);
-
-			Mat lines = new Mat();
-
-			Imgproc.HoughLinesP(dst, lines, 1, Math.PI / 180, 50, 360, 350);
-
-			for (int x = 0; x < lines.cols(); x++) {
-				double[] vec = lines.get(0, x);
-				double x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
-				Point start = new Point(x1, y1);
-				Point end = new Point(x2, y2);
-				lineCoordinates.add(start);
-				lineCoordinates.add(end);
-				// Core.line(image, start, end, new Scalar(255,0,0), 3);
-
-			}
-			// drawApproxLines(); TODO
-
-			/*
-			 * Find the circles in the image
-			 */
-			Mat circles = new Mat();
-			Imgproc.HoughCircles(imageBlurr, circles,
-					Imgproc.CV_HOUGH_GRADIENT, 1, 50, 200, 50, 5, 10);
-
-			if (!circles.empty()) {
-				int radius;
-				Point pt;
-
-				for (int i = 0; i <= circles.cols(); i++) {
-
-					double[] coordinate = circles.get(0, i);
-					if (coordinate == null) {
-						break;
-					}
-					pt = new Point(Math.round(coordinate[0]),
-							Math.round(coordinate[1]));
-					radius = (int) Math.round(coordinate[2]);
-
-					Core.circle(image, pt, radius, new Scalar(0, 0, 0));
-					objects.add(new NodeObjects(Math.round(coordinate[0]), Math
-							.round(coordinate[1]), "ball"));
-				}
-			}
+			findBallsInImage(imageBlurr);
 
 			// add the robot for testing
 			// objects.add(new NodeObjects(500, 300, "FrontRobot"));
@@ -148,86 +97,149 @@ public class ContourTest implements Runnable {
 			// Core.line(image, new Point(500,320), new Point(190, 49), new
 			// Scalar(255,255,0));
 
-			// find the robot with color scan
+			findRobotFrontAndBack();
 
-			Mat imgOriginal = Highgui.imread("cameraTest2.jpg");
+			if (objects.size() > 0) {
+				// pathfinder.run(objects);
+			}
 
-			Mat imgHSV = new Mat();
+		}
 
-			Mat[] robotMats = new Mat[2];
+	}
 
-			Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
+	private void findRobotFrontAndBack() {
+		// find the robot with color scan
 
-			// we have two parts of the robot we want to find
-			Mat imgThresholded = new Mat();
-			Mat imgThresholded2 = new Mat();
-			robotMats[0] = imgThresholded;
-			robotMats[1] = imgThresholded2;
+		Mat imgOriginal = Highgui.imread("cameraTest2.jpg");
 
-			Core.inRange(imgHSV, new Scalar(iLowH, iLowS, iLowV), new Scalar(
-					iHighH, iHighS, iHighV), imgThresholded);
+		Mat imgHSV = new Mat();
 
-			Core.inRange(imgHSV, new Scalar(iLowH2, iLowS2, iLowV2),
-					new Scalar(iHighH2, iHighS2, iHighV2), imgThresholded2);
+		Mat[] robotMats = new Mat[2];
 
-			// check for both the front and back of the robot.
-			for (int j = 0; j < robotMats.length; j++) {
+		Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
 
-				// morphological opening (removes small objects from the
-				// foreground)
-				Imgproc.erode(robotMats[j], robotMats[j], Imgproc
-						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
-								5, 5)));
-				Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
-						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
-								5, 5)));
+		// we have two parts of the robot we want to find
+		Mat imgThresholded = new Mat();
+		Mat imgThresholded2 = new Mat();
+		robotMats[0] = imgThresholded;
+		robotMats[1] = imgThresholded2;
 
-				// morphological closing (removes small holes from the
-				// foreground)
-				Imgproc.erode(robotMats[j], robotMats[j], Imgproc
-						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
-								5, 5)));
-				Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
-						.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(
-								5, 5)));
+		Core.inRange(imgHSV, new Scalar(iLowH, iLowS, iLowV), new Scalar(
+				iHighH, iHighS, iHighV), imgThresholded);
 
-				Moments oMoments = Imgproc.moments(robotMats[j], true);
+		Core.inRange(imgHSV, new Scalar(iLowH2, iLowS2, iLowV2), new Scalar(
+				iHighH2, iHighS2, iHighV2), imgThresholded2);
 
-				double dM01 = oMoments.get_m01();
-				double dM10 = oMoments.get_m10();
-				double dArea = oMoments.get_m00();
+		// check for both the front and back of the robot.
+		for (int j = 0; j < robotMats.length; j++) {
 
-				// if the area <= 10000, I consider that the there are no object
-				// in
-				// the image and it's because of the noise, the area is not zero
-				if (dArea > 50) {
-					// calculate the position of the ball
-					double posX = dM10 / dArea;
-					double posY = dM01 / dArea;
-					Core.circle(image, new Point(posX, posY), (int) Math
-							.sqrt(dArea / 3.14), new Scalar(255, 255, 255));
-					// add the robot objects to the ArrayList for pathfinding
-					if (j == 0) {
-						objects.add(new NodeObjects(posX, posY, "robotBack"));
-					} else {
-						objects.add(new NodeObjects(posX, posY, "robotFront"));
-					}
-				}
+			// morphological opening (removes small objects from the
+			// foreground)
+			Imgproc.erode(robotMats[j], robotMats[j], Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+			Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
 
-				// convert to buffered image to show on the screen
-				outImg2 = toBufferedImage(image);
-				outImg = toBufferedImage(robotMats[j]);
+			// morphological closing (removes small holes from the
+			// foreground)
+			Imgproc.erode(robotMats[j], robotMats[j], Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
+			Imgproc.dilate(robotMats[j], robotMats[j], Imgproc
+					.getStructuringElement(Imgproc.MORPH_ELLIPSE,
+							new Size(5, 5)));
 
-				for (int i = 0; i < objects.size(); i++) {
-					System.out.println(objects.get(i).toString());
-				}
-				System.out.println("*****************************************");
-				if (objects.size() > 0) {
-					//pathfinder.run(objects);
+			Moments oMoments = Imgproc.moments(robotMats[j], true);
+
+			double dM01 = oMoments.get_m01();
+			double dM10 = oMoments.get_m10();
+			double dArea = oMoments.get_m00();
+
+			// if the area <= 10000, I consider that the there are no object
+			// in
+			// the image and it's because of the noise, the area is not zero
+			if (dArea > 50) {
+				// calculate the position of the ball
+				double posX = dM10 / dArea;
+				double posY = dM01 / dArea;
+				Core.circle(image, new Point(posX, posY),
+						(int) Math.sqrt(dArea / 3.14),
+						new Scalar(255, 255, 255));
+				// add the robot objects to the ArrayList for pathfinding
+				if (j == 0) {
+					objects.add(new NodeObjects(posX, posY, "robotBack"));
+				} else {
+					objects.add(new NodeObjects(posX, posY, "robotFront"));
 				}
 			}
 		}
+		// assemble the 2 robot findings into 1 Mat.
+		// convert this Mat to an Image
+		robotMats[0].copyTo(robotMats[1], robotMats[0]);
+		// convert to buffered image to show on the screen
+		outImg2 = toBufferedImage(image);
+		outImg = toBufferedImage(robotMats[1]);
+	}
 
+	private void findBallsInImage(Mat imageBlurr) {
+		/*
+		 * Find the circles in the image
+		 */
+		Mat circles = new Mat();
+		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
+				50, 200, 50, 5, 10);
+
+		if (!circles.empty()) {
+			int radius;
+			Point pt;
+
+			for (int i = 0; i <= circles.cols(); i++) {
+
+				double[] coordinate = circles.get(0, i);
+				if (coordinate == null) {
+					break;
+				}
+				pt = new Point(Math.round(coordinate[0]),
+						Math.round(coordinate[1]));
+				radius = (int) Math.round(coordinate[2]);
+
+				Core.circle(image, pt, radius, new Scalar(0, 0, 0));
+				objects.add(new NodeObjects(Math.round(coordinate[0]), Math
+						.round(coordinate[1]), "ball"));
+			}
+		}
+	}
+
+	private void identifyLines() {
+		/*
+		 * Find the lines representing the edge of the field
+		 */
+
+		Mat src = Highgui.imread("cameraTest2.jpg", 0);
+		Mat dst = new Mat();
+		// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
+		// Highgui.imwrite("wtf1.jpg",dst);
+		Imgproc.cvtColor(src, dst, Imgproc.COLOR_GRAY2BGR);
+		Highgui.imwrite("wtf2.jpg", dst);
+		Imgproc.Canny(dst, dst, 50, 200, 3, false);
+
+		Mat lines = new Mat();
+
+		Imgproc.HoughLinesP(dst, lines, 1, Math.PI / 180, 50, 360, 350);
+
+		for (int x = 0; x < lines.cols(); x++) {
+			double[] vec = lines.get(0, x);
+			double x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
+			Point start = new Point(x1, y1);
+			Point end = new Point(x2, y2);
+			lineCoordinates.add(start);
+			lineCoordinates.add(end);
+			// Core.line(image, start, end, new Scalar(255,0,0), 3);
+
+		}
+		//drawApproxLines();
 	}
 
 	/**
