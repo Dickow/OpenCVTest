@@ -104,8 +104,11 @@ public class Pathfinding {
 				if (rotationAngle > 4) {
 					if (dest.getX() - robotFront.getX() < 0) {
 						robot.rotateRobotLeft(rotationAngle);
+						System.out.println("rotating left " + rotationAngle);
+						
 					} else {
 						robot.rotateRobotRight(rotationAngle);
+						System.out.println("rotating right " + rotationAngle);
 					}
 				} else if (lengthToDest > 20) {
 					// calculate how many degrees the motor should be rotated

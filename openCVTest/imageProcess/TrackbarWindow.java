@@ -178,7 +178,7 @@ public class TrackbarWindow {
 					imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 					imgLabel2.removeAll();
 					imgLabel2.setIcon(new ImageIcon(imageProcess.outImg2));
-					System.out.println("input image");
+					//System.out.println("input image");
 				} else {
 					try {
 						if (!imageIsSet) {
