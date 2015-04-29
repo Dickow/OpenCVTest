@@ -1,5 +1,6 @@
 package robotCommunication;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -8,9 +9,11 @@ import lejos.pc.comm.NXTConnector;
 
 public class BTConnector {
 	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
-			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9;
+			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
+			FINISHED = 10;
 	private NXTConnector conn;
 	private DataOutputStream dos;
+	private DataInputStream din;
 
 	/**
 	 * create a new BTConnector, it creates a connection to the nxt device use
@@ -42,6 +45,7 @@ public class BTConnector {
 			System.exit(1);
 		}
 		dos = new DataOutputStream(conn.getOutputStream());
+		din = new DataInputStream(conn.getInputStream());
 
 	}
 
@@ -55,7 +59,7 @@ public class BTConnector {
 			dos.writeInt(TURNRIGHT);
 			dos.writeInt((int) angle);
 			dos.flush();
-
+			waitForRobot();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -72,7 +76,7 @@ public class BTConnector {
 			dos.writeInt(TURNLEFT);
 			dos.writeInt((int) angle);
 			dos.flush();
-
+			waitForRobot();
 			System.out.println("written to robot");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -91,7 +95,8 @@ public class BTConnector {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(distance);
 			dos.flush();
-			
+
+			waitForRobot();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,7 +112,7 @@ public class BTConnector {
 			dos.writeInt(BACKWARDS);
 			dos.writeDouble(distance);
 			dos.flush();
-			
+			waitForRobot();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -120,6 +125,7 @@ public class BTConnector {
 		try {
 			dos.writeInt(OPEN);
 			dos.flush();
+			waitForRobot();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -133,6 +139,7 @@ public class BTConnector {
 		try {
 			dos.writeInt(CLOSE);
 			dos.flush();
+			waitForRobot();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -145,13 +152,24 @@ public class BTConnector {
 	public void deliverBall() {
 
 	}
-	
-	public void robotCalibrate(){
-		try{
+
+	public void robotCalibrate() {
+		try {
 			dos.writeInt(CALIBRATE);
-			dos.flush(); 
-		}catch(IOException e){
+			dos.flush();
+			waitForRobot();
+		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void waitForRobot() {
+		try {
+			while (din.readInt() != FINISHED) {
+
+			}
+		} catch (IOException e) {
+			System.out.println("Why did we end up here????!?!?!?!??!");
 		}
 	}
 }

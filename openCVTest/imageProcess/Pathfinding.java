@@ -17,7 +17,7 @@ public class Pathfinding {
 	private int calibrating = 0;
 	private double distanceCalibration = 0;
 	private double xCalibration, yCalibration;
-	// coordinate of the middle of the robot
+	// coordinates of the middle of the robot
 	private NodeObjects robotMiddle;
 	private NodeObjects robotFront;
 	private NodeObjects robotBack;
@@ -33,8 +33,11 @@ public class Pathfinding {
 			return;
 		}
 		robotMiddle = calcMiddleRobotCoord();
-
+		
+		System.out.println(robotFront.toString());
+		System.out.println(robotBack.toString());
 		int min_index = findClosestBall(objects);
+		if(min_index == -1){return;}
 		try {
 			instructRobot(objects.get(min_index));
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -53,25 +56,24 @@ public class Pathfinding {
 
 		for (int i = 0; i < objects.size(); i++) {
 			if (objects.get(i).getType().equals("ball")) {
-				if (min_index == -1) {
-					min_index = i;
-				} else if ((tmpLength = calcLength(objects.get(i),
+				 if ((tmpLength = calcLength(objects.get(i),
 						objects.get(robotFrontIndex))) < min_length) {
 					min_length = tmpLength;
 					min_index = i;
 				}
 			}
 		}
+		System.out.println(objects.get(min_index).toString());
 		return min_index;
 	}
 
 	private double findRotationAngle(NodeObjects robotFront,
 			NodeObjects robotMiddle, NodeObjects dest) {
 
-		Vector vector1 = new Vector(robotFront.getX() - dest.getX(),
-				robotFront.getY() - dest.getY());
-		Vector vector2 = new Vector(robotMiddle.getX() - dest.getX(),
-				robotMiddle.getY() - dest.getY());
+		Vector vector1 = new Vector(robotFront.getX() - robotMiddle.getX(),
+				robotFront.getY() - robotMiddle.getY());
+		Vector vector2 = new Vector(dest.getX()-robotMiddle.getX(),
+				dest.getY()-robotMiddle.getY());
 
 		double ang = Math
 				.toDegrees(Math.acos((vector1.dX * vector2.dX + vector1.dY
@@ -79,7 +81,7 @@ public class Pathfinding {
 						/ (Math.sqrt(Math.pow(vector1.dX, 2)
 								+ Math.pow(vector1.dY, 2)) * Math.sqrt(Math
 								.pow(vector2.dX, 2) + Math.pow(vector2.dY, 2)))));
-		return 180 - ang;
+		return ang;
 
 	}
 
@@ -101,15 +103,10 @@ public class Pathfinding {
 		if (calibratingDone()) {
 			if (!gotBall) {
 				// sequence to get to ball
-				if (rotationAngle > 4) {
-					if (dest.getX() - robotFront.getX() < 0) {
-						robot.rotateRobotLeft(rotationAngle);
-						System.out.println("rotating left " + rotationAngle);
-						
-					} else {
-						robot.rotateRobotRight(rotationAngle);
-						System.out.println("rotating right " + rotationAngle);
-					}
+				if (rotationAngle > 2 || rotationAngle < 2) {
+					// insert function to rotate robot
+					rotateRobot(rotationAngle, dest);
+					
 				} else if (lengthToDest > 20) {
 					// calculate how many degrees the motor should be rotated
 					// use a relative less distance, which is the distance
@@ -194,6 +191,42 @@ public class Pathfinding {
 		} else {
 			return true;
 		}
+	}
+	
+	private void rotateRobot(double rotationAngle, NodeObjects dest){
+		
+		if(robotFront.getY() < dest.getY()){
+			if(dest.getX()-robotFront.getX() > 0){
+				robot.rotateRobotRight(rotationAngle);
+			}else if(dest.getX() - robotFront.getX() < 0){
+				robot.rotateRobotLeft(rotationAngle);
+			}
+		}
+		else if(robotFront.getY() > dest.getY()){
+			if(dest.getX() - robotFront.getX() > 0){
+				robot.rotateRobotLeft(rotationAngle);
+			}else if(dest.getX() - robotFront.getX() < 0){
+				robot.rotateRobotRight(rotationAngle);
+			}
+		}
+		else if(robotFront.getY() == dest.getY()){
+			if(dest.getX() - robotFront.getX() > 0){
+				if(robotFront.getY() < robotMiddle.getY()){
+					robot.rotateRobotRight(rotationAngle);
+				}else{
+					robot.rotateRobotLeft(rotationAngle);
+				}
+			}else{
+				if(robotFront.getY() < robotMiddle.getY()){
+					robot.rotateRobotLeft(rotationAngle);
+				}else{
+					robot.rotateRobotRight(rotationAngle);
+				}
+			}
+		}else if(robotFront.getY() == dest.getY() && robotFront.getY() == robotMiddle.getY()){
+			robot.rotateRobotLeft(rotationAngle);
+		}
+		
 	}
 
 }

@@ -169,9 +169,9 @@ public class ContourTest implements Runnable {
 						new Scalar(255, 255, 255));
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-					objects.add(new NodeObjects(posX, posY, "robotBack"));
-				} else {
 					objects.add(new NodeObjects(posX, posY, "robotFront"));
+				} else {
+					objects.add(new NodeObjects(posX, posY, "robotBack"));
 				}
 			}
 		}
