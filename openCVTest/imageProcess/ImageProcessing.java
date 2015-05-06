@@ -18,8 +18,8 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-public class ContourTest implements Runnable {
-	private Pathfinding pathfinder = new Pathfinding();
+public class ImageProcessing implements Runnable {
+	private PathFinding2 pathfinder = new PathFinding2();
 	public int ballSize = 5;
 
 	public int iLowH = 0;
@@ -44,7 +44,7 @@ public class ContourTest implements Runnable {
 
 	public ArrayList<NodeObjects> objects;
 	public ArrayList<Point> lineCoordinates;
-	private Mat image;
+	private Mat origImage, copyImage = null;
 
 	public void run() {
 
@@ -62,17 +62,21 @@ public class ContourTest implements Runnable {
 		while (true) {
 			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
-
+			
 			videoCapture.read(frame);
-			Highgui.imwrite("cameraInput.jpg", frame);
-
+			//Highgui.imwrite("cameraInput.jpg", frame);
+			
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			image = Highgui.imread("cameraInput.jpg");
-			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
-			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
+			//image = Highgui.imread("cameraInput.jpg");
+			origImage = frame; 
+			// copy the original to the copy
+			origImage.copyTo(copyImage);
+			
+			Mat imageHSV = new Mat(origImage.size(), Core.DEPTH_MASK_8U);
+			Mat imageBlurr = new Mat(origImage.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
-			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
-			Highgui.imwrite("gray.jpg", imageHSV);
+			Imgproc.cvtColor(origImage, imageHSV, Imgproc.COLOR_BGR2GRAY);
+			//Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
 
 			identifyLines();
@@ -85,10 +89,10 @@ public class ContourTest implements Runnable {
 			}catch(Exception e){
 				// do nothing
 			}
-			outImg2 = toBufferedImage(image);
+			outImg2 = toBufferedImage(origImage);
 
 			if (objects.size() > 0) {
-				pathfinder.run(objects);
+				pathfinder.findPath(objects);
 			}
 
 		}
@@ -97,14 +101,12 @@ public class ContourTest implements Runnable {
 
 	private void findRobotFrontAndBack() {
 		// find the robot with color scan
-
-		Mat imgOriginal = Highgui.imread("cameraInput.jpg");
-
+		
 		Mat imgHSV = new Mat();
 
 		Mat[] robotMats = new Mat[2];
 
-		Imgproc.cvtColor(imgOriginal, imgHSV, Imgproc.COLOR_BGR2HSV);
+		Imgproc.cvtColor(copyImage, imgHSV, Imgproc.COLOR_BGR2HSV);
 
 		// we have two parts of the robot we want to find
 		Mat imgThresholded = new Mat();
@@ -152,7 +154,7 @@ public class ContourTest implements Runnable {
 				// calculate the position of the ball
 				double posX = dM10 / dArea;
 				double posY = dM01 / dArea;
-				Core.circle(image, new Point(posX, posY),
+				Core.circle(origImage, new Point(posX, posY),
 						(int) Math.sqrt(dArea / 3.14),
 						new Scalar(255, 255, 255));
 				// add the robot objects to the ArrayList for pathfinding
@@ -177,7 +179,7 @@ public class ContourTest implements Runnable {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT,
-				1.4, 50, 200, 15, 5, 8);
+				1.2, 50, 200, 15, 5, 8);
 
 		if (!circles.empty()) {
 			int radius;
@@ -193,7 +195,7 @@ public class ContourTest implements Runnable {
 						Math.round(coordinate[1]));
 				radius = (int) Math.round(coordinate[2]);
 
-				Core.circle(image, pt, radius, new Scalar(0, 0, 0));
+				Core.circle(origImage, pt, radius, new Scalar(0, 0, 0));
 				objects.add(new NodeObjects(Math.round(coordinate[0]), Math
 						.round(coordinate[1]), "ball"));
 			}
@@ -205,12 +207,11 @@ public class ContourTest implements Runnable {
 		 * Find the lines representing the edge of the field
 		 */
 
-		Mat src = Highgui.imread("cameraInput.jpg", 0);
 		Mat dst = new Mat();
 		// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
 		// Highgui.imwrite("wtf1.jpg",dst);
-		Imgproc.cvtColor(src, dst, Imgproc.COLOR_GRAY2BGR);
-		Highgui.imwrite("wtf2.jpg", dst);
+		Imgproc.cvtColor(copyImage, dst, Imgproc.COLOR_GRAY2BGR);
+		//Highgui.imwrite("wtf2.jpg", dst);
 		Imgproc.Canny(dst, dst, 50, 200, 3, false);
 
 		Mat lines = new Mat();
@@ -334,25 +335,31 @@ public class ContourTest implements Runnable {
 				"LinePoint"));
 
 		// draw lines
-		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
-		Core.line(image, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
-		Core.line(image, lineBottomLeft, lineBottomRight,
+		Core.line(origImage, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
+		Core.line(origImage, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
+		Core.line(origImage, lineBottomLeft, lineBottomRight,
 				new Scalar(0, 0, 255), 3);
-		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
+		Core.line(origImage, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
 				3);
 	}
+	
+	/* ##########################################################
+	 * # these are just testing methods, they are here for 		#
+	 * # visuals on the image for us. 							#
+	 * ##########################################################
+	 */
 
 	private void drawVectors() {
 		int ballIndex = findClosestBall(objects);
 		int backIndex = findBack(objects);
 		int frontIndex = findFront(objects);
 		try {
-			Core.line(image, new Point(objects.get(backIndex).getX(), objects
+			Core.line(origImage, new Point(objects.get(backIndex).getX(), objects
 					.get(backIndex).getY()), new Point(objects.get(frontIndex)
 					.getX(), objects.get(frontIndex).getY()), new Scalar(0, 0,
 					0));
 
-			Core.line(image, new Point(objects.get(backIndex).getX(), objects
+			Core.line(origImage, new Point(objects.get(backIndex).getX(), objects
 					.get(backIndex).getY()), new Point(objects.get(ballIndex)
 					.getX(), objects.get(ballIndex).getY()),
 					new Scalar(0, 0, 0));

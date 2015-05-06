@@ -30,7 +30,7 @@ public class TrackbarWindow {
 	private JLabel lowerH, upperH, lowerS, upperS, lowerV, upperV, imgLabel,
 			imgLabel2;
 	private JLabel lowerH2, upperH2, lowerS2, upperS2, lowerV2, upperV2;
-	private ContourTest imageProcess;
+	private ImageProcessing imageProcess;
 	private SlideListener slideListener = new SlideListener();
 	private boolean imageIsSet = false;
 
@@ -74,7 +74,7 @@ public class TrackbarWindow {
 		frame.getContentPane().add(trackPanel, BorderLayout.SOUTH);
 		frame.getContentPane().add(imgPanel, BorderLayout.CENTER);
 
-		imageProcess = new ContourTest();
+		imageProcess = new ImageProcessing();
 		new Thread(imageProcess).start();
 
 		// set the Labels
@@ -173,7 +173,7 @@ public class TrackbarWindow {
 		ActionListener taskPerformer = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				// add an image to the top panel
-				if (imageProcess.outImg != null) {
+				if (imageProcess.outImg != null && imgLabel != null && imgLabel2 != null) {
 					imgLabel.removeAll();
 					imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 					imgLabel2.removeAll();

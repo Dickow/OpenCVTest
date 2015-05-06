@@ -19,6 +19,7 @@ public class Pathfinding {
 	private int calibrating = 0;
 	private double distanceCalibration = 0;
 	private double xCalibration, yCalibration;
+	
 	// coordinates of the middle of the robot
 	private NodeObjects robotMiddle;
 	private NodeObjects robotFront;
@@ -114,7 +115,7 @@ public class Pathfinding {
 		if (calibratingDone()) {
 			if (!gotBall) {
 				// sequence to get to ball
-				if (rotationAngle > 2) {
+				if (rotationAngle > 1) {
 					// insert function to rotate robot
 					rotateRobot(rotationAngle, dest);
 
@@ -133,7 +134,7 @@ public class Pathfinding {
 			} else {
 				System.out.println("else sentence !=!!=");
 				robot.closeRobotArms();
-				gotBall = false; 
+				gotBall = false;
 			}
 		}
 
@@ -175,7 +176,7 @@ public class Pathfinding {
 		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 
-	NodeObjects calcMiddleRobotCoord() {
+	private NodeObjects calcMiddleRobotCoord() {
 
 		double x = robotFront.getX() - robotBack.getX();
 		double y = robotFront.getY() - robotBack.getY();
