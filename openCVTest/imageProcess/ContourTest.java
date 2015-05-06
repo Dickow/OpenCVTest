@@ -19,7 +19,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 public class ContourTest implements Runnable {
-	 private Pathfinding pathfinder = new Pathfinding();
+	private Pathfinding pathfinder = new Pathfinding();
 	public int ballSize = 5;
 
 	public int iLowH = 0;
@@ -79,28 +79,16 @@ public class ContourTest implements Runnable {
 
 			findBallsInImage(imageBlurr);
 
-			// add the robot for testing
-			// objects.add(new NodeObjects(500, 300, "FrontRobot"));
-			// objects.add(new NodeObjects(500, 340, "BackRobot"));
-			// Core.circle(image, new Point(500, 300),
-			// (int) Math.sqrt(49),
-			// new Scalar(255, 255, 255));
-			// Core.circle(image, new Point(500, 340),
-			// (int) Math.sqrt(49),
-			// new Scalar(255, 255, 255));
-			//
-			// // draw a test triangle delete when done TODO
-			// Core.line(image, new Point(500,300), new Point(190, 49), new
-			// Scalar(255,255,0));
-			// Core.line(image, new Point(500,300), new Point(500, 320), new
-			// Scalar(255,255,0));
-			// Core.line(image, new Point(500,320), new Point(190, 49), new
-			// Scalar(255,255,0));
-
 			findRobotFrontAndBack();
+			try{
+			drawVectors();
+			}catch(Exception e){
+				// do nothing
+			}
+			outImg2 = toBufferedImage(image);
 
 			if (objects.size() > 0) {
-				 pathfinder.run(objects);
+				pathfinder.run(objects);
 			}
 
 		}
@@ -169,9 +157,9 @@ public class ContourTest implements Runnable {
 						new Scalar(255, 255, 255));
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-					objects.add(new NodeObjects(posX, posY, "robotFront"));
-				} else {
 					objects.add(new NodeObjects(posX, posY, "robotBack"));
+				} else {
+					objects.add(new NodeObjects(posX, posY, "robotFront"));
 				}
 			}
 		}
@@ -179,7 +167,7 @@ public class ContourTest implements Runnable {
 		// convert this Mat to an Image
 		robotMats[0].copyTo(robotMats[1], robotMats[0]);
 		// convert to buffered image to show on the screen
-		outImg2 = toBufferedImage(image);
+
 		outImg = toBufferedImage(robotMats[1]);
 	}
 
@@ -188,8 +176,8 @@ public class ContourTest implements Runnable {
 		 * Find the circles in the image
 		 */
 		Mat circles = new Mat();
-		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				50, 200, 15, 5, 10);
+		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT,
+				1.4, 50, 200, 15, 5, 8);
 
 		if (!circles.empty()) {
 			int radius;
@@ -239,7 +227,7 @@ public class ContourTest implements Runnable {
 			// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 		}
-		//drawApproxLines();
+		// drawApproxLines();
 	}
 
 	/**
@@ -352,5 +340,77 @@ public class ContourTest implements Runnable {
 				new Scalar(0, 0, 255), 3);
 		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
 				3);
+	}
+
+	private void drawVectors() {
+		int ballIndex = findClosestBall(objects);
+		int backIndex = findBack(objects);
+		int frontIndex = findFront(objects);
+		try {
+			Core.line(image, new Point(objects.get(backIndex).getX(), objects
+					.get(backIndex).getY()), new Point(objects.get(frontIndex)
+					.getX(), objects.get(frontIndex).getY()), new Scalar(0, 0,
+					0));
+
+			Core.line(image, new Point(objects.get(backIndex).getX(), objects
+					.get(backIndex).getY()), new Point(objects.get(ballIndex)
+					.getX(), objects.get(ballIndex).getY()),
+					new Scalar(0, 0, 0));
+		} catch (Exception e) {
+			return;
+		}
+
+	}
+
+	/**
+	 * @param objects
+	 * @return
+	 */
+	private int findClosestBall(ArrayList<NodeObjects> objects) {
+		double tmpLength;
+		double min_length = 1000;
+		int min_index = -1;
+		for (int i = 0; i < objects.size(); i++) {
+			if (objects.get(i).getType().equals("ball")) {
+				if ((tmpLength = calcLength(objects.get(i),
+						objects.get(findFront(objects)))) < min_length) {
+					min_length = tmpLength;
+					min_index = i;
+				}
+			}
+		}
+
+		/* remove this when done testing */
+		try {
+			System.out.println(objects.get(min_index).toString());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return -1;
+		}
+		return min_index;
+	}
+
+	int findFront(ArrayList<NodeObjects> objects) {
+		for (int i = 0; i < objects.size(); i++) {
+			if (objects.get(i).getType().equals("robotFront")) {
+				return i;
+			}
+
+		}
+		return -1;
+	}
+
+	private double calcLength(NodeObjects first, NodeObjects second) {
+		return Math.sqrt(Math.pow((first.getX() - second.getX()), 2)
+				+ Math.pow((first.getY() - second.getY()), 2));
+	}
+
+	int findBack(ArrayList<NodeObjects> objects) {
+		for (int i = 0; i < objects.size(); i++) {
+			if (objects.get(i).getType().equals("robotBack")) {
+				return i;
+			}
+
+		}
+		return -1;
 	}
 }
