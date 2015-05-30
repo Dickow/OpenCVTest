@@ -216,7 +216,7 @@ public class PathFinding2 {
 		 Vector vector2 = new Vector(dest.getX() - robotMiddle.getX(),
 		 dest.getY() - robotMiddle.getY());
 		
-		 double delta = vector1.dX * -vector2.dY - -vector1.dY * vector2.dX;
+		 double delta = vector1.dX * (-vector2.dY) - (-vector1.dY) * vector2.dX;
 		 System.out.println("delta = " + delta);
 		
 		 if (delta > 0) {
