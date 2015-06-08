@@ -1,7 +1,5 @@
 package imageProcess;
 
-import imageProcess.NodeObjects;
-
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -62,13 +60,13 @@ public class ImageProcessing implements Runnable {
 		while (true) {
 			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
-			
+
 			videoCapture.read(frame);
 			Highgui.imwrite("cameraInput.jpg", frame);
-			
+
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
 			image = Highgui.imread("cameraInput2.jpg");
-			//image = frame; 
+			// image = frame;
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
@@ -81,9 +79,9 @@ public class ImageProcessing implements Runnable {
 			findBallsInImage(imageBlurr);
 
 			findRobotFrontAndBack();
-			try{
-			drawVectors();
-			}catch(Exception e){
+			try {
+				drawVectors();
+			} catch (Exception e) {
 				// do nothing
 			}
 			outImg2 = toBufferedImage(image);
@@ -413,5 +411,29 @@ public class ImageProcessing implements Runnable {
 
 		}
 		return -1;
+	}
+
+	/**
+	 * Method to remove balls that appears inside robot
+	 */
+	private void ignoreBallInsideRobot() {
+
+		// we need the back and front of robot to get area to delete from
+		int backIndex = findBack(objects);
+		int frontIndex = findFront(objects);
+
+		// run through the list of objects to find balls
+		for (int i = 0; i < objects.size(); i++) {
+
+			// if x and y is between front and back of robot we remove the ball
+			if (objects.get(i).getType().equals("ball")
+					&& objects.get(i).getX() <= objects.get(frontIndex).getX()
+					&& objects.get(i).getY() <= objects.get(frontIndex).getY()
+					&& objects.get(i).getX() >= objects.get(backIndex).getX()
+					&& objects.get(i).getY() >= objects.get(backIndex).getY()) {
+
+				objects.remove(i);
+			}
+		}
 	}
 }
