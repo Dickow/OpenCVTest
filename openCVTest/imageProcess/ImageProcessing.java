@@ -75,7 +75,7 @@ public class ImageProcessing implements Runnable {
 				continue;
 			}
 			Highgui.imwrite("gray.jpg", imageHSV);
-			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
+			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(3, 3), 0, 0);
 			
 			identifyLines();
 			
@@ -183,7 +183,7 @@ public class ImageProcessing implements Runnable {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT,
-				1.8, 50, 210, 15, 5, 8);
+				1.8, 50, 80, 22, 5, 8);
 
 		if (!circles.empty()) {
 //			int radius;
