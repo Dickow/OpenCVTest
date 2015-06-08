@@ -336,6 +336,10 @@ public class ImageProcessing implements Runnable {
 				"LinePoint"));
 		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y,
 				"LinePoint"));
+		
+		// add Goals to the list of objects
+		objects.add(new NodeObjects(lineBottomRight.x, Math.round(lineBottomRight.y / 2), "GoalA"));
+		objects.add(new NodeObjects(lineBottomRight.x, Math.round(lineBottomRight.y / 2), "GoalB"));
 
 		// draw lines
 		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
