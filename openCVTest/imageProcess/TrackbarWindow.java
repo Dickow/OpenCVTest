@@ -1,5 +1,7 @@
 package imageProcess;
 
+import imageCapture.ImageCapturer;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -31,6 +33,7 @@ public class TrackbarWindow {
 			imgLabel2;
 	private JLabel lowerH2, upperH2, lowerS2, upperS2, lowerV2, upperV2;
 	private ImageProcessing imageProcess;
+	private ImageCapturer capturer; 
 	private SlideListener slideListener = new SlideListener();
 	private boolean imageIsSet = false;
 
@@ -73,7 +76,10 @@ public class TrackbarWindow {
 		imgPanel = new JPanel(new FlowLayout());
 		frame.getContentPane().add(trackPanel, BorderLayout.SOUTH);
 		frame.getContentPane().add(imgPanel, BorderLayout.CENTER);
-
+		
+		capturer = new ImageCapturer();
+		new Thread(capturer).start();
+		
 		imageProcess = new ImageProcessing();
 		new Thread(imageProcess).start();
 

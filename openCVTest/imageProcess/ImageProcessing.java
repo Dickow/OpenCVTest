@@ -1,5 +1,7 @@
 package imageProcess;
 
+import imageCapture.ImageObject;
+
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -49,20 +51,15 @@ public class ImageProcessing implements Runnable {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		// get a picture from the webcam and save it VideoCapture
-		VideoCapture videoCapture = new VideoCapture(0);
-		if (!videoCapture.isOpened()) {
-			System.out.println("could not find video ");
-		} else {
-			System.out.println(" webcam was found: " + videoCapture.toString());
-		}
+		
 		Mat frame = new Mat();
 
 		while (true) {
 			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
-
-			videoCapture.read(frame);
+			
+			frame = ImageObject.getInstance().getImg();
+			
 			Highgui.imwrite("cameraInput.jpg", frame);
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
@@ -71,12 +68,17 @@ public class ImageProcessing implements Runnable {
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
+			try{
 			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
+			}catch(Exception e){
+				System.out.println("frame was empty returning");
+				continue;
+			}
 			Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(1, 1), 2, 2);
-
+			
 			identifyLines();
-
+			
 			findRobotFrontAndBack();
 			
 			findBallsInImage(imageBlurr);
@@ -88,7 +90,7 @@ public class ImageProcessing implements Runnable {
 				// do nothing
 			}
 			outImg2 = toBufferedImage(image);
-
+			
 			if (objects.size() > 0) {
 				// remove all illegal balls
 				
@@ -437,8 +439,9 @@ public class ImageProcessing implements Runnable {
 			
 			// if x and y is between front and back of robot we remove the ball
 			if (objects.get(i).getType().equals("ball")&& robotRectangle.contains(objects.get(i).getX(), objects.get(i).getY())) {
-				i--;
+			
 				objects.remove(i);
+				i--;
 			}
 		}
 	}

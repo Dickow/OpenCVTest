@@ -56,10 +56,10 @@ public class PathFinding2 {
 		// see if we are far away from the destination
 		else if (distanceToDest > 20) {
 			// we need to drive closer to the robot
-			/*
-			 * robot.robotForward(distanceToDest / calibrationLength - 30 TODO
-			 * 30 is just a random value need to test this );
-			 */
+			
+			 //robot.robotForward(distanceToDest / calibrationLength - 30); // TODO
+			 //30 is just a random value need to test this 
+			 
 		}
 		// if we do not need to rotate and we are close, then we must be
 		// able to
@@ -222,16 +222,16 @@ public class PathFinding2 {
 
 		if (delta > 0) {
 			// the new direction is to the left of our current facing
-			// robot.rotateRobotLeft(rotationAngle); TODO
+			//robot.rotateRobotLeft(rotationAngle); //TODO
 			System.out.println("rotating left" + rotationAngle);
 		} else if (delta < 0) {
 			// the new direction is to the right of our current facing
-			// robot.rotateRobotRight(rotationAngle); TODO
+			//robot.rotateRobotRight(rotationAngle); //TODO
 			System.out.println("rotating right " + rotationAngle);
 		} else if (delta == 0) {
 			// we are directly opposite of the direction, just pick a direction
 			// to turn
-			// robot.rotateRobotRight(rotationAngle); TODO
+			//robot.rotateRobotRight(rotationAngle); //TODO
 			System.out.println("rotating 180 degrees");
 		}
 
@@ -248,7 +248,7 @@ public class PathFinding2 {
 			xCalibrate = robotFront.getX();
 			yCalibrate = robotBack.getY();
 
-			//robot.robotCalibrate();TODO
+			//robot.robotCalibrate();//TODO
 			calibrationStep++;
 			return false;
 		} else if (calibrationStep == 1) {
@@ -288,7 +288,7 @@ public class PathFinding2 {
 				if (vecStep.dX == obstacleCoordinates.get(i).x
 						&& vecStep.dY == obstacleCoordinates.get(i).y) {
 					rotateRobot(90);
-					//robot.robotForward(5);TODO
+					//robot.robotForward(5);//TODO
 				}
 			}
 		}
