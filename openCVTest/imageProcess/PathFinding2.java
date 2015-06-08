@@ -2,13 +2,14 @@ package imageProcess;
 
 import geometry.Vector;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import robotCommunication.BTConnector;
 
 public class PathFinding2 {
 	private NodeObjects robotFront, robotMiddle, robotBack, dest;
-	// private BTConnector robot = new BTConnector(); TODO
+	private BTConnector robot = new BTConnector();
 	private double xCalibrate, yCalibrate;
 	private int calibrationStep = 0;
 	private double calibrationLength;
@@ -171,68 +172,68 @@ public class PathFinding2 {
 
 	private void rotateRobot(double rotationAngle) {
 
-//		if (robotFront.getY() < dest.getY()) {
-//			if (dest.getX() - robotFront.getX() > 0) {
-////				robot.rotateRobotRight(rotationAngle);
-//				System.out.println("rotating right " + rotationAngle);
-//			} else if (dest.getX() - robotFront.getX() < 0) {
-////				robot.rotateRobotLeft(rotationAngle);
-//				System.out.println("rotating left " + rotationAngle);
-//			}
-//		} else if (robotFront.getY() > dest.getY()) {
-//			if (dest.getX() - robotFront.getX() > 0) {
-////				robot.rotateRobotLeft(rotationAngle);
-//				System.out.println("rotating left " + rotationAngle);
-//			} else if (dest.getX() - robotFront.getX() < 0) {
-////				robot.rotateRobotRight(rotationAngle);
-//				System.out.println("rotating right " + rotationAngle);
-//			}
-//		} else if (robotFront.getY() == dest.getY()) {
-//			if (dest.getX() - robotFront.getX() > 0) {
-//				if (robotFront.getY() < robotMiddle.getY()) {
-////					robot.rotateRobotRight(rotationAngle);
-//					System.out.println("rotating right " + rotationAngle);
-//				} else {
-////					robot.rotateRobotLeft(rotationAngle);
-//					System.out.println("rotating left " + rotationAngle);
-//				}
-//			} else {
-//				if (robotFront.getY() < robotMiddle.getY()) {
-////					robot.rotateRobotLeft(rotationAngle);
-//					System.out.println("rotating left " + rotationAngle);
-//				} else {
-////					robot.rotateRobotRight(rotationAngle);
-//					System.out.println("rotating right " + rotationAngle);
-//				}
-//			}
-//		} else if (robotFront.getY() == dest.getY()
-//				&& robotFront.getY() == robotMiddle.getY()) {
-////			robot.rotateRobotLeft(rotationAngle);
-//			System.out.println("rotating left " + rotationAngle);
-//		}
+		// if (robotFront.getY() < dest.getY()) {
+		// if (dest.getX() - robotFront.getX() > 0) {
+		// // robot.rotateRobotRight(rotationAngle);
+		// System.out.println("rotating right " + rotationAngle);
+		// } else if (dest.getX() - robotFront.getX() < 0) {
+		// // robot.rotateRobotLeft(rotationAngle);
+		// System.out.println("rotating left " + rotationAngle);
+		// }
+		// } else if (robotFront.getY() > dest.getY()) {
+		// if (dest.getX() - robotFront.getX() > 0) {
+		// // robot.rotateRobotLeft(rotationAngle);
+		// System.out.println("rotating left " + rotationAngle);
+		// } else if (dest.getX() - robotFront.getX() < 0) {
+		// // robot.rotateRobotRight(rotationAngle);
+		// System.out.println("rotating right " + rotationAngle);
+		// }
+		// } else if (robotFront.getY() == dest.getY()) {
+		// if (dest.getX() - robotFront.getX() > 0) {
+		// if (robotFront.getY() < robotMiddle.getY()) {
+		// // robot.rotateRobotRight(rotationAngle);
+		// System.out.println("rotating right " + rotationAngle);
+		// } else {
+		// // robot.rotateRobotLeft(rotationAngle);
+		// System.out.println("rotating left " + rotationAngle);
+		// }
+		// } else {
+		// if (robotFront.getY() < robotMiddle.getY()) {
+		// // robot.rotateRobotLeft(rotationAngle);
+		// System.out.println("rotating left " + rotationAngle);
+		// } else {
+		// // robot.rotateRobotRight(rotationAngle);
+		// System.out.println("rotating right " + rotationAngle);
+		// }
+		// }
+		// } else if (robotFront.getY() == dest.getY()
+		// && robotFront.getY() == robotMiddle.getY()) {
+		// // robot.rotateRobotLeft(rotationAngle);
+		// System.out.println("rotating left " + rotationAngle);
+		// }
 
-		 Vector vector1 = new Vector(robotFront.getX() - robotMiddle.getX(),
-		 robotFront.getY() - robotMiddle.getY());
-		 Vector vector2 = new Vector(dest.getX() - robotMiddle.getX(),
-		 dest.getY() - robotMiddle.getY());
-		
-		 double delta = vector1.dX * (-vector2.dY) - (-vector1.dY) * vector2.dX;
-		 System.out.println("delta = " + delta);
-		
-		 if (delta > 0) {
-		 // the new direction is to the left of our current facing
-		 // robot.rotateRobotLeft(rotationAngle); TODO
-		 System.out.println("rotating left" + rotationAngle);
-		 } else if (delta < 0) {
-		 // the new direction is to the right of our current facing
-		 // robot.rotateRobotRight(rotationAngle); TODO
-		 System.out.println("rotating right " + rotationAngle);
-		 } else if (delta == 0) {
-		 // we are directly opposite of the direction, just pick a direction
-		 // to turn
-		 // robot.rotateRobotRight(rotationAngle); TODO
-		 System.out.println("rotating 180 degrees");
-		 }
+		Vector vector1 = new Vector(robotFront.getX() - robotMiddle.getX(),
+				robotFront.getY() - robotMiddle.getY());
+		Vector vector2 = new Vector(dest.getX() - robotMiddle.getX(),
+				dest.getY() - robotMiddle.getY());
+
+		double delta = vector1.dX * (-vector2.dY) - (-vector1.dY) * vector2.dX;
+		System.out.println("delta = " + delta);
+
+		if (delta > 0) {
+			// the new direction is to the left of our current facing
+			// robot.rotateRobotLeft(rotationAngle); TODO
+			System.out.println("rotating left" + rotationAngle);
+		} else if (delta < 0) {
+			// the new direction is to the right of our current facing
+			// robot.rotateRobotRight(rotationAngle); TODO
+			System.out.println("rotating right " + rotationAngle);
+		} else if (delta == 0) {
+			// we are directly opposite of the direction, just pick a direction
+			// to turn
+			// robot.rotateRobotRight(rotationAngle); TODO
+			System.out.println("rotating 180 degrees");
+		}
 
 	}
 
@@ -247,7 +248,7 @@ public class PathFinding2 {
 			xCalibrate = robotFront.getX();
 			yCalibrate = robotBack.getY();
 
-			// robot.robotCalibrate(); TODO
+			robot.robotCalibrate();
 			calibrationStep++;
 			return false;
 		} else if (calibrationStep == 1) {
@@ -257,4 +258,51 @@ public class PathFinding2 {
 		}
 		return true;
 	}
+
+	/**
+	 * Method to avoid obstacles on the course by a given coordinate list
+	 * 
+	 * @param obstacleCoordinates
+	 */
+	private void avoidObstacle(ArrayList<Point> obstacleCoordinates) {
+
+		// Get the vector to nearest object
+		Vector vectorToDest = vectorFromRobotToNearestObject();
+		Vector vecStep = vectorFromRobotToNearestObject();
+
+		// Run through every coordinate to see if the vector runs through
+		for (int i = 0; i < obstacleCoordinates.size(); i++) {
+
+			/*
+			 * The vector between point A and a point B is B-A (x2-x1, y2-y1) If
+			 * you normalize that vector, and multiply it by the factor you want
+			 * (it seems you want a distance of 10px, so your factor is 10), you
+			 * can get all the points by adding it to the a current point (which
+			 * initially is the origin A) until you reach the end point B.
+			 */
+			for (int j = 0; j < vectorToDest.length(); j++) {
+				vecStep = vectorToDest.normalize();
+				vecStep = vectorToDest.scale(2);
+
+				// If we hit an obstacle rotate and move robot away
+				if (vecStep.dX == obstacleCoordinates.get(i).x
+						&& vecStep.dY == obstacleCoordinates.get(i).y) {
+					rotateRobot(90);
+					robot.robotForward(5);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Method to calculate the vector from the robot to the nearest object
+	 * 
+	 * @return vectors x and y as a Vector
+	 */
+	private Vector vectorFromRobotToNearestObject() {
+
+		return new Vector((dest.getX() - robotMiddle.getX()),
+				(dest.getY() - robotMiddle.getY()));
+	}
+
 }
