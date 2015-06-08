@@ -86,14 +86,14 @@ public class ImageProcessing implements Runnable {
 			try {
 				drawVectors();
 				ignoreBallInsideRobot();
+				drawBalls();
 			} catch (Exception e) {
 				// do nothing
 			}
 			outImg2 = toBufferedImage(image);
 			
 			if (objects.size() > 0) {
-				// remove all illegal balls
-				
+				// remove all illegal balls		
 				pathfinder.findPath(objects);
 			}
 
@@ -183,11 +183,11 @@ public class ImageProcessing implements Runnable {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT,
-				1.8, 50, 200, 15, 5, 8);
+				1.8, 50, 210, 15, 5, 8);
 
 		if (!circles.empty()) {
-			int radius;
-			Point pt;
+//			int radius;
+//			Point pt;
 
 			for (int i = 0; i <= circles.cols(); i++) {
 
@@ -195,13 +195,21 @@ public class ImageProcessing implements Runnable {
 				if (coordinate == null) {
 					break;
 				}
-				pt = new Point(Math.round(coordinate[0]),
-						Math.round(coordinate[1]));
-				radius = (int) Math.round(coordinate[2]);
+//				pt = new Point(Math.round(coordinate[0]),
+//						Math.round(coordinate[1]));
+//				radius = (int) Math.round(coordinate[2]);
 
-				Core.circle(image, pt, radius, new Scalar(0, 0, 0));
+				//Core.circle(image, pt, radius, new Scalar(0, 0, 0));
 				objects.add(new NodeObjects(Math.round(coordinate[0]), Math
 						.round(coordinate[1]), "ball"));
+			}
+		}
+	}
+	
+	private void drawBalls(){
+		for (NodeObjects node : objects) {
+			if(node.getType().equalsIgnoreCase("ball")){
+				Core.circle(image, new Point(node.getX(),node.getY()),8, new Scalar(0,0,0));
 			}
 		}
 	}
@@ -233,7 +241,11 @@ public class ImageProcessing implements Runnable {
 			// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 		}
-		// drawApproxLines();
+		try{
+			drawApproxLines();
+		}catch(Exception e){
+			System.out.println("no lines");
+		}
 	}
 
 	/**
