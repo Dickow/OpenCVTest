@@ -1,6 +1,7 @@
 package imageProcess;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class ImageProcessing implements Runnable {
 			Highgui.imwrite("cameraInput.jpg", frame);
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-			image = Highgui.imread("cameraInput2.jpg");
+			image = Highgui.imread("cameraInput.jpg");
 			// image = frame;
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
@@ -76,17 +77,21 @@ public class ImageProcessing implements Runnable {
 
 			identifyLines();
 
-			findBallsInImage(imageBlurr);
-
 			findRobotFrontAndBack();
+			
+			findBallsInImage(imageBlurr);
+			
 			try {
 				drawVectors();
+				ignoreBallInsideRobot();
 			} catch (Exception e) {
 				// do nothing
 			}
 			outImg2 = toBufferedImage(image);
 
 			if (objects.size() > 0) {
+				// remove all illegal balls
+				
 				pathfinder.findPath(objects);
 			}
 
@@ -97,7 +102,7 @@ public class ImageProcessing implements Runnable {
 	private void findRobotFrontAndBack() {
 		// find the robot with color scan
 
-		Mat imgOriginal = Highgui.imread("cameraInput2.jpg");
+		Mat imgOriginal = Highgui.imread("cameraInput.jpg");
 
 		Mat imgHSV = new Mat();
 
@@ -204,7 +209,7 @@ public class ImageProcessing implements Runnable {
 		 * Find the lines representing the edge of the field
 		 */
 
-		Mat src = Highgui.imread("cameraInput2.jpg", 0);
+		Mat src = Highgui.imread("cameraInput.jpg", 0);
 		Mat dst = new Mat();
 		// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
 		// Highgui.imwrite("wtf1.jpg",dst);
@@ -421,17 +426,18 @@ public class ImageProcessing implements Runnable {
 		// we need the back and front of robot to get area to delete from
 		int backIndex = findBack(objects);
 		int frontIndex = findFront(objects);
-
+		
+		double midX = (objects.get(backIndex).getX()+objects.get(frontIndex).getX())/2;
+		double midY = (objects.get(backIndex).getY()+objects.get(frontIndex).getY())/2;
+		
+		Rectangle robotRectangle = new Rectangle((int)midX-20, (int)midY-20, 40, 40);
+		
 		// run through the list of objects to find balls
 		for (int i = 0; i < objects.size(); i++) {
-
+			
 			// if x and y is between front and back of robot we remove the ball
-			if (objects.get(i).getType().equals("ball")
-					&& objects.get(i).getX() <= objects.get(frontIndex).getX()
-					&& objects.get(i).getY() <= objects.get(frontIndex).getY()
-					&& objects.get(i).getX() >= objects.get(backIndex).getX()
-					&& objects.get(i).getY() >= objects.get(backIndex).getY()) {
-
+			if (objects.get(i).getType().equals("ball")&& robotRectangle.contains(objects.get(i).getX(), objects.get(i).getY())) {
+				i--;
 				objects.remove(i);
 			}
 		}

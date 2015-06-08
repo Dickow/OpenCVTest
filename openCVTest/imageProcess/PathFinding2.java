@@ -9,7 +9,7 @@ import robotCommunication.BTConnector;
 
 public class PathFinding2 {
 	private NodeObjects robotFront, robotMiddle, robotBack, dest;
-	private BTConnector robot = new BTConnector();
+	//private BTConnector robot = new BTConnector();
 	private double xCalibrate, yCalibrate;
 	private int calibrationStep = 0;
 	private double calibrationLength;
@@ -248,7 +248,7 @@ public class PathFinding2 {
 			xCalibrate = robotFront.getX();
 			yCalibrate = robotBack.getY();
 
-			robot.robotCalibrate();
+			//robot.robotCalibrate();TODO
 			calibrationStep++;
 			return false;
 		} else if (calibrationStep == 1) {
@@ -288,7 +288,7 @@ public class PathFinding2 {
 				if (vecStep.dX == obstacleCoordinates.get(i).x
 						&& vecStep.dY == obstacleCoordinates.get(i).y) {
 					rotateRobot(90);
-					robot.robotForward(5);
+					//robot.robotForward(5);TODO
 				}
 			}
 		}
