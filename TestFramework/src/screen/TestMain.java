@@ -35,6 +35,21 @@ public class TestMain extends Applet implements Runnable {
 		Frame frame = (Frame) this.getParent().getParent();
 		frame.setTitle("Robot test framework");
 	}
+	
+	private void createObjects() {
+		// create the robot
+		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
+
+		// create the balls placed on the map
+		Random rand = new Random();
+		for(int i = 0; i < 5; i++){
+			
+			int randomX = rand.nextInt((625-15) + 1) + 15;
+			int randomY = rand.nextInt((465-15) + 1) + 15;
+			balls.add(new Ball(randomX, randomY));
+		}
+
+	}
 
 	private void createObstacles() {
 
@@ -43,10 +58,10 @@ public class TestMain extends Applet implements Runnable {
 
 		// setup the goals
 		goalA = new Goal(
-				(frames.topLeft().getX() + frames.lowLeft().getX()) / 2 + robot.getLenght(),
+				((frames.topLeft().getX() + frames.lowLeft().getX()) / 2) + robot.getLenght(),
 				(frames.topLeft().getY() + frames.lowLeft().getY()) / 2);
 		goalB = new Goal(
-				(frames.topRight().getX() + frames.lowRight().getX()) / 2 - robot.getLenght(),
+				((frames.topRight().getX() + frames.lowRight().getX()) / 2) - robot.getLenght(),
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
 		cross = new MiddleCross((frames.topRight().getX()
@@ -69,21 +84,6 @@ public class TestMain extends Applet implements Runnable {
 				cross.getCenterOfCross().getX(),
 				cross.getCenterOfCross().getY()
 						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
-
-	}
-
-	private void createObjects() {
-		// create the robot
-		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
-
-		// create the balls placed on the map
-		Random rand = new Random();
-		for(int i = 0; i < 5; i++){
-			
-			int randomX = rand.nextInt((625-15) + 1) + 15;
-			int randomY = rand.nextInt((465-15) + 1) + 15;
-			balls.add(new Ball(randomX, randomY));
-		}
 
 	}
 
