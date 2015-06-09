@@ -43,10 +43,10 @@ public class TestMain extends Applet implements Runnable {
 
 		// setup the goals
 		goalA = new Goal(
-				(frames.topLeft().getX() + frames.lowLeft().getX()) / 2,
+				(frames.topLeft().getX() + frames.lowLeft().getX()) / 2 + robot.getLenght(),
 				(frames.topLeft().getY() + frames.lowLeft().getY()) / 2);
 		goalB = new Goal(
-				(frames.topRight().getX() + frames.lowRight().getX()) / 2,
+				(frames.topRight().getX() + frames.lowRight().getX()) / 2 - robot.getLenght(),
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
 		cross = new MiddleCross((frames.topRight().getX()

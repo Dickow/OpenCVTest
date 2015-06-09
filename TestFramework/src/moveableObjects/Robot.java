@@ -8,6 +8,9 @@ public class Robot {
 	private Coordinate backCord;
 	private Coordinate middleCord;
 	private MoveState state;
+	
+	int lenghtOfRobot =  (int) Math.ceil(Math.sqrt(Math.pow((getFrontCord().getX() - getBackCord().getX()), 2)
+			+ Math.pow((getFrontCord().getY() - getBackCord().getY()), 2)));
 
 	public Robot(Coordinate front, Coordinate back) {
 		this.frontCord = front;
@@ -16,6 +19,10 @@ public class Robot {
 		double yMiddle = ((frontCord.getY() + backCord.getY()) / 2);
 		this.middleCord = new Coordinate(xMiddle, yMiddle);
 		
+	}
+	
+	public int getLenght(){
+		return lenghtOfRobot;
 	}
 	
 	public MoveState getState(){
