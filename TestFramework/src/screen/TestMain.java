@@ -194,7 +194,10 @@ public class TestMain extends Applet implements Runnable {
 						repaint();
 						sleep();
 					} else {
-						robot.forward(distance, new Coordinate(goalA.getX(),
+						robot.forward(distance, new Coordinate(goalA.getX() + 
+									Math.sqrt(Math.pow((robot.getFrontCord().getX() - 
+									robot.getBackCord().getX()), 2) + Math.pow((robot.getFrontCord().getY() - 
+									robot.getBackCord().getY()), 2)),
 								goalA.getY()));
 						nextState();
 						repaint();
