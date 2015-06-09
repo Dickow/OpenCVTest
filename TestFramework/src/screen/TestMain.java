@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Random;
 
 import obstacles.Goal;
 import obstacles.MiddleCross;
@@ -76,12 +77,13 @@ public class TestMain extends Applet implements Runnable {
 		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
 
 		// create the balls placed on the map
-		// this could be done randomly TODO
-		balls.add(new Ball(200, 300));
-		balls.add(new Ball(50, 75));
-		balls.add(new Ball(400, 360));
-		balls.add(new Ball(250, 389));
-		balls.add(new Ball(600, 145));
+		Random rand = new Random();
+		for(int i = 0; i < 5; i++){
+			
+			int randomX = rand.nextInt((625-15) + 1) + 15;
+			int randomY = rand.nextInt((465-15) + 1) + 15;
+			balls.add(new Ball(randomX, randomY));
+		}
 
 	}
 
