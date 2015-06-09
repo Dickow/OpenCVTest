@@ -1,28 +1,17 @@
 package obstacles;
 
-public class Goal {
-	private double x,y;
+import moveableObjects.Coordinate;
+
+public class Goal extends Coordinate {
+		
+	public Goal(double x, double y) {
+		super(x, y);
+		// TODO Auto-generated constructor stub
+	}
+
+
 	
-	public Goal(double x, double y){
-		this.x = x; 
-		this.y = y; 
-	}
 
-	public double getX() {
-		return x;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
-	}
 	
 	
 }

@@ -1,16 +1,13 @@
 package moveableObjects;
 
-public class Ball {
+public class Ball extends Coordinate{
+	private double radius;
 	
-	private double x,y,radius;
-	
-	public Ball(double x, double y){
-		this.x = x;
-		this.y = y; 
-		
+	public Ball(double x, double y) {
+		super(x, y);
+		// TODO Auto-generated constructor stub
 	}
 
-	
 	public double getRadius() {
 		return radius;
 	}
@@ -21,21 +18,7 @@ public class Ball {
 	}
 
 
-	public double getX() {
-		return x;
-	}
 
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
-	}
 	
 	
 
