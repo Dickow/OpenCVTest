@@ -377,10 +377,13 @@ public class ImageProcessing implements Runnable {
 		// Add crss to the list of objects
 		objects.add(new NodeObjects(cross.x, cross.y, "cross"));
 
-		// add Goals to the list of objects
-		objects.add(new NodeObjects(lineBottomRight.x, Math
+		int lenghtOfRobot =  (int) Math.ceil(Math.sqrt(Math.pow((objects.get(frontIndex).getX() - objects.get(backIndex).getX()), 2)
+				+ Math.pow((objects.get(frontIndex).getY() - objects.get(backIndex).getY()), 2)));
+		
+		// add Goal points to the list of objects (where the robot )
+		objects.add(new NodeObjects(lineBottomRight.x + lenghtOfRobot, Math
 				.round(lineBottomRight.y / 2), "GoalA"));
-		objects.add(new NodeObjects(lineBottomRight.x, Math
+		objects.add(new NodeObjects(lineBottomRight.x - lenghtOfRobot, Math
 				.round(lineBottomRight.y / 2), "GoalB"));
 
 		// Draw cross
