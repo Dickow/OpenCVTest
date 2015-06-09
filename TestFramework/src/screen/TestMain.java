@@ -51,6 +51,7 @@ public class TestMain extends Applet implements Runnable {
 		cross = new MiddleCross(frames.topLeft().getX()
 				- frames.topRight().getX(), frames.topLeft().getY()
 				- frames.lowLeft().getY());
+		
 
 	}
 
