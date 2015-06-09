@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 import obstacles.Goal;
+import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import routing.Pathfinder;
 import routing.RobotState;
@@ -23,6 +24,7 @@ public class TestMain extends Applet implements Runnable {
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private Pathfinder router;
 	private RotationState state;
+	private MiddleCross cross;
 	private Robot robot;;
 
 	public void init() {
@@ -45,6 +47,10 @@ public class TestMain extends Applet implements Runnable {
 		goalB = new Goal(
 				(frames.topRight().getX() + frames.lowRight().getX()) / 2,
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
+
+		cross = new MiddleCross(frames.topLeft().getX()
+				- frames.topRight().getX(), frames.topLeft().getY()
+				- frames.lowLeft().getY());
 
 	}
 
