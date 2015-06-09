@@ -3,6 +3,7 @@ package routing;
 import java.util.ArrayList;
 
 import obstacles.Goal;
+import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import utilities.Vector;
 import MoveableObjects.Ball;
@@ -16,7 +17,7 @@ public class Pathfinder {
 	public double rotationAngle = 0, lengthToDest = 0;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
-			Goal goalB, ObstacleFrame frames) {
+			Goal goalB, ObstacleFrame frames, MiddleCross cross) {
 		rotationAngle = 0;
 		lengthToDest = 0;
 		// we have no ball right now so find one

@@ -48,10 +48,26 @@ public class TestMain extends Applet implements Runnable {
 				(frames.topRight().getX() + frames.lowRight().getX()) / 2,
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
-		cross = new MiddleCross(frames.topLeft().getX()
-				- frames.topRight().getX(), frames.topLeft().getY()
-				- frames.lowLeft().getY());
-		
+		cross = new MiddleCross((frames.topRight().getX()
+				+ frames.topLeft().getX())/2, (frames.lowLeft().getY()
+				+ frames.topLeft().getY())/2);
+
+		cross.setLeftCross(new Coordinate(cross.getCenterOfCross().getX()
+				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
+				cross.getCenterOfCross().getY()));
+
+		cross.setRightCross(new Coordinate(cross.getCenterOfCross().getX()
+				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
+				cross.getCenterOfCross().getY()));
+
+		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX(), cross
+				.getCenterOfCross().getY()
+				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+
+		cross.setBottomCross(new Coordinate(
+				cross.getCenterOfCross().getX(),
+				cross.getCenterOfCross().getY()
+						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
 
 	}
 
@@ -85,6 +101,19 @@ public class TestMain extends Applet implements Runnable {
 		g.drawLine((int) frames.lowLeft().getX(),
 				(int) frames.lowLeft().getY(), (int) frames.lowRight().getX(),
 				(int) frames.lowRight().getY());
+
+		// paint the cross
+		g.fillRect(
+				(int) cross.getLeftCross().getX(),
+				(int) cross.getLeftCross().getY() - 10,
+				(int) ((frames.topRight().getX() - frames.topLeft().getX()) / 18) * 2,
+				10);
+
+		g.fillRect(
+				(int) cross.getTopCross().getX() - 10,
+				(int) cross.getTopCross().getY(),
+				10,
+				(int) ((frames.lowRight().getY() - frames.topRight().getY()) / 12) * 2);
 
 		// paint the goals
 		g.setColor(Color.BLUE);
@@ -184,7 +213,7 @@ public class TestMain extends Applet implements Runnable {
 	public void run() {
 		while (true) {
 
-			router.findPath(robot, balls, goalA, goalB, frames);
+			router.findPath(robot, balls, goalA, goalB, frames, cross);
 
 			updateComponents();
 
