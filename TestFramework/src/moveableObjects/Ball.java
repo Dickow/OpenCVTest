@@ -1,31 +1,21 @@
 package moveableObjects;
 
-public class Ball {
+public class Ball extends Coordinate{
 	
-	private double x,y;
+	private double radius;
 	
 	public Ball(double x, double y){
-		this.x = x;
-		this.y = y; 
+		super(x,y);
 		
 	}
 
-	public double getX() {
-		return x;
+	public double getRadius() {
+		return radius;
 	}
 
-	public void setX(double x) {
-		this.x = x;
+	public void setRadius(double radius) {
+		this.radius = radius;
 	}
 
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
-	}
-	
-	
 
 }
