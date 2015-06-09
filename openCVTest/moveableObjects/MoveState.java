@@ -1,4 +1,4 @@
-package MoveableObjects;
+package moveableObjects;
 
 public enum MoveState {
 	ROTATING,

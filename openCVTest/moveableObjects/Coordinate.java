@@ -1,4 +1,4 @@
-package MoveableObjects;
+package moveableObjects;
 
 public class Coordinate {
 	private double x,y; 

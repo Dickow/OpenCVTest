@@ -1,6 +1,6 @@
-package MoveableObjects;
+package moveableObjects;
 
-import utilities.Vector;
+import geometry.Vector;
 
 public class Robot {
 

@@ -1,4 +1,4 @@
-package routing;
+package pathfinding;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import moveableObjects.Robot;
 import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
-import utilities.Vector;
+import geometry.Vector;
 
 public class Pathfinder {
 

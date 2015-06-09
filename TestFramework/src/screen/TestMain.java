@@ -7,15 +7,15 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Random;
 
+import moveableObjects.Ball;
+import moveableObjects.Coordinate;
+import moveableObjects.MoveState;
+import moveableObjects.Robot;
 import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import routing.Pathfinder;
 import routing.RobotState;
-import MoveableObjects.Ball;
-import MoveableObjects.Coordinate;
-import MoveableObjects.MoveState;
-import MoveableObjects.Robot;
 
 public class TestMain extends Applet implements Runnable {
 

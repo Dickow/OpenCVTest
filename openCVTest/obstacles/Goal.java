@@ -1,13 +1,11 @@
-package MoveableObjects;
+package obstacles;
 
-public class Ball {
-	
+public class Goal {
 	private double x,y;
 	
-	public Ball(double x, double y){
-		this.x = x;
+	public Goal(double x, double y){
+		this.x = x; 
 		this.y = y; 
-		
 	}
 
 	public double getX() {
@@ -27,5 +25,4 @@ public class Ball {
 	}
 	
 	
-
 }
