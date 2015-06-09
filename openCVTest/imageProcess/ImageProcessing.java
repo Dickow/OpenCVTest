@@ -51,15 +51,15 @@ public class ImageProcessing implements Runnable {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		
+
 		Mat frame = new Mat();
 
 		while (true) {
 			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
-			
+
 			frame = ImageObject.getInstance().getImg();
-			
+
 			Highgui.imwrite("cameraInput.jpg", frame);
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
@@ -68,21 +68,21 @@ public class ImageProcessing implements Runnable {
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
-			try{
-			Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
-			}catch(Exception e){
+			try {
+				Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
+			} catch (Exception e) {
 				System.out.println("frame was empty returning");
 				continue;
 			}
 			Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(3, 3), 0, 0);
-			
+
 			identifyLines();
-			
+
 			findRobotFrontAndBack();
-			
+
 			findBallsInImage(imageBlurr);
-			
+
 			try {
 				drawVectors();
 				ignoreBallInsideRobot();
@@ -91,9 +91,9 @@ public class ImageProcessing implements Runnable {
 				// do nothing
 			}
 			outImg2 = toBufferedImage(image);
-			
+
 			if (objects.size() > 0) {
-				// remove all illegal balls		
+				// remove all illegal balls
 				pathfinder.findPath(objects);
 			}
 
@@ -186,8 +186,8 @@ public class ImageProcessing implements Runnable {
 				1.8, 50, 80, 22, 5, 8);
 
 		if (!circles.empty()) {
-//			int radius;
-//			Point pt;
+			// int radius;
+			// Point pt;
 
 			for (int i = 0; i <= circles.cols(); i++) {
 
@@ -195,21 +195,22 @@ public class ImageProcessing implements Runnable {
 				if (coordinate == null) {
 					break;
 				}
-//				pt = new Point(Math.round(coordinate[0]),
-//						Math.round(coordinate[1]));
-//				radius = (int) Math.round(coordinate[2]);
+				// pt = new Point(Math.round(coordinate[0]),
+				// Math.round(coordinate[1]));
+				// radius = (int) Math.round(coordinate[2]);
 
-				//Core.circle(image, pt, radius, new Scalar(0, 0, 0));
+				// Core.circle(image, pt, radius, new Scalar(0, 0, 0));
 				objects.add(new NodeObjects(Math.round(coordinate[0]), Math
 						.round(coordinate[1]), "ball"));
 			}
 		}
 	}
-	
-	private void drawBalls(){
+
+	private void drawBalls() {
 		for (NodeObjects node : objects) {
-			if(node.getType().equalsIgnoreCase("ball")){
-				Core.circle(image, new Point(node.getX(),node.getY()),8, new Scalar(0,0,0));
+			if (node.getType().equalsIgnoreCase("ball")) {
+				Core.circle(image, new Point(node.getX(), node.getY()), 8,
+						new Scalar(0, 0, 0));
 			}
 		}
 	}
@@ -241,9 +242,9 @@ public class ImageProcessing implements Runnable {
 			// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 		}
-		try{
+		try {
 			drawApproxLines();
-		}catch(Exception e){
+		} catch (Exception e) {
 			System.out.println("no lines");
 		}
 	}
@@ -271,11 +272,21 @@ public class ImageProcessing implements Runnable {
 	}
 
 	private void drawApproxLines() {
+		int backIndex = findBack(objects);
+		int frontIndex = findFront(objects);
+
+		double midX = (objects.get(backIndex).getX() + objects.get(frontIndex)
+				.getX()) / 2;
+		double midY = (objects.get(backIndex).getY() + objects.get(frontIndex)
+				.getY()) / 2;
+
 		Rect topLeftRect = new Rect(new Point(0, 0), new Point(100, 100));
 		Rect topRightRect = new Rect(new Point(540, 0), new Point(640, 100));
 		Rect bottomLeftRect = new Rect(new Point(0, 380), new Point(100, 480));
 		Rect bottomRightRect = new Rect(new Point(540, 380),
 				new Point(640, 480));
+		Rect robotRectangle = new Rect((int) midX - 20, (int) midY - 20, 40, 40);
+		Rect arena = new Rect(new Point(100, 100), new Point(540, 380));
 
 		Point lineTopLeft;
 		Point lineTopRight;
@@ -342,6 +353,18 @@ public class ImageProcessing implements Runnable {
 		y /= count;
 		lineBottomRight = new Point(x, y);
 
+		for (int i = 0; i < lineCoordinates.size(); i++) {
+			if (lineCoordinates.get(i).inside(arena)
+					&& !lineCoordinates.get(i).inside(robotRectangle)) {
+				count++;
+				x += lineCoordinates.get(i).x;
+				y += lineCoordinates.get(i).y;
+			}
+		}
+		x /= count;
+		y /= count;
+		Point cross = new Point(x, y);
+
 		// add the corners to the list of objects that we have to take into
 		// consideration
 		objects.add(new NodeObjects(lineTopLeft.x, lineTopLeft.y, "LinePoint"));
@@ -350,10 +373,18 @@ public class ImageProcessing implements Runnable {
 				"LinePoint"));
 		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y,
 				"LinePoint"));
-		
+
+		// Add crss to the list of objects
+		objects.add(new NodeObjects(cross.x, cross.y, "cross"));
+
 		// add Goals to the list of objects
-		objects.add(new NodeObjects(lineBottomRight.x, Math.round(lineBottomRight.y / 2), "GoalA"));
-		objects.add(new NodeObjects(lineBottomRight.x, Math.round(lineBottomRight.y / 2), "GoalB"));
+		objects.add(new NodeObjects(lineBottomRight.x, Math
+				.round(lineBottomRight.y / 2), "GoalA"));
+		objects.add(new NodeObjects(lineBottomRight.x, Math
+				.round(lineBottomRight.y / 2), "GoalB"));
+
+		// Draw cross
+		Core.line(image, cross, cross, new Scalar(0, 0, 255), 3);
 
 		// draw lines
 		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
@@ -362,6 +393,7 @@ public class ImageProcessing implements Runnable {
 				new Scalar(0, 0, 255), 3);
 		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
 				3);
+
 	}
 
 	private void drawVectors() {
@@ -444,18 +476,23 @@ public class ImageProcessing implements Runnable {
 		// we need the back and front of robot to get area to delete from
 		int backIndex = findBack(objects);
 		int frontIndex = findFront(objects);
-		
-		double midX = (objects.get(backIndex).getX()+objects.get(frontIndex).getX())/2;
-		double midY = (objects.get(backIndex).getY()+objects.get(frontIndex).getY())/2;
-		
-		Rectangle robotRectangle = new Rectangle((int)midX-20, (int)midY-20, 40, 40);
-		
+
+		double midX = (objects.get(backIndex).getX() + objects.get(frontIndex)
+				.getX()) / 2;
+		double midY = (objects.get(backIndex).getY() + objects.get(frontIndex)
+				.getY()) / 2;
+
+		Rectangle robotRectangle = new Rectangle((int) midX - 20,
+				(int) midY - 20, 40, 40);
+
 		// run through the list of objects to find balls
 		for (int i = 0; i < objects.size(); i++) {
-			
+
 			// if x and y is between front and back of robot we remove the ball
-			if (objects.get(i).getType().equals("ball")&& robotRectangle.contains(objects.get(i).getX(), objects.get(i).getY())) {
-			
+			if (objects.get(i).getType().equals("ball")
+					&& robotRectangle.contains(objects.get(i).getX(), objects
+							.get(i).getY())) {
+
 				objects.remove(i);
 				i--;
 			}
