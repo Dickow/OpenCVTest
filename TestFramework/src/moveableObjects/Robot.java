@@ -17,6 +17,9 @@ public class Robot {
 		this.middleCord = new Coordinate(xMiddle, yMiddle);
 		
 	}
+	public Robot(){
+		
+	}
 	
 	public MoveState getState(){
 		return this.state;
@@ -49,7 +52,12 @@ public class Robot {
 	public void setMiddleCord(Coordinate middleCord) {
 		this.middleCord = middleCord;
 	}
-
+	
+	public void updateMiddleCord() {
+		middleCord = new Coordinate((frontCord.getX() + backCord.getX()) / 2,
+				(frontCord.getY() + backCord.getY()) / 2);
+	}
+	
 	public void rotateRobot(double rotationAngle) {
 		// code for rotation found on
 		// http://stackoverflow.com/questions/14842090/rotate-line-around-center-point-given-two-vertices

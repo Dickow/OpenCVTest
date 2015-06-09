@@ -8,6 +8,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
+import moveableObjects.Ball;
+import moveableObjects.Coordinate;
+import moveableObjects.Robot;
+import obstacles.Goal;
+import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 
 import org.opencv.core.Core;
@@ -17,12 +22,13 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
-import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
+import pathfinding.Pathfinder;
+
 public class ImageProcessing implements Runnable {
-	private PathFinding2 pathfinder = new PathFinding2();
+	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 5;
 
 	public int iLowH = 0;
@@ -44,10 +50,13 @@ public class ImageProcessing implements Runnable {
 	public int iHighV2 = 255;
 
 	public Image outImg, outImg2;
-	
-	private ObstacleFrame frames = new ObstacleFrame();
 
-	public ArrayList<NodeObjects> objects;
+	private ObstacleFrame frames = new ObstacleFrame();
+	private Robot robot = new Robot();
+	private ArrayList<Ball> balls;
+	private MiddleCross cross;
+	private Goal goalA, goalB;
+
 	public ArrayList<Point> lineCoordinates;
 	private Mat image;
 
@@ -57,10 +66,10 @@ public class ImageProcessing implements Runnable {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mat frame = new Mat();
-		
+
 		while (true) {
+			balls = new ArrayList<Ball>();
 			lineCoordinates = new ArrayList<Point>();
-			objects = new ArrayList<NodeObjects>();
 
 			frame = ImageObject.getInstance().getImg();
 
@@ -68,17 +77,14 @@ public class ImageProcessing implements Runnable {
 
 			// Consider the image for processing Imgproc.COLOR_BGR2GRAY
 			image = Highgui.imread("cameraInput.jpg");
-			// image = frame;
 			Mat imageHSV = new Mat(image.size(), Core.DEPTH_MASK_8U);
 			Mat imageBlurr = new Mat(image.size(), Core.DEPTH_MASK_8U);
-			// Mat imageA = new Mat(image.size(), Core.DEPTH_MASK_ALL);
 			try {
 				Imgproc.cvtColor(image, imageHSV, Imgproc.COLOR_BGR2GRAY);
 			} catch (Exception e) {
 				System.out.println("frame was empty returning");
 				continue;
 			}
-			Highgui.imwrite("gray.jpg", imageHSV);
 			Imgproc.GaussianBlur(imageHSV, imageBlurr, new Size(3, 3), 0, 0);
 
 			identifyLines();
@@ -96,11 +102,12 @@ public class ImageProcessing implements Runnable {
 			}
 			outImg2 = toBufferedImage(image);
 
-			if (objects.size() > 0) {
-				// remove all illegal balls
-				pathfinder.findPath(objects);
+			// TODO call the pathfinder here
+			try {
+				pathfinder.findPath(robot, balls, goalA, goalB, frames, cross);
+			} catch (Exception e) {
+				System.out.println("Error happened");
 			}
-
 		}
 
 	}
@@ -167,12 +174,14 @@ public class ImageProcessing implements Runnable {
 						new Scalar(255, 255, 255));
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-					objects.add(new NodeObjects(posX, posY, "robotBack"));
+					robot.setBackCord(new Coordinate(posX, posY));
 				} else {
-					objects.add(new NodeObjects(posX, posY, "robotFront"));
+					robot.setFrontCord(new Coordinate(posX, posY));
 				}
 			}
 		}
+
+		robot.updateMiddleCord();
 		// assemble the 2 robot findings into 1 Mat.
 		// convert this Mat to an Image
 		robotMats[0].copyTo(robotMats[1], robotMats[0]);
@@ -190,8 +199,6 @@ public class ImageProcessing implements Runnable {
 				1.8, 50, 80, 22, 5, 8);
 
 		if (!circles.empty()) {
-			// int radius;
-			// Point pt;
 
 			for (int i = 0; i <= circles.cols(); i++) {
 
@@ -199,23 +206,17 @@ public class ImageProcessing implements Runnable {
 				if (coordinate == null) {
 					break;
 				}
-				// pt = new Point(Math.round(coordinate[0]),
-				// Math.round(coordinate[1]));
-				// radius = (int) Math.round(coordinate[2]);
 
-				// Core.circle(image, pt, radius, new Scalar(0, 0, 0));
-				objects.add(new NodeObjects(Math.round(coordinate[0]), Math
-						.round(coordinate[1]), "ball"));
+				balls.add(new Ball(coordinate[0], coordinate[1]));
+				balls.get(balls.size() - 1).setRadius(coordinate[2]);
 			}
 		}
 	}
 
 	private void drawBalls() {
-		for (NodeObjects node : objects) {
-			if (node.getType().equalsIgnoreCase("ball")) {
-				Core.circle(image, new Point(node.getX(), node.getY()), 8,
-						new Scalar(0, 0, 0));
-			}
+		for (Ball ball : balls) {
+			Core.circle(image, new Point(ball.getX(), ball.getY()),
+					(int) ball.getRadius(), new Scalar(0, 0, 0));
 		}
 	}
 
@@ -226,8 +227,6 @@ public class ImageProcessing implements Runnable {
 
 		Mat src = Highgui.imread("cameraInput.jpg", 0);
 		Mat dst = new Mat();
-		// Imgproc.cvtColor(src, dst, Imgproc.COLOR_YUV420sp2RGB);
-		// Highgui.imwrite("wtf1.jpg",dst);
 		Imgproc.cvtColor(src, dst, Imgproc.COLOR_GRAY2BGR);
 		Highgui.imwrite("wtf2.jpg", dst);
 		Imgproc.Canny(dst, dst, 50, 200, 3, false);
@@ -243,7 +242,6 @@ public class ImageProcessing implements Runnable {
 			Point end = new Point(x2, y2);
 			lineCoordinates.add(start);
 			lineCoordinates.add(end);
-			// Core.line(image, start, end, new Scalar(255,0,0), 3);
 
 		}
 		try {
@@ -276,13 +274,10 @@ public class ImageProcessing implements Runnable {
 	}
 
 	private void drawApproxLines() {
-		int backIndex = findBack(objects);
-		int frontIndex = findFront(objects);
 
-		double midX = (objects.get(backIndex).getX() + objects.get(frontIndex)
-				.getX()) / 2;
-		double midY = (objects.get(backIndex).getY() + objects.get(frontIndex)
-				.getY()) / 2;
+		// the robot middle coordinates are already updated
+		double midX = robot.getMiddleCord().getX();
+		double midY = robot.getMiddleCord().getY();
 
 		Rect topLeftRect = new Rect(new Point(0, 0), new Point(100, 100));
 		Rect topRightRect = new Rect(new Point(540, 0), new Point(640, 100));
@@ -367,31 +362,53 @@ public class ImageProcessing implements Runnable {
 		}
 		x /= count;
 		y /= count;
-		Point cross = new Point(x, y);
+
+		// Add the cross object and set all the points
+		cross = new MiddleCross(x, y);
+		cross.setLeftCross(new Coordinate(cross.getCenterOfCross().getX()
+				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
+				cross.getCenterOfCross().getY()));
+
+		cross.setRightCross(new Coordinate(cross.getCenterOfCross().getX()
+				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
+				cross.getCenterOfCross().getY()));
+
+		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX(), cross
+				.getCenterOfCross().getY()
+				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+
+		cross.setBottomCross(new Coordinate(
+				cross.getCenterOfCross().getX(),
+				cross.getCenterOfCross().getY()
+						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
 
 		// add the corners to the list of objects that we have to take into
 		// consideration
-		objects.add(new NodeObjects(lineTopLeft.x, lineTopLeft.y, "LinePoint"));
-		objects.add(new NodeObjects(lineTopRight.x, lineTopRight.y, "LinePoint"));
-		objects.add(new NodeObjects(lineBottomLeft.x, lineBottomLeft.y,
-				"LinePoint"));
-		objects.add(new NodeObjects(lineBottomRight.x, lineBottomRight.y,
-				"LinePoint"));
+		frames.setTopLeft(new Coordinate(lineTopLeft.x, lineTopLeft.y));
+		frames.setTopRight(new Coordinate(lineTopRight.x, lineTopRight.y));
+		frames.setLowRight(new Coordinate(lineBottomRight.x, lineBottomRight.y));
+		frames.setLowLeft(new Coordinate(lineBottomLeft.x, lineBottomLeft.y));
 
-		// Add crss to the list of objects
-		objects.add(new NodeObjects(cross.x, cross.y, "cross"));
+		int lenghtOfRobot = (int) Math.ceil(Math.sqrt(Math.pow((robot
+				.getFrontCord().getX() - robot.getBackCord().getX()), 2)
+				+ Math.pow((robot.getFrontCord().getY() - robot.getBackCord()
+						.getY()), 2)));
 
-		int lenghtOfRobot =  (int) Math.ceil(Math.sqrt(Math.pow((objects.get(frontIndex).getX() - objects.get(backIndex).getX()), 2)
-				+ Math.pow((objects.get(frontIndex).getY() - objects.get(backIndex).getY()), 2)));
-		
 		// add Goal points to the list of objects (where the robot )
-		objects.add(new NodeObjects(lineBottomRight.x + lenghtOfRobot, Math
-				.round(lineBottomRight.y / 2), "GoalA"));
-		objects.add(new NodeObjects(lineBottomRight.x - lenghtOfRobot, Math
-				.round(lineBottomRight.y / 2), "GoalB"));
+		goalA = new Goal(lineBottomRight.x + lenghtOfRobot,
+				lineBottomRight.y / 2);
+		goalB = new Goal(lineBottomRight.x - lenghtOfRobot,
+				lineBottomRight.y / 2);
 
 		// Draw cross
-		Core.line(image, cross, cross, new Scalar(0, 0, 255), 3);
+		Core.line(image, new Point(cross.getLeftCross().getX(), cross
+				.getLeftCross().getY()), new Point(
+				cross.getRightCross().getX(), cross.getRightCross().getY()),
+				new Scalar(0, 0, 255), 3);
+		Core.line(image, new Point(cross.getTopCross().getX(), cross
+				.getTopCross().getY()), new Point(
+				cross.getBottomCross().getX(), cross.getBottomCross().getY()),
+				new Scalar(0, 0, 255), 3);
 
 		// draw lines
 		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
@@ -404,50 +421,38 @@ public class ImageProcessing implements Runnable {
 	}
 
 	private void drawVectors() {
-		int ballIndex = findClosestBall(objects);
-		int backIndex = findBack(objects);
-		int frontIndex = findFront(objects);
-		try {
-			Core.line(image, new Point(objects.get(backIndex).getX(), objects
-					.get(backIndex).getY()), new Point(objects.get(frontIndex)
-					.getX(), objects.get(frontIndex).getY()), new Scalar(0, 0,
-					0));
+		int ballIndex = findClosestBall(balls, robot);
 
-			Core.line(image, new Point(objects.get(backIndex).getX(), objects
-					.get(backIndex).getY()), new Point(objects.get(ballIndex)
-					.getX(), objects.get(ballIndex).getY()),
-					new Scalar(0, 0, 0));
+		try {
+			Core.line(image, new Point(robot.getBackCord().getX(), robot
+					.getBackCord().getY()), new Point(robot.getFrontCord()
+					.getX(), robot.getFrontCord().getY()), new Scalar(0, 0, 0));
+
+			Core.line(image, new Point(robot.getBackCord().getX(), robot
+					.getBackCord().getY()), new Point(balls.get(ballIndex)
+					.getX(), balls.get(ballIndex).getY()), new Scalar(0, 0, 0));
 		} catch (Exception e) {
 			return;
 		}
 
 	}
 
-	/**
-	 * @param objects
-	 * @return
-	 */
-	private int findClosestBall(ArrayList<NodeObjects> objects) {
-		double tmpLength;
-		double min_length = 1000;
-		int min_index = -1;
-		for (int i = 0; i < objects.size(); i++) {
-			if (objects.get(i).getType().equals("ball")) {
-				if ((tmpLength = calcLength(objects.get(i),
-						objects.get(findFront(objects)))) < min_length) {
-					min_length = tmpLength;
-					min_index = i;
-				}
+	private int findClosestBall(ArrayList<Ball> balls, Robot robot) {
+		// init with improbable values
+		int indexOfClosestBall = -1;
+		int shortestDistance = 9999;
+
+		// look through the rest of the array and see if another ball is closer
+		for (int i = 0; i < balls.size(); i++) {
+			int distance = (int) calcDifference(robot.getFrontCord().getX(),
+					robot.getFrontCord().getY(), balls.get(i).getX(), balls
+							.get(i).getY());
+			if (distance < shortestDistance) {
+				indexOfClosestBall = i;
+				shortestDistance = distance;
 			}
 		}
-
-		/* remove this when done testing */
-		try {
-			System.out.println(objects.get(min_index).toString());
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return -1;
-		}
-		return min_index;
+		return indexOfClosestBall;
 	}
 
 	int findFront(ArrayList<NodeObjects> objects) {
@@ -460,9 +465,8 @@ public class ImageProcessing implements Runnable {
 		return -1;
 	}
 
-	private double calcLength(NodeObjects first, NodeObjects second) {
-		return Math.sqrt(Math.pow((first.getX() - second.getX()), 2)
-				+ Math.pow((first.getY() - second.getY()), 2));
+	private double calcDifference(double x1, double y1, double x2, double y2) {
+		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 
 	int findBack(ArrayList<NodeObjects> objects) {
@@ -481,27 +485,18 @@ public class ImageProcessing implements Runnable {
 	private void ignoreBallInsideRobot() {
 
 		// we need the back and front of robot to get area to delete from
-		int backIndex = findBack(objects);
-		int frontIndex = findFront(objects);
-
-		double midX = (objects.get(backIndex).getX() + objects.get(frontIndex)
-				.getX()) / 2;
-		double midY = (objects.get(backIndex).getY() + objects.get(frontIndex)
-				.getY()) / 2;
+		double midX = (robot.getBackCord().getX() + robot.getFrontCord().getX()) / 2;
+		double midY = (robot.getBackCord().getY() + robot.getFrontCord().getY()) / 2;
 
 		Rectangle robotRectangle = new Rectangle((int) midX - 20,
 				(int) midY - 20, 40, 40);
 
 		// run through the list of objects to find balls
-		for (int i = 0; i < objects.size(); i++) {
-
+		for (Ball ball : balls) {
 			// if x and y is between front and back of robot we remove the ball
-			if (objects.get(i).getType().equals("ball")
-					&& robotRectangle.contains(objects.get(i).getX(), objects
-							.get(i).getY())) {
+			if (robotRectangle.contains(ball.getX(), ball.getY())) {
+				balls.remove(ball);
 
-				objects.remove(i);
-				i--;
 			}
 		}
 	}
