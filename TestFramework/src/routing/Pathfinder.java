@@ -1,11 +1,13 @@
 package routing;
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import obstacles.Goal;
 import obstacles.ObstacleFrame;
 import utilities.Vector;
 import MoveableObjects.Ball;
+import MoveableObjects.Coordinate;
 import MoveableObjects.MoveState;
 import MoveableObjects.Robot;
 
@@ -13,6 +15,7 @@ public class Pathfinder {
 
 	private RobotState state = RobotState.NOBALL;
 	private Ball destBall;
+	private Coordinate tempCord;
 	public double rotationAngle = 0, lengthToDest = 0;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
@@ -141,6 +144,41 @@ public class Pathfinder {
 
 	public Ball getDest() {
 		return this.destBall;
+	}
+	
+	/**
+	 * Method to avoid obstacles on the course by a given coordinate list
+	 * 
+	 * @param obstacleCoordinates
+	 */
+	private void avoidObstacle(Robot robot, ArrayList<Point> obstacleCoordinates, Coordinate destCord, double distance) {
+		
+		double lengthToDest = calcDifference(robot.getMiddleCord().getX(), robot.getMiddleCord().getY(), destCord.getX(), destCord.getY());
+
+		// Get the vector to nearest object
+		Vector robotVector = new Vector(robot.getMiddleCord().getX(),robot.getMiddleCord().getY());
+		Vector destination = new Vector(destCord.getX(), destCord.getY());
+		Vector directionVector = destination.sub(robotVector);
+		
+		
+		// Run through every coordinate to see if the vector runs through
+		for (int i = 0; i < obstacleCoordinates.size(); i++) {
+
+
+			for (int j = 0; j < robotVector.length(); j++) {
+				Vector newRobotVect = robotVector.add(directionVector.scale((double)distance/lengthToDest));
+				tempCord.setX(newRobotVect.dX);
+				tempCord.setY(newRobotVect.dY);
+
+				// If we hit an obstacle rotate and move robot away
+				if (tempCord.getX() == obstacleCoordinates.get(i).x
+						&& tempCord.getY() == obstacleCoordinates.get(i).y) {
+					//robot.rotateRobot(90);
+					//robot.forward(5, Coordinate);//TODO
+					System.out.println("Error in coordinates");
+				}
+			}
+		}
 	}
 
 }
