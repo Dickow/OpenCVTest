@@ -25,4 +25,17 @@ public class ObstacleFrame {
 	public Coordinate lowLeft(){
 		return frameCorners[3];
 	}
+	
+	public void setTopLeft(Coordinate topLeft){
+		frameCorners[0] = topLeft;
+	}
+	public void setTopRight(Coordinate topRight){
+		frameCorners[1] = topRight; 
+	}
+	public void setLowRight(Coordinate lowRight){
+		frameCorners[2] = lowRight;
+	}
+	public void setLowLeft(Coordinate lowLeft){
+		frameCorners[3] = lowLeft;
+	}
 }

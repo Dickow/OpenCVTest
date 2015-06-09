@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
+import obstacles.ObstacleFrame;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -42,6 +44,8 @@ public class ImageProcessing implements Runnable {
 	public int iHighV2 = 255;
 
 	public Image outImg, outImg2;
+	
+	private ObstacleFrame frames = new ObstacleFrame();
 
 	public ArrayList<NodeObjects> objects;
 	public ArrayList<Point> lineCoordinates;
@@ -53,7 +57,7 @@ public class ImageProcessing implements Runnable {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mat frame = new Mat();
-
+		
 		while (true) {
 			lineCoordinates = new ArrayList<Point>();
 			objects = new ArrayList<NodeObjects>();
