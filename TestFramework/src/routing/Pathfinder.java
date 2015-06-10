@@ -16,6 +16,7 @@ import utilities.Vector;
 public class Pathfinder {
 
 	private RobotState state = RobotState.NOBALL;
+	private RobotState prevState = RobotState.NOBALL;
 	private Ball destBall;
 	private ObstacleFrame frames;
 	public double rotationAngle = 0, lengthToDest = 0;
@@ -53,7 +54,7 @@ public class Pathfinder {
 				avoidObstacle(robot, balls.get(indexOfClosestBall),
 						lengthToDest, cross); // :TODO
 				if(state == RobotState.SAFETY){
-					robot.setState(MoveState.MOVING);
+					robot.setState(MoveState.ROTATING);
 					getToSafety(robot);
 				}
 				if (lengthToDest > 1) {
@@ -85,7 +86,6 @@ public class Pathfinder {
 
 			avoidObstacle(robot, goalADelivery, lengthToDest, cross); // :TODO
 			if(state == RobotState.SAFETY){
-				robot.setState(MoveState.MOVING);
 				getToSafety(robot);
 			}
 			// we have the angle from before
@@ -165,13 +165,19 @@ public class Pathfinder {
 	public RobotState getState() {
 		return this.state;
 	}
+	public RobotState getPrevState(){
+		return this.prevState;
+	}
 
 	public void setState(RobotState state) {
 		this.state = state;
 	}
-
+	
 	public Ball getDest() {
 		return this.destBall;
+	}
+	public Coordinate testDest(){
+		return this.dest;
 	}
 
 	/**
@@ -194,6 +200,7 @@ public class Pathfinder {
 				|| crossVerticalPart.intersectsLine(line)) {
 			
 			moveToSafePoint(robot, distance, cross);
+			prevState = state;
 			state = RobotState.SAFETY;
 		} 
 		
