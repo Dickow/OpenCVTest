@@ -53,6 +53,7 @@ public class Pathfinder {
 				avoidObstacle(robot, balls.get(indexOfClosestBall),
 						lengthToDest, cross); // :TODO
 				if(state == RobotState.SAFETY){
+					robot.setState(MoveState.MOVING);
 					getToSafety(robot);
 				}
 				if (lengthToDest > 1) {
@@ -84,6 +85,7 @@ public class Pathfinder {
 
 			avoidObstacle(robot, goalADelivery, lengthToDest, cross); // :TODO
 			if(state == RobotState.SAFETY){
+				robot.setState(MoveState.MOVING);
 				getToSafety(robot);
 			}
 			// we have the angle from before
@@ -118,7 +120,6 @@ public class Pathfinder {
 		rotationAngle = Math.abs(findRotationAngle(robot, dest));
 		lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 				.getFrontCord().getY(), dest.getX(), dest.getY());
-		robot.forward(lengthToDest, dest);
 	}
 
 	private int findClosestBall(ArrayList<Ball> balls, Robot robot) {

@@ -180,8 +180,14 @@ public class TestMain extends Applet implements Runnable {
 					nextState();
 					repaint();
 					sleep();
-				}
-				else if (router.getState() == RobotState.GRABBALL) {
+				} else if (router.getState() == RobotState.SAFETY) {
+					robot.forward(distance, new Coordinate(router.getDest()
+							.getX(), router.getDest().getY()));
+					nextState();
+					repaint();
+					sleep();
+					
+				} else if (router.getState() == RobotState.GRABBALL) {
 					balls.remove(router.getDest());
 					router.setState(RobotState.HASBALL);
 					repaint();
@@ -242,7 +248,7 @@ public class TestMain extends Applet implements Runnable {
 		switch (state) {
 		case ZERO:
 			state = RotationState.ONE;
-			break; 
+			break;
 		case ONE:
 			state = RotationState.TWO;
 			break;
