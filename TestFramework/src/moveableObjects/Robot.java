@@ -91,7 +91,6 @@ public class Robot {
 		// http://math.stackexchange.com/questions/333350/moving-point-along-the-vector	
 		
 		double lengthToDest = calcDifference(frontCord.getX(), frontCord.getY(), dest.getX(), dest.getY());
-		System.out.println(lengthToDest);
 		
 		Vector frontVector = new Vector(frontCord.getX(),frontCord.getY());
 		Vector backVector = new Vector(backCord.getX(), backCord.getY());

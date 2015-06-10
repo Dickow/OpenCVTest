@@ -20,7 +20,7 @@ import routing.RobotState;
 public class TestMain extends Applet implements Runnable {
 
 	private static final long serialVersionUID = -5731219325204852230L;
-	private Goal goalA, goalB;
+	private Goal goalA, goalB, goalADelivery;
 	private ObstacleFrame frames;
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private Pathfinder router;
@@ -35,17 +35,17 @@ public class TestMain extends Applet implements Runnable {
 		Frame frame = (Frame) this.getParent().getParent();
 		frame.setTitle("Robot test framework");
 	}
-	
+
 	private void createObjects() {
 		// create the robot
 		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
 
 		// create the balls placed on the map
 		Random rand = new Random();
-		for(int i = 0; i < 5; i++){
-			
-			int randomX = rand.nextInt((625-15) + 1) + 15;
-			int randomY = rand.nextInt((465-15) + 1) + 15;
+		for (int i = 0; i < 5; i++) {
+
+			int randomX = rand.nextInt((625 - 15) + 1) + 15;
+			int randomY = rand.nextInt((465 - 15) + 1) + 15;
 			balls.add(new Ball(randomX, randomY));
 		}
 
@@ -64,9 +64,11 @@ public class TestMain extends Applet implements Runnable {
 				((frames.topRight().getX() + frames.lowRight().getX()) / 2),
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
-		cross = new MiddleCross((frames.topRight().getX()
-				+ frames.topLeft().getX())/2, (frames.lowLeft().getY()
-				+ frames.topLeft().getY())/2);
+		goalADelivery = new Goal(goalA.getX() + 30, goalA.getY());
+
+		cross = new MiddleCross((frames.topRight().getX() + frames.topLeft()
+				.getX()) / 2, (frames.lowLeft().getY() + frames.topLeft()
+				.getY()) / 2);
 
 		cross.setLeftCross(new Coordinate(cross.getCenterOfCross().getX()
 				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
@@ -152,7 +154,7 @@ public class TestMain extends Applet implements Runnable {
 
 		if (robot.getState() == MoveState.ROTATING) {
 
-			state = RotationState.ONE;
+			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
 
 				double rotationAngle = router.rotationAngle / 10;
@@ -164,7 +166,7 @@ public class TestMain extends Applet implements Runnable {
 				sleep();
 			}
 		} else if (robot.getState() == MoveState.MOVING) {
-			state = RotationState.ONE;
+			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
 				double distance = router.lengthToDest / 10;
 
@@ -178,31 +180,22 @@ public class TestMain extends Applet implements Runnable {
 					repaint();
 					sleep();
 				}
-				if (router.getState() == RobotState.GRABBALL) {
+				else if (router.getState() == RobotState.GRABBALL) {
 					balls.remove(router.getDest());
 					router.setState(RobotState.HASBALL);
 					repaint();
 					sleep();
+					break;
 				}
 				// go for the goal
-				if (router.getState() == RobotState.HASBALL) {
+				else if (router.getState() == RobotState.HASBALL
+						|| router.getState() == RobotState.TO_DELIVER
+						|| router.getState() == RobotState.AT_DELIVER) {
 
-					if (robot.getState() == MoveState.ROTATING) {
-						double rotationAngle = router.rotationAngle / 10;
-						robot.rotateRobot(rotationAngle);
-						nextState();
-						repaint();
-						sleep();
-					} else {
-						robot.forward(distance, new Coordinate(goalA.getX() + 
-									Math.sqrt(Math.pow((robot.getFrontCord().getX() - 
-									robot.getBackCord().getX()), 2) + Math.pow((robot.getFrontCord().getY() - 
-									robot.getBackCord().getY()), 2)),
-								goalA.getY()));
-						nextState();
-						repaint();
-						sleep();
-					}
+					robot.forward(distance, router.dest);
+					nextState();
+					repaint();
+					sleep();
 
 				}
 
@@ -218,7 +211,8 @@ public class TestMain extends Applet implements Runnable {
 	public void run() {
 		while (true) {
 
-			router.findPath(robot, balls, goalA, goalB, frames, cross);
+			router.findPath(robot, balls, goalA, goalB, goalADelivery, frames,
+					cross);
 
 			updateComponents();
 
@@ -227,10 +221,10 @@ public class TestMain extends Applet implements Runnable {
 	}
 
 	public void start() {
-		createObstacles();
 		createObjects();
+		createObstacles();
 		router = new Pathfinder();
-		state = RotationState.ONE;
+		state = RotationState.ZERO;
 		Thread thread = new Thread(this);
 		thread.start();
 	}
@@ -239,13 +233,15 @@ public class TestMain extends Applet implements Runnable {
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	private void nextState() {
 		switch (state) {
+		case ZERO:
+			state = RotationState.ONE;
+			break; 
 		case ONE:
 			state = RotationState.TWO;
 			break;
@@ -274,7 +270,7 @@ public class TestMain extends Applet implements Runnable {
 			state = RotationState.TEN;
 			break;
 		case TEN:
-			state = RotationState.ONE;
+			state = RotationState.ZERO;
 			break;
 
 		default:

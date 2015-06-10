@@ -1,6 +1,7 @@
 package screen;
 
 public enum RotationState {
+	ZERO,
 	ONE,
 	TWO,
 	THREE,
