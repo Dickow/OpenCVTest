@@ -127,29 +127,29 @@ public class TrackbarWindow {
 		trackPanel.add(upperVSlider);
 
 		// set the Labels of the blue color find
-		lowerH2 = new JLabel("lower H : " + imageProcess.iLowH2);
-		upperH2 = new JLabel("upper H : " + imageProcess.iHighH2);
+		lowerH2 = new JLabel("lower H : " + imageProcess.iLowHFront);
+		upperH2 = new JLabel("upper H : " + imageProcess.iHighHFront);
 
-		lowerS2 = new JLabel("lower S : " + imageProcess.iLowS2);
-		upperS2 = new JLabel("upper S : " + imageProcess.iHighS2);
+		lowerS2 = new JLabel("lower S : " + imageProcess.iLowSFront);
+		upperS2 = new JLabel("upper S : " + imageProcess.iHighSFront);
 
-		lowerV2 = new JLabel("lower V : " + imageProcess.iLowV2);
-		upperV2 = new JLabel("upper V : " + imageProcess.iHighV2);
+		lowerV2 = new JLabel("lower V : " + imageProcess.iLowVFront);
+		upperV2 = new JLabel("upper V : " + imageProcess.iHighVFront);
 
 		// set the Sliders
-		lowerHSlider2 = new JSlider(0, 255, imageProcess.iLowH2);
+		lowerHSlider2 = new JSlider(0, 255, imageProcess.iLowHFront);
 		lowerHSlider2.addChangeListener(slideListener);
-		upperHSlider2 = new JSlider(0, 255, imageProcess.iHighH2);
+		upperHSlider2 = new JSlider(0, 255, imageProcess.iHighHFront);
 		upperHSlider2.addChangeListener(slideListener);
 
-		lowerSSlider2 = new JSlider(0, 255, imageProcess.iLowS2);
+		lowerSSlider2 = new JSlider(0, 255, imageProcess.iLowSFront);
 		lowerSSlider2.addChangeListener(slideListener);
-		upperSSlider2 = new JSlider(0, 255, imageProcess.iHighS2);
+		upperSSlider2 = new JSlider(0, 255, imageProcess.iHighSFront);
 		upperSSlider2.addChangeListener(slideListener);
 
-		lowerVSlider2 = new JSlider(0, 255, imageProcess.iLowV2);
+		lowerVSlider2 = new JSlider(0, 255, imageProcess.iLowVFront);
 		lowerVSlider2.addChangeListener(slideListener);
-		upperVSlider2 = new JSlider(0, 255, imageProcess.iHighV2);
+		upperVSlider2 = new JSlider(0, 255, imageProcess.iHighVFront);
 		upperVSlider2.addChangeListener(slideListener);
 
 		// add all the components to the panel
@@ -246,32 +246,32 @@ public class TrackbarWindow {
 			// second part of the sliders
 			if (e.getSource() == lowerHSlider2) {
 				lowerH2.setText("lower H : " + lowerHSlider2.getValue());
-				imageProcess.iLowH2 = lowerHSlider2.getValue();
+				imageProcess.iLowHFront = lowerHSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperHSlider2) {
 				upperH2.setText("upper H : " + upperHSlider2.getValue());
-				imageProcess.iHighH2 = upperHSlider2.getValue();
+				imageProcess.iHighHFront = upperHSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerSSlider2) {
 				lowerS2.setText("lower S : " + lowerSSlider2.getValue());
-				imageProcess.iLowS2 = lowerSSlider2.getValue();
+				imageProcess.iLowSFront = lowerSSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperSSlider2) {
 				upperS2.setText("upper S : " + upperSSlider2.getValue());
-				imageProcess.iHighS2 = upperSSlider2.getValue();
+				imageProcess.iHighSFront = upperSSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == lowerVSlider2) {
 				lowerV2.setText("lower V : " + lowerVSlider2.getValue());
-				imageProcess.iLowV2 = lowerVSlider2.getValue();
+				imageProcess.iLowVFront = lowerVSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			} else if (e.getSource() == upperVSlider2) {
 				upperV2.setText("upper V : " + upperVSlider2.getValue());
-				imageProcess.iHighV2 = upperVSlider2.getValue();
+				imageProcess.iHighVFront = upperVSlider2.getValue();
 				// imgLabel.removeAll();
 				// imgLabel.setIcon(new ImageIcon(imageProcess.outImg));
 			}

@@ -6,3 +6,6 @@ lowerV = 0; upperV = 195;
 
 blue color lowerH = 96; upperH = 136; lowerS = 173;
 upperS = 255; lowerV = 119; upperV = 255;
+
+green color lowerH = 49; upperH = 97; lowerS = 155; upperS 255; l
+lowerV = 0; upperV = 255
