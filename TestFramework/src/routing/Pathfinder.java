@@ -23,6 +23,7 @@ public class Pathfinder {
 
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
+	private int safePointCounter = 0;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
@@ -170,6 +171,7 @@ public class Pathfinder {
 
 		Line2D line = new Line2D.Double(robot.getFrontCord().getX(), robot
 				.getFrontCord().getY(), destCord.getX(), destCord.getY());
+		
 
 		setcrossHorizontalPart(crossHorizontalPart, cross);
 		setcrossVerticalPart(crossVerticalPart, cross);
@@ -177,9 +179,13 @@ public class Pathfinder {
 		// If we hit an obstacle rotate and move robot away
 		if (crossHorizontalPart.intersectsLine(line)
 				|| crossVerticalPart.intersectsLine(line)) {
-
-			System.out.println("Error in coordinates");
-		}
+			
+			moveToSafePoint(robot, destCord, distance, cross);
+			//System.out.println("Error in coordinates");
+		} 
+		
+		safePointCounter = 0;
+		
 	}
 
 	public Rectangle getcrossHorizontalPart() {
@@ -212,4 +218,18 @@ public class Pathfinder {
 				crossHeight);
 	}
 
+	public void moveToSafePoint(Robot robot, Coordinate destCord, double distance, MiddleCross cross){
+		
+		Coordinate[] safePoints = new Coordinate[3];
+		safePoints[0] = new Coordinate(10, 10);
+		safePoints[1] = new Coordinate(630, 10);
+		safePoints[2] = new Coordinate(10, 470);
+		safePoints[3] = new Coordinate(630, 470);
+	
+		destCord = safePoints[safePointCounter];
+		avoidObstacle(robot, destCord, distance, cross);
+			
+		safePointCounter++;
+		
+	}
 }
