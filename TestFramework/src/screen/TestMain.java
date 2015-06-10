@@ -26,7 +26,7 @@ public class TestMain extends Applet implements Runnable {
 	private Pathfinder router;
 	private RotationState state;
 	private MiddleCross cross;
-	private Robot robot;;
+	private Robot robot;
 
 	public void init() {
 		setSize(640, 480);
@@ -162,10 +162,10 @@ public class TestMain extends Applet implements Runnable {
 				robot.rotateRobot(rotationAngle);
 				nextState();
 				repaint();
-
 				// set slower rotation
 				sleep();
 			}
+			robot.setState(MoveState.MOVING);
 		} else if (robot.getState() == MoveState.MOVING) {
 			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
@@ -177,11 +177,26 @@ public class TestMain extends Applet implements Runnable {
 				if (router.getState() == RobotState.NOBALL) {
 					robot.forward(distance, new Coordinate(router.getDest()
 							.getX(), router.getDest().getY()));
+
 					nextState();
 					repaint();
 					sleep();
-				}
-				else if (router.getState() == RobotState.GRABBALL) {
+				} else if (router.getState() == RobotState.SAFETY) {
+					Coordinate cord = new Coordinate(router.testDest().getX(),
+							router.testDest().getY());
+					robot.forward(distance, cord);
+
+					if (router.getPrevState() == RobotState.TO_DELIVER) {
+						router.setState(RobotState.TO_DELIVER);
+					} else {
+						router.setState(RobotState.NOBALL);
+					}
+					nextState();
+					repaint();
+					sleep();
+					break;
+
+				} else if (router.getState() == RobotState.GRABBALL) {
 					balls.remove(router.getDest());
 					router.setState(RobotState.HASBALL);
 					repaint();
@@ -242,7 +257,7 @@ public class TestMain extends Applet implements Runnable {
 		switch (state) {
 		case ZERO:
 			state = RotationState.ONE;
-			break; 
+			break;
 		case ONE:
 			state = RotationState.TWO;
 			break;
