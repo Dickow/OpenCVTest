@@ -48,6 +48,7 @@ public class TestMain extends Applet implements Runnable {
 			int randomY = rand.nextInt((465 - 15) + 1) + 15;
 			balls.add(new Ball(randomX, randomY));
 		}
+		balls.add(new Ball(400, 250));
 
 	}
 

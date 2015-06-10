@@ -5,5 +5,6 @@ public enum RobotState {
 	NOBALL,
 	GRABBALL,
 	TO_DELIVER,
-	AT_DELIVER
+	AT_DELIVER,
+	SAFETY
 }

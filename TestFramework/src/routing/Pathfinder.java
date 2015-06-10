@@ -23,7 +23,7 @@ public class Pathfinder {
 
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
-	private int safePointCounter = 0;
+	private int safePointCounter = -1;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
@@ -52,6 +52,9 @@ public class Pathfinder {
 						balls.get(indexOfClosestBall).getY());
 				avoidObstacle(robot, balls.get(indexOfClosestBall),
 						lengthToDest, cross); // :TODO
+				if(state == RobotState.SAFETY){
+					getToSafety(robot);
+				}
 				if (lengthToDest > 1) {
 					robot.setState(MoveState.MOVING);
 					destBall = balls.get(indexOfClosestBall);
@@ -80,7 +83,9 @@ public class Pathfinder {
 			}
 
 			avoidObstacle(robot, goalADelivery, lengthToDest, cross); // :TODO
-			
+			if(state == RobotState.SAFETY){
+				getToSafety(robot);
+			}
 			// we have the angle from before
 			if (rotationAngle > 1) {
 				// rotate the robot
@@ -107,6 +112,13 @@ public class Pathfinder {
 
 			// find the distance if no rotation were necessary
 		}
+	}
+	
+	private void getToSafety(Robot robot){
+		rotationAngle = Math.abs(findRotationAngle(robot, dest));
+		lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
+				.getFrontCord().getY(), dest.getX(), dest.getY());
+		robot.forward(lengthToDest, dest);
 	}
 
 	private int findClosestBall(ArrayList<Ball> balls, Robot robot) {
@@ -180,11 +192,11 @@ public class Pathfinder {
 		if (crossHorizontalPart.intersectsLine(line)
 				|| crossVerticalPart.intersectsLine(line)) {
 			
-			moveToSafePoint(robot, destCord, distance, cross);
-			//System.out.println("Error in coordinates");
+			moveToSafePoint(robot, distance, cross);
+			state = RobotState.SAFETY;
 		} 
 		
-		safePointCounter = 0;
+		safePointCounter = -1;
 		
 	}
 
@@ -218,16 +230,16 @@ public class Pathfinder {
 				crossHeight);
 	}
 
-	public void moveToSafePoint(Robot robot, Coordinate destCord, double distance, MiddleCross cross){
+	public void moveToSafePoint(Robot robot, double distance, MiddleCross cross){
 		
-		Coordinate[] safePoints = new Coordinate[3];
+		Coordinate[] safePoints = new Coordinate[4];
 		safePoints[0] = new Coordinate(10, 10);
 		safePoints[1] = new Coordinate(630, 10);
 		safePoints[2] = new Coordinate(10, 470);
 		safePoints[3] = new Coordinate(630, 470);
 	
-		destCord = safePoints[safePointCounter];
-		avoidObstacle(robot, destCord, distance, cross);
+		dest = safePoints[safePointCounter + 1];
+		avoidObstacle(robot, dest, distance, cross);
 			
 		safePointCounter++;
 		
