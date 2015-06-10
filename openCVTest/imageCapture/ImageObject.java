@@ -7,6 +7,7 @@ public class ImageObject {
 	// variables
 	private static ImageObject instance = null; 
 	private Mat matImg = new Mat(); 
+	private boolean imgSet = false; 
 	
 	protected ImageObject(){
 		
@@ -22,7 +23,8 @@ public class ImageObject {
 	
 	public synchronized Mat getImg(){
 		
-		if(matImg != null){
+		if(imgSet == true){
+			imgSet = false; 
 			return this.matImg;
 		}else{
 			return null; 
@@ -30,6 +32,7 @@ public class ImageObject {
 	}
 	
 	public synchronized void setImg(Mat newImg){
+		imgSet = true; 
 		this.matImg = newImg; 
 	}
 
