@@ -100,12 +100,13 @@ public class Robot {
 		Vector backVector = new Vector(backCord.getX(), backCord.getY());
 		Vector destination = new Vector(dest.getX(), dest.getY());
 		Vector directionVector = destination.sub(frontVector);
-		
-		Vector newRobotVect = frontVector.add(directionVector.scale((double)distance/lengthToDest));
+		System.out.println(lengthToDest);
+		Vector newRobotVect = frontVector.add(directionVector.scale((distance)/(0.00000000001+lengthToDest)));
+	
 		frontCord.setX(newRobotVect.dX);
 		frontCord.setY(newRobotVect.dY);
 
-		newRobotVect = backVector.add(directionVector.scale((double)distance/lengthToDest));
+		newRobotVect = backVector.add(directionVector.scale((distance)/(0.00000000001+lengthToDest)));
 		backCord.setX(newRobotVect.dX);
 		backCord.setY(newRobotVect.dY);
 		

@@ -165,7 +165,7 @@ public class TestMain extends Applet implements Runnable {
 				repaint();
 				sleep();
 			}
-			robot.setState(MoveState.MOVING);
+			
 		} else if (robot.getState() == MoveState.MOVING) {
 			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {

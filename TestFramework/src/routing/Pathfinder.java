@@ -29,10 +29,10 @@ public class Pathfinder {
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
-
+ 
 		rotationAngle = 0;
 		lengthToDest = 0;
-
+		
 		// calculate and set the frame and obstacles of the course prior to
 		// routing
 		this.frames = frames;
@@ -41,28 +41,35 @@ public class Pathfinder {
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross);
 		robot.updateMiddleCord();
+		//System.out.println(robot);
 
 		switch (destState) {
 		case NODEST:
+			//System.out.println(state);
+			//System.out.println(destState);
 			// try to see if we can reach a ball
 			if (state == RobotState.NOBALL) {
+				//System.out.println("1");
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
 				dest = goalA;
+				//System.out.println("2");
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
-				state = RobotState.HASBALL; 
+				state = RobotState.HASBALL;
+				//System.out.println("3");
 				return; 
 			} 
 			else if(state == RobotState.SCOREBALL){
 				// do the score routine here but in the test we already scored
 				state = RobotState.NOBALL; 
+				//System.out.println("4");
 				return; 
 			}
 			else {
 			
-				System.out.println("fejl i jeppes mor");
+				//System.out.println("fejl i jeppes mor");
 			}
 			
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
@@ -72,9 +79,12 @@ public class Pathfinder {
 				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint) && currentSafePoint == -1) {
 					dest = safePoints[findSafePoint(robot.toCoordinate())];
 					currentSafePoint = findSafePoint(robot.toCoordinate());
+					//System.out.println("5");
 				} else {
 					currentSafePoint = nextSafePoint();
 					dest = safePoints[currentSafePoint];
+					//System.out.println("current safe point = " + currentSafePoint);
+					//System.out.println("6");
 				}
 			}
 			else {
@@ -262,7 +272,7 @@ public class Pathfinder {
 						.getY() + cross.getBottomCross().getY()) / 2);
 				break;
 			default:
-				System.out.println("WTF happend");
+				//System.out.println("WTF happend");
 				break;
 
 			}
