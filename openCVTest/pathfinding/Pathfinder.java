@@ -1,6 +1,7 @@
 package pathfinding;
 
-import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import moveableObjects.Ball;
@@ -15,64 +16,93 @@ import geometry.Vector;
 public class Pathfinder {
 
 	private RobotState state = RobotState.NOBALL;
-	private Ball destBall;
-	private Coordinate tempCord;
+	private ObstacleFrame frames;
+	private MiddleCross cross;
 	public double rotationAngle = 0, lengthToDest = 0;
+	public Coordinate dest;
+	private Coordinate[] safePoints = new Coordinate[4];
+	private int currentSafePoint = -1;
+	private Rectangle crossHorizontalPart;
+	private Rectangle crossVerticalPart;
+	private DestState destState = DestState.NODEST;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
-			Goal goalB, ObstacleFrame frames, MiddleCross cross) {
+			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
+			MiddleCross cross) {
+
 		rotationAngle = 0;
 		lengthToDest = 0;
-		// we have no ball right now so find one
-		if (state == RobotState.NOBALL) {
-			// find the closest ball first
-			destBall = null;
-			int indexOfClosestBall = findClosestBall(balls, robot);
 
-			// this functions returns the angle to the destination based on the
-			// current state
-			rotationAngle = Math.abs(findRotationAngle(robot, goalA,
-					balls.get(indexOfClosestBall)));
+		// calculate and set the frame and obstacles of the course prior to
+		// routing
+		this.frames = frames;
+		this.cross = cross;
+		setSafePoints();
+		// makes sure the cross is seen as an obstacle
+		setObstacles(cross);
+		robot.updateMiddleCord();
 
-			if (rotationAngle > 1) {
-				robot.setState(MoveState.ROTATING);
-			} else {
-				lengthToDest = calcDifference(robot.getFrontCord().getX(),
-						robot.getFrontCord().getY(),
-						balls.get(indexOfClosestBall).getX(),
-						balls.get(indexOfClosestBall).getY());
-				if (lengthToDest > 1) {
-					robot.setState(MoveState.MOVING);
-					destBall = balls.get(indexOfClosestBall);
+		switch (destState) {
+		case NODEST:
+			// try to see if we can reach a ball
+			if (state == RobotState.NOBALL) {
+				dest = balls.get(findClosestBall(balls, robot));
+
+			} else if (state == RobotState.HASBALL) {
+				dest = goalA;
+			} else if (state == RobotState.GRABBALL) {
+				// grab the ball here, but in the test we already got it
+				state = RobotState.HASBALL; 
+				return; 
+			} 
+			else if(state == RobotState.SCOREBALL){
+				// do the score routine here but in the test we already scored
+				state = RobotState.NOBALL; 
+				return; 
+			}
+			else {
+			
+				System.out.println("fejl i jeppes mor");
+			}
+			
+			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
+					.getFrontCord().getY(), dest.getX(), dest.getY());
+			
+			if (avoidObstacle(robot, dest, lengthToDest)) {
+				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint) && currentSafePoint == -1) {
+					dest = safePoints[findSafePoint(robot.toCoordinate())];
+					currentSafePoint = findSafePoint(robot.toCoordinate());
 				} else {
-					state = RobotState.GRABBALL;
-					destBall = balls.get(indexOfClosestBall);
+					currentSafePoint = nextSafePoint();
+					dest = safePoints[currentSafePoint];
 				}
 			}
-		}
-		// we already have a ball so find a way to the goal
-		else if (state == RobotState.HASBALL) {
-			// this functions returns the angle to the destination based on the
-			// current state
-			rotationAngle = Math.abs(findRotationAngle(robot, goalA, null));
-			// calculate the length to the destination
+			else {
+				currentSafePoint = -1;
+			}
+			destState = DestState.HASDEST;
+
+		case HASDEST:
+			rotationAngle = findRotationAngle(robot, dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
-					.getFrontCord().getY(), goalA.getX(), goalA.getY());
-			// we have the angle from before
+					.getFrontCord().getY(), dest.getX(), dest.getY());
+
 			if (rotationAngle > 1) {
-				// rotate the robot
 				robot.setState(MoveState.ROTATING);
 			} else if (lengthToDest > 1) {
-				// move towards the goal
 				robot.setState(MoveState.MOVING);
 			} else {
-				// we are the goal throw it in
-				state = RobotState.NOBALL;
+				// arrived at dest routine
+				destState = DestState.NODEST;
+				destReached();
 			}
 
-			// find the distance if no rotation were necessary
-		}
+			break;
 
+		default:
+			break;
+
+		}
 	}
 
 	private int findClosestBall(ArrayList<Ball> balls, Robot robot) {
@@ -97,41 +127,45 @@ public class Pathfinder {
 		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 
-	private double findRotationAngle(Robot robot, Goal goalA, Ball ball) {
+	private double findRotationAngle(Robot robot, Coordinate dest) {
 
 		Vector robotVect = new Vector(robot.getFrontCord().getX()
 				- robot.getMiddleCord().getX(), robot.getFrontCord().getY()
 				- robot.getMiddleCord().getY());
 
-		Vector goalVect = new Vector((goalA.getX() - robot.getMiddleCord()
-				.getX()), (goalA.getY() - robot.getMiddleCord().getY()));
+		Vector destVect = new Vector((dest.getX() - robot.getMiddleCord()
+				.getX()), (dest.getY() - robot.getMiddleCord().getY()));
 
-		if (state == RobotState.NOBALL) {
-			if (ball != null) {
-				Vector ballVect = new Vector((ball.getX() - robot
-						.getMiddleCord().getX()), (ball.getY() - robot
-						.getMiddleCord().getY()));
-				double angRadians = Math.atan2(robotVect.dX * (ballVect.dY)
-						- (robotVect.dY) * ballVect.dX, robotVect.dX
-						* ballVect.dX + (robotVect.dY) * (ballVect.dY));
+		double angRadians = Math.atan2(robotVect.dX * (destVect.dY)
+				- (robotVect.dY) * destVect.dX, robotVect.dX * destVect.dX
+				+ (robotVect.dY) * (destVect.dY));
 
-				double angDegrees = Math.toDegrees(angRadians);
+		double angDegrees = Math.toDegrees(angRadians);
+		return Math.abs(angDegrees);
 
-				System.out.println("rotation angle to ball = " + angDegrees);
-				return angDegrees;
+	}
+
+	private void destReached() {
+		switch (state) {
+		case GRABBALL:
+			state = RobotState.HASBALL;
+			break;
+		case HASBALL:
+			if (currentSafePoint == -1) {
+				state = RobotState.SCOREBALL;
 			}
-			return -1;
+			break;
+		case NOBALL:
+			if (currentSafePoint == -1) {
+				state = RobotState.GRABBALL;
+			}
+			break;
+		case SCOREBALL:
+			state = RobotState.NOBALL;
+			break;
+		default:
+			break;
 
-		} else {
-
-			double angRadians = Math.atan2(robotVect.dX * (goalVect.dY)
-					- (robotVect.dY) * goalVect.dX, robotVect.dX * goalVect.dX
-					+ (robotVect.dY) * (goalVect.dY));
-
-			double angDegrees = Math.toDegrees(angRadians);
-
-			System.out.println("rotation angle to goal = " + angDegrees);
-			return angDegrees;
 		}
 	}
 
@@ -143,43 +177,140 @@ public class Pathfinder {
 		this.state = state;
 	}
 
-	public Ball getDest() {
-		return this.destBall;
+	public Coordinate getDest() {
+		return this.dest;
 	}
-	
+
 	/**
 	 * Method to avoid obstacles on the course by a given coordinate list
 	 * 
-	 * @param obstacleCoordinates
+	 * @param crossCoordinates
 	 */
-	private void avoidObstacle(Robot robot, ArrayList<Point> obstacleCoordinates, Coordinate destCord, double distance) {
-		
-		double lengthToDest = calcDifference(robot.getMiddleCord().getX(), robot.getMiddleCord().getY(), destCord.getX(), destCord.getY());
+	private boolean avoidObstacle(Robot robot, Coordinate destCord,
+			double distance) {
 
-		// Get the vector to nearest object
-		Vector robotVector = new Vector(robot.getMiddleCord().getX(),robot.getMiddleCord().getY());
-		Vector destination = new Vector(destCord.getX(), destCord.getY());
-		Vector directionVector = destination.sub(robotVector);
-		
-		
-		// Run through every coordinate to see if the vector runs through
-		for (int i = 0; i < obstacleCoordinates.size(); i++) {
+		Line2D line = new Line2D.Double(robot.getFrontCord().getX(), robot
+				.getFrontCord().getY(), destCord.getX(), destCord.getY());
 
+		// If we hit an obstacle rotate and move robot away
+		if (crossHorizontalPart.intersectsLine(line)
+				|| crossVerticalPart.intersectsLine(line)) {
+			return true;
+		}
+		return false;
+	}
 
-			for (int j = 0; j < robotVector.length(); j++) {
-				Vector newRobotVect = robotVector.add(directionVector.scale((double)distance/lengthToDest));
-				tempCord.setX(newRobotVect.dX);
-				tempCord.setY(newRobotVect.dY);
+	private void setObstacles(MiddleCross cross) {
+		setcrossHorizontalPart(crossHorizontalPart, cross);
+		setcrossVerticalPart(crossVerticalPart, cross);
+	}
 
-				// If we hit an obstacle rotate and move robot away
-				if (tempCord.getX() == obstacleCoordinates.get(i).x
-						&& tempCord.getY() == obstacleCoordinates.get(i).y) {
-					//robot.rotateRobot(90);
-					//robot.forward(5, Coordinate);//TODO
-					System.out.println("Error in coordinates");
-				}
+	public Rectangle getcrossHorizontalPart() {
+		return crossHorizontalPart;
+	}
+
+	public void setcrossHorizontalPart(Rectangle crossHorizontalPart,
+			MiddleCross cross) {
+		int crossX = (int) cross.getLeftCross().getX();
+		int crossY = (int) cross.getLeftCross().getY() - 10;
+		int crossWidth = (int) ((frames.topRight().getX() - frames.topLeft()
+				.getX()) / 18) * 2;
+		int crossHeight = 10;
+		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
+				crossHeight);
+	}
+
+	public Rectangle getcrossVerticalPart() {
+		return crossVerticalPart;
+	}
+
+	public void setcrossVerticalPart(Rectangle crossVerticalPart,
+			MiddleCross cross) {
+		int crossX = (int) cross.getTopCross().getX() - 10;
+		int crossY = (int) cross.getTopCross().getY();
+		int crossWidth = 10;
+		int crossHeight = (int) ((frames.lowRight().getY() - frames.topRight()
+				.getY()) / 12) * 2;
+		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
+				crossHeight);
+	}
+
+	private void setSafePoints() {
+
+		for (int i = 0; i < safePoints.length; i++) {
+			switch (i) {
+			case 0:
+				safePoints[0] = new Coordinate((frames.topLeft().getX() + cross
+						.getCenterOfCross().getX()) / 2, (frames.topLeft()
+						.getY() + cross.getTopCross().getY()) / 2);
+				break;
+			case 1:
+				safePoints[1] = new Coordinate(
+						(frames.topRight().getX() + cross.getCenterOfCross()
+								.getX()) / 2, (frames.topRight().getY() + cross
+								.getTopCross().getY()) / 2);
+				break;
+			case 2:
+				safePoints[2] = new Coordinate(
+						(frames.lowRight().getX() + cross.getCenterOfCross()
+								.getX()) / 2, (frames.lowRight().getY() + cross
+								.getBottomCross().getY()) / 2);
+				break;
+			case 3:
+				safePoints[3] = new Coordinate((frames.lowLeft().getX() + cross
+						.getCenterOfCross().getX()) / 2, (frames.lowLeft()
+						.getY() + cross.getBottomCross().getY()) / 2);
+				break;
+			default:
+				System.out.println("WTF happend");
+				break;
+
 			}
 		}
 	}
 
+	private int findSafePoint(Coordinate dest) {
+
+		int retIndex = -1;
+		double shortestDistance = 99999;
+
+		for (int i = 0; i < safePoints.length; i++) {
+			if (retIndex == -1) {
+				retIndex = i;
+				shortestDistance = calcDifference(safePoints[0].getX(),
+						safePoints[0].getY(), dest.getX(), dest.getY());
+			}
+			double tmpDistance = calcDifference(safePoints[i].getX(),
+					safePoints[i].getY(), dest.getX(), dest.getY());
+			if (tmpDistance < shortestDistance && tmpDistance > 20) {
+				shortestDistance = tmpDistance;
+				retIndex = i;
+			}
+
+		}
+		return retIndex;
+	}
+
+	private int nextSafePoint() {
+
+		switch (currentSafePoint) {
+		case 0:
+
+			return 1;
+
+		case 1:
+
+			return 2;
+		case 2:
+
+			return 3;
+
+		case 3:
+
+			return 0;
+
+		default:
+			return 0;
+		}
+	}
 }

@@ -3,5 +3,6 @@ package pathfinding;
 public enum RobotState {
 	HASBALL,
 	NOBALL,
-	GRABBALL
+	GRABBALL,
+	SCOREBALL
 }
