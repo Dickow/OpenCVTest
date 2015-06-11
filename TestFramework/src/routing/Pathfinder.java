@@ -64,16 +64,21 @@ public class Pathfinder {
 			
 				System.out.println("fejl i jeppes mor");
 			}
+			
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
+			
 			if (avoidObstacle(robot, dest, lengthToDest)) {
-				if (!(findSafePoint(robot.toCoordinate()) == currentSafePoint)) {
+				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint) && currentSafePoint == -1) {
 					dest = safePoints[findSafePoint(robot.toCoordinate())];
 					currentSafePoint = findSafePoint(robot.toCoordinate());
 				} else {
 					currentSafePoint = nextSafePoint();
 					dest = safePoints[currentSafePoint];
 				}
+			}
+			else {
+				currentSafePoint = -1;
 			}
 			destState = DestState.HASDEST;
 
@@ -89,7 +94,6 @@ public class Pathfinder {
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
-				currentSafePoint = -1;
 				destReached();
 			}
 

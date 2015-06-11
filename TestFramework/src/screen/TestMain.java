@@ -42,14 +42,14 @@ public class TestMain extends Applet implements Runnable {
 		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
 
 		// create the balls placed on the map
-//		Random rand = new Random();
-//		for (int i = 0; i < 5; i++) {
-//
-//			int randomX = rand.nextInt((625 - 15) + 1) + 15;
-//			int randomY = rand.nextInt((465 - 15) + 1) + 15;
-//			balls.add(new Ball(randomX, randomY));
-//		}
-		balls.add(new Ball(400, 250));
+		Random rand = new Random();
+		for (int i = 0; i < 5; i++) {
+
+			int randomX = rand.nextInt((625 - 15) + 1) + 15;
+			int randomY = rand.nextInt((465 - 15) + 1) + 15;
+			balls.add(new Ball(randomX, randomY));
+		}
+		balls.add(new Ball(400, 280));
 
 	}
 
