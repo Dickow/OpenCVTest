@@ -21,6 +21,7 @@ public class TestMain extends Applet implements Runnable {
 
 	private static final long serialVersionUID = -5731219325204852230L;
 	private Goal goalA, goalB, goalADelivery;
+	private Coordinate safePoint;
 	private ObstacleFrame frames;
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private Pathfinder router;
@@ -182,9 +183,9 @@ public class TestMain extends Applet implements Runnable {
 					repaint();
 					sleep();
 				} else if (router.getState() == RobotState.SAFETY) {
-					Coordinate cord = new Coordinate(router.testDest().getX(),
+					safePoint = new Coordinate(router.testDest().getX(),
 							router.testDest().getY());
-					robot.forward(distance, cord);
+					//robot.forward(distance, cord);
 
 					if (router.getPrevState() == RobotState.TO_DELIVER) {
 						router.setState(RobotState.TO_DELIVER);
@@ -206,7 +207,8 @@ public class TestMain extends Applet implements Runnable {
 				// go for the goal
 				else if (router.getState() == RobotState.HASBALL
 						|| router.getState() == RobotState.TO_DELIVER
-						|| router.getState() == RobotState.AT_DELIVER) {
+						|| router.getState() == RobotState.AT_DELIVER
+						|| router.getState() == RobotState.SAFETY) {
 
 					robot.forward(distance, router.dest);
 					nextState();
@@ -227,8 +229,7 @@ public class TestMain extends Applet implements Runnable {
 	public void run() {
 		while (true) {
 
-			router.findPath(robot, balls, goalA, goalB, goalADelivery, frames,
-					cross);
+			router.findPath(robot,balls, goalA, goalB, goalADelivery, frames, cross);
 
 			updateComponents();
 

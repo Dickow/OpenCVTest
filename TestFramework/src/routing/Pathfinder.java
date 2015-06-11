@@ -53,16 +53,19 @@ public class Pathfinder {
 						balls.get(indexOfClosestBall).getY());
 				avoidObstacle(robot, balls.get(indexOfClosestBall),
 						lengthToDest, cross); // :TODO
-				if(state == RobotState.SAFETY){
-					robot.setState(MoveState.ROTATING);
-					getToSafety(robot);
-				}
+
 				if (lengthToDest > 1) {
-					robot.setState(MoveState.MOVING);
-					destBall = balls.get(indexOfClosestBall);
+
+					if (state == RobotState.SAFETY) {
+						robot.setState(MoveState.ROTATING);
+						getToSafety(robot);
+					} else {
+						robot.setState(MoveState.MOVING);
+						destBall = balls.get(indexOfClosestBall);
+					}
 				} else {
-					state = RobotState.GRABBALL;
-					destBall = balls.get(indexOfClosestBall);
+						state = RobotState.GRABBALL;
+						destBall = balls.get(indexOfClosestBall);
 				}
 			}
 		}
@@ -73,27 +76,27 @@ public class Pathfinder {
 			// this functions returns the angle to the destination based on the
 			// current state
 			if (state == RobotState.HASBALL) {
-				rotationAngle = Math.abs(findRotationAngle(robot,
-						goalADelivery));
-				lengthToDest = calcDifference(robot.getMiddleCord()
-						.getX(), robot.getMiddleCord().getY(),
-						goalADelivery.getX(), goalADelivery.getY());
+				rotationAngle = Math
+						.abs(findRotationAngle(robot, goalADelivery));
+				lengthToDest = calcDifference(robot.getMiddleCord().getX(),
+						robot.getMiddleCord().getY(), goalADelivery.getX(),
+						goalADelivery.getY());
 			} else {
 				rotationAngle = Math.abs(findRotationAngle(robot, goalA));
-				lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
-						.getFrontCord().getY(), goalA.getX(), goalA.getY());
+				lengthToDest = calcDifference(robot.getFrontCord().getX(),
+						robot.getFrontCord().getY(), goalA.getX(), goalA.getY());
 			}
 
 			avoidObstacle(robot, goalADelivery, lengthToDest, cross); // :TODO
-			if(state == RobotState.SAFETY){
+			if (state == RobotState.SAFETY) {
 				getToSafety(robot);
+				robot.setState(MoveState.MOVING);
 			}
 			// we have the angle from before
 			if (rotationAngle > 1) {
 				// rotate the robot
 				robot.setState(MoveState.ROTATING);
-			} else if (lengthToDest > 1
-					&& state != RobotState.TO_DELIVER) {
+			} else if (lengthToDest > 1 && state != RobotState.TO_DELIVER) {
 				// move to delivery coordinate
 				// save the length to the destination for the simulator
 				dest = goalADelivery;
@@ -115,8 +118,8 @@ public class Pathfinder {
 			// find the distance if no rotation were necessary
 		}
 	}
-	
-	private void getToSafety(Robot robot){
+
+	private void getToSafety(Robot robot) {
 		rotationAngle = Math.abs(findRotationAngle(robot, dest));
 		lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 				.getFrontCord().getY(), dest.getX(), dest.getY());
@@ -165,18 +168,20 @@ public class Pathfinder {
 	public RobotState getState() {
 		return this.state;
 	}
-	public RobotState getPrevState(){
+
+	public RobotState getPrevState() {
 		return this.prevState;
 	}
 
 	public void setState(RobotState state) {
 		this.state = state;
 	}
-	
+
 	public Ball getDest() {
 		return this.destBall;
 	}
-	public Coordinate testDest(){
+
+	public Coordinate testDest() {
 		return this.dest;
 	}
 
@@ -190,7 +195,6 @@ public class Pathfinder {
 
 		Line2D line = new Line2D.Double(robot.getFrontCord().getX(), robot
 				.getFrontCord().getY(), destCord.getX(), destCord.getY());
-		
 
 		setcrossHorizontalPart(crossHorizontalPart, cross);
 		setcrossVerticalPart(crossVerticalPart, cross);
@@ -198,14 +202,14 @@ public class Pathfinder {
 		// If we hit an obstacle rotate and move robot away
 		if (crossHorizontalPart.intersectsLine(line)
 				|| crossVerticalPart.intersectsLine(line)) {
-			
-			moveToSafePoint(robot, distance, cross);
+
+			moveToSafePoint(robot, distance, cross, dest);
 			prevState = state;
 			state = RobotState.SAFETY;
-		} 
-		
+		}
+
 		safePointCounter = -1;
-		
+
 	}
 
 	public Rectangle getcrossHorizontalPart() {
@@ -229,8 +233,8 @@ public class Pathfinder {
 
 	public void setcrossVerticalPart(Rectangle crossVerticalPart,
 			MiddleCross cross) {
-		int crossX = (int) cross.getLeftCross().getX() - 10;
-		int crossY = (int) cross.getLeftCross().getY();
+		int crossX = (int) cross.getTopCross().getX() - 10;
+		int crossY = (int) cross.getTopCross().getY();
 		int crossWidth = 10;
 		int crossHeight = (int) ((frames.lowRight().getY() - frames.topRight()
 				.getY()) / 12) * 2;
@@ -238,18 +242,20 @@ public class Pathfinder {
 				crossHeight);
 	}
 
-	public void moveToSafePoint(Robot robot, double distance, MiddleCross cross){
-		
+	public void moveToSafePoint(Robot robot, double distance,
+			MiddleCross cross, Coordinate destCord) {
+
 		Coordinate[] safePoints = new Coordinate[4];
-		safePoints[0] = new Coordinate(10, 10);
-		safePoints[1] = new Coordinate(630, 10);
-		safePoints[2] = new Coordinate(10, 470);
-		safePoints[3] = new Coordinate(630, 470);
-	
-		dest = safePoints[safePointCounter + 1];
+		safePoints[0] = new Coordinate(40, 40);
+		safePoints[1] = new Coordinate(600, 40);
+		safePoints[2] = new Coordinate(40, 420);
+		safePoints[3] = new Coordinate(600, 420);
+
+		destCord = safePoints[safePointCounter + 1];
+		dest = destCord;
 		avoidObstacle(robot, dest, distance, cross);
-			
+
 		safePointCounter++;
-		
+
 	}
 }
