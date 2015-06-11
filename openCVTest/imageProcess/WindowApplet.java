@@ -1,5 +1,7 @@
 package imageProcess;
 
+import imageCapture.ImageCapturer;
+
 import java.applet.Applet;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,9 +32,9 @@ public class WindowApplet extends Applet implements Runnable {
 
 		// start the processing thread
 		// start the img capture thread
-		// ImageCapturer capturer = new ImageCapturer();
-		// Thread capThread = new Thread(capturer);
-		// capThread.start();
+		 ImageCapturer capturer = new ImageCapturer();
+		 Thread capThread = new Thread(capturer);
+		 capThread.start();
 
 		while (true) {
 
@@ -46,7 +48,7 @@ public class WindowApplet extends Applet implements Runnable {
 			drawer.setGoalA(processing.getGoalA());
 			drawer.setGoalB(processing.getGoalB());
 			drawer.setRobot(processing.getRobot());
-			backGroundImg = getImage(getCodeBase(), "test.jpg");
+			backGroundImg = processing.getBackgroundImage();
 			drawer.setBackGroundImg(backGroundImg);
 			drawer.repaint();
 			
@@ -70,7 +72,7 @@ public class WindowApplet extends Applet implements Runnable {
 		Frame frame = (Frame) this.getParent().getParent();
 		frame.setTitle("Robot Screen");
 		processing = new ImageProcessing();
-		backGroundImg = getImage(getCodeBase(), "test.jpg");
+		backGroundImg = processing.getBackgroundImage();
 		drawer = new ScreenDrawing();
 		drawer.setPreferredSize(new Dimension(640,480));
 		

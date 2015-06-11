@@ -31,10 +31,10 @@ public class ImageProcessing {
 	// private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 5;
 
-	public int iLowH = 0;
+	public int iLowH = 16;
 	public int iLowHFront = 49;
 
-	public int iHighH = 138;
+	public int iHighH = 255;
 	public int iHighHFront = 97;
 
 	public int iLowS = 173;
@@ -57,27 +57,28 @@ public class ImageProcessing {
 
 	private ArrayList<Point> lineCoordinates;
 	private Mat image, frame, imgHSV, imageBlurr;
-	private Image robotImage;
+	private Image backgroundImage;
 
 	public void process() {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
+		
 		frame = new Mat();
 		image = new Mat();
 
 		balls = new ArrayList<Ball>();
 		lineCoordinates = new ArrayList<Point>();
 
-		// frame = ImageObject.getInstance().getImg();
-		// // if the frame was empty we should return
-		// if (frame == null) {
-		// return;
-		// }
+		frame = ImageObject.getInstance().getImg();
+		// if the frame was empty we should return
+		if (frame == null) {
+			return;
+		}
 		// Highgui.imwrite("test.jpg", frame);
-		frame = Highgui.imread("test.jpg");
+		// frame = Highgui.imread("test.jpg");
 		// Consider the image for processing Imgproc.COLOR_BGR2GRAY
+		
 		try {
 			frame.copyTo(image);
 		} catch (Exception e) {
@@ -115,7 +116,7 @@ public class ImageProcessing {
 			System.out.println("error in ignore balls method");
 		}
 
-		Highgui.imwrite("image.jpg", image);
+		backgroundImage = toBufferedImage(image);
 
 		// try {
 		// pathfinder.findPath(robot, balls, goalA, goalB, frames, cross);
@@ -198,7 +199,7 @@ public class ImageProcessing {
 
 		robotMats[0].copyTo(robotMats[1], robotMats[0]);
 		// convert the mats to one mat and convert it to an Image
-		// robotImage = toBufferedImage(robotMats[1]); TODO
+		//backgroundImage = toBufferedImage(robotMats[1]); 
 		robot.updateMiddleCord();
 
 	}
@@ -432,8 +433,8 @@ public class ImageProcessing {
 
 	}
 
-	public Image getRobotImage() {
-		return this.robotImage;
+	public Image getBackgroundImage() {
+		return this.backgroundImage;
 	}
 
 	// shitty java does not have pointers....
