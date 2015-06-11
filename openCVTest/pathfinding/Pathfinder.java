@@ -1,5 +1,7 @@
 package pathfinding;
 
+import geometry.Vector;
+
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import moveableObjects.Robot;
 import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
-import geometry.Vector;
+import robotCommunication.BTConnector;
 
 public class Pathfinder {
 
@@ -25,11 +27,18 @@ public class Pathfinder {
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
+	private BTConnector robotController = new BTConnector();
+	private int calibrationStep = 0;
+	private double calibrationLength, xCalibrate, yCalibrate;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
+		if (!calibrateRobot(robot)) {
+			// we are not yet done calibrating, so just return
+			return;
+		}
 		rotationAngle = 0;
 		lengthToDest = 0;
 
@@ -52,47 +61,51 @@ public class Pathfinder {
 				dest = goalA;
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
-				state = RobotState.HASBALL; 
-				return; 
-			} 
-			else if(state == RobotState.SCOREBALL){
+				state = RobotState.HASBALL;
+				return;
+			} else if (state == RobotState.SCOREBALL) {
 				// do the score routine here but in the test we already scored
-				state = RobotState.NOBALL; 
-				return; 
-			}
-			else {
-			
+				state = RobotState.NOBALL;
+				return;
+			} else {
+
 				System.out.println("fejl i jeppes mor");
 			}
-			
+
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
-			
+
 			if (avoidObstacle(robot, dest, lengthToDest)) {
-				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint) && currentSafePoint == -1) {
+				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint)
+						&& currentSafePoint == -1) {
 					dest = safePoints[findSafePoint(robot.toCoordinate())];
 					currentSafePoint = findSafePoint(robot.toCoordinate());
 				} else {
 					currentSafePoint = nextSafePoint();
 					dest = safePoints[currentSafePoint];
 				}
-			}
-			else {
+			} else {
 				currentSafePoint = -1;
 			}
 			destState = DestState.HASDEST;
 
 		case HASDEST:
+			System.out.println(state);
 			rotationAngle = findRotationAngle(robot, dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (rotationAngle > 1) {
+			if (rotationAngle > 2) {
+				robotController.rotateRobotLeft(rotationAngle);
+				System.out.println("rotation angle = " + rotationAngle);
 				robot.setState(MoveState.ROTATING);
-			} else if (lengthToDest > 1) {
+			} else if (lengthToDest > 4) {
+				robotController.robotForward(lengthToDest/calibrationLength);
 				robot.setState(MoveState.MOVING);
+				System.out.println("trying to move");
 			} else {
 				// arrived at dest routine
+				System.out.println("destination reached");
 				destState = DestState.NODEST;
 				destReached();
 			}
@@ -312,5 +325,23 @@ public class Pathfinder {
 		default:
 			return 0;
 		}
+	}
+
+	private boolean calibrateRobot(Robot robot) {
+		// this is the first time we enter calibration
+		if (calibrationStep == 0) {
+			// save our x and y values so we can see how far we move
+			xCalibrate = robot.getFrontCord().getX();
+			yCalibrate = robot.getFrontCord().getY();
+
+			robotController.robotCalibrate();
+			calibrationStep++;
+			return false;
+		} else if (calibrationStep == 1) {
+			calibrationLength = calcDifference(xCalibrate, yCalibrate, robot
+					.getFrontCord().getX(), robot.getFrontCord().getY());
+			calibrationStep++;
+		}
+		return true;
 	}
 }

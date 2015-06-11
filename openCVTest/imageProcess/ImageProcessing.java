@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
+import javafx.scene.shape.Circle;
 import moveableObjects.Ball;
 import moveableObjects.Coordinate;
 import moveableObjects.Robot;
@@ -28,7 +29,7 @@ import org.opencv.imgproc.Moments;
 import pathfinding.Pathfinder;
 
 public class ImageProcessing {
-	// private Pathfinder pathfinder = new Pathfinder();
+	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 5;
 
 	public int iLowH = 16;
@@ -63,7 +64,7 @@ public class ImageProcessing {
 
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		
+
 		frame = new Mat();
 		image = new Mat();
 
@@ -78,7 +79,7 @@ public class ImageProcessing {
 		// Highgui.imwrite("test.jpg", frame);
 		// frame = Highgui.imread("test.jpg");
 		// Consider the image for processing Imgproc.COLOR_BGR2GRAY
-		
+
 		try {
 			frame.copyTo(image);
 		} catch (Exception e) {
@@ -111,18 +112,20 @@ public class ImageProcessing {
 			System.out.println("error in finding balls");
 		}
 		try {
-			ignoreBallInsideRobot();
+			//ignoreBallInsideRobot();
+			drawBalls();
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
 		}
 
 		backgroundImage = toBufferedImage(image);
 
-		// try {
-		// pathfinder.findPath(robot, balls, goalA, goalB, frames, cross);
-		// } catch (Exception e) {
-		// System.out.println("Error happened in pathfinding");
-		// }
+		try {
+			 pathfinder
+			 .findPath(robot, balls, goalA, goalB, null, frames, cross);
+		} catch (Exception e) {
+			System.out.println("Error happened in pathfinding");
+		}
 	}
 
 	private void findRobotFrontAndBack() {
@@ -182,16 +185,22 @@ public class ImageProcessing {
 				// calculate the position of the ball
 				double posX = dM10 / dArea;
 				double posY = dM01 / dArea;
-				Core.circle(image, new Point(posX, posY),
-						(int) Math.sqrt(dArea / 3.14),
-						new Scalar(255, 255, 255));
+				
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-					System.out.println("found robot front");
+//					System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
+					robot.setAreaBack(new Circle(posX, posY, 3 * Math
+							.sqrt(dArea / 3.14)));
+					Core.circle(image, new Point(posX, posY), (int) (3 * Math
+							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 				} else {
-					System.out.println("found robot back");
+//					System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
+					robot.setAreaFront(new Circle(posX, posY, 2.5 * Math
+							.sqrt(dArea / 3.14)));
+					Core.circle(image, new Point(posX, posY), (int) (2.5 * Math
+							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 				}
 			}
 
@@ -199,7 +208,7 @@ public class ImageProcessing {
 
 		robotMats[0].copyTo(robotMats[1], robotMats[0]);
 		// convert the mats to one mat and convert it to an Image
-		//backgroundImage = toBufferedImage(robotMats[1]); 
+		// backgroundImage = toBufferedImage(robotMats[1]);
 		robot.updateMiddleCord();
 
 	}
@@ -210,7 +219,7 @@ public class ImageProcessing {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				10, 20, 15, 1, 9);
+				10, 150, 11, 1, 7);
 
 		if (!circles.empty()) {
 
@@ -221,11 +230,14 @@ public class ImageProcessing {
 					break;
 				}
 
-				Core.circle(image, new Point(coordinate[0], coordinate[1]),
-						(int) coordinate[2], new Scalar(0, 0, 255));
-				balls.add(new Ball(coordinate[0], coordinate[1]));
-				balls.get(balls.size() - 1).setRadius(coordinate[2]);
-				System.out.println("found a ball");
+				if (!robot.getRobotFrontArea().contains(coordinate[0],
+						coordinate[1])
+						&& !robot.getRobotBackArea().contains(coordinate[0],
+								coordinate[1])) {
+					balls.add(new Ball(coordinate[0], coordinate[1]));
+					balls.get(balls.size() - 1).setRadius(coordinate[2]);
+//					System.out.println("found a ball");
+				}
 			}
 		}
 	}
@@ -253,7 +265,7 @@ public class ImageProcessing {
 			Core.line(image, start, start, new Scalar(140, 210, 40));
 
 		}
-		System.out.println(lineCoordinates.size());
+//		System.out.println(lineCoordinates.size());
 		drawApproxLines();
 
 	}
@@ -394,19 +406,13 @@ public class ImageProcessing {
 	 */
 	private void ignoreBallInsideRobot() {
 
-		// we need the back and front of robot to get area to delete from
-		double midX = (robot.getBackCord().getX() + robot.getFrontCord().getX()) / 2;
-		double midY = (robot.getBackCord().getY() + robot.getFrontCord().getY()) / 2;
-
-		Rectangle robotRectangle = new Rectangle((int) midX - 20,
-				(int) midY - 20, 40, 40);
-
 		// run through the list of objects to find balls
 		for (Ball ball : balls) {
 			// if x and y is between front and back of robot we remove the ball
-			if (robotRectangle.contains(ball.getX(), ball.getY())) {
+			if (robot.getRobotFrontArea().contains(ball.getX(), ball.getY())
+					|| robot.getRobotBackArea().contains(ball.getX(),
+							ball.getY())) {
 				balls.remove(ball);
-
 			}
 		}
 	}
@@ -431,6 +437,13 @@ public class ImageProcessing {
 		System.arraycopy(b, 0, targetPixels, 0, b.length);
 		return image;
 
+	}
+
+	private void drawBalls() {
+		for (Ball ball : balls) {
+			Core.circle(image, new Point(ball.getX(), ball.getY()),
+					(int) ball.getRadius(), new Scalar(0, 0, 255));
+		}
 	}
 
 	public Image getBackgroundImage() {

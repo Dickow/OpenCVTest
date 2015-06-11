@@ -27,7 +27,7 @@ public class ImageCapturer implements Runnable {
 			ImageObject.getInstance().setImg(img);
 			Highgui.imwrite("image.jpg", img);
 			try {
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (Exception e) {
 
 			}
