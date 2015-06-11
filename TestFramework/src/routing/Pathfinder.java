@@ -53,7 +53,7 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				dest = goalA;
+				dest = new Coordinate((goalA.getX()+cross.getLeftCross().getX())/4, goalA.getY());
 				//System.out.println("2");
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
@@ -62,9 +62,13 @@ public class Pathfinder {
 				return; 
 			} 
 			else if(state == RobotState.SCOREBALL){
-				// do the score routine here but in the test we already scored
+				dest = goalA;  
+				//System.out.println("4"); 
+			}
+			else if(state == RobotState.SCORED){
+				// we scored now 
+				System.out.println("We scored!!!");
 				state = RobotState.NOBALL; 
-				//System.out.println("4");
 				return; 
 			}
 			else {
@@ -171,7 +175,7 @@ public class Pathfinder {
 			}
 			break;
 		case SCOREBALL:
-			state = RobotState.NOBALL;
+			state = RobotState.SCORED;
 			break;
 		default:
 			break;
