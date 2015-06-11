@@ -42,13 +42,13 @@ public class TestMain extends Applet implements Runnable {
 		robot = new Robot(new Coordinate(100, 100), new Coordinate(100, 130));
 
 		// create the balls placed on the map
-		Random rand = new Random();
-		for (int i = 0; i < 5; i++) {
-
-			int randomX = rand.nextInt((625 - 15) + 1) + 15;
-			int randomY = rand.nextInt((465 - 15) + 1) + 15;
-			balls.add(new Ball(randomX, randomY));
-		}
+//		Random rand = new Random();
+//		for (int i = 0; i < 5; i++) {
+//
+//			int randomX = rand.nextInt((625 - 15) + 1) + 15;
+//			int randomY = rand.nextInt((465 - 15) + 1) + 15;
+//			balls.add(new Ball(randomX, randomY));
+//		}
 		balls.add(new Ball(400, 250));
 
 	}
@@ -163,7 +163,6 @@ public class TestMain extends Applet implements Runnable {
 				robot.rotateRobot(rotationAngle);
 				nextState();
 				repaint();
-				// set slower rotation
 				sleep();
 			}
 			robot.setState(MoveState.MOVING);
@@ -171,56 +170,16 @@ public class TestMain extends Applet implements Runnable {
 			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
 				double distance = router.lengthToDest / 10;
-
-				// there are 2 types of destinations, balls or goals
-
-				// go for the ball
-				if (router.getState() == RobotState.NOBALL) {
-					robot.forward(distance, new Coordinate(router.getDest()
-							.getX(), router.getDest().getY()));
-
-					nextState();
-					repaint();
-					sleep();
-				} else if (router.getState() == RobotState.SAFETY) {
-					safePoint = new Coordinate(router.testDest().getX(),
-							router.testDest().getY());
-					//robot.forward(distance, cord);
-
-					if (router.getPrevState() == RobotState.TO_DELIVER) {
-						router.setState(RobotState.TO_DELIVER);
-					} else {
-						router.setState(RobotState.NOBALL);
-					}
-					nextState();
-					repaint();
-					sleep();
-					break;
-
-				} else if (router.getState() == RobotState.GRABBALL) {
-					balls.remove(router.getDest());
-					router.setState(RobotState.HASBALL);
-					repaint();
-					sleep();
-					break;
-				}
-				// go for the goal
-				else if (router.getState() == RobotState.HASBALL
-						|| router.getState() == RobotState.TO_DELIVER
-						|| router.getState() == RobotState.AT_DELIVER
-						|| router.getState() == RobotState.SAFETY) {
-
-					robot.forward(distance, router.dest);
-					nextState();
-					repaint();
-					sleep();
-
-				}
-
+				
+				robot.forward(distance, router.dest);
+				
+				repaint();
+				nextState();
+				sleep();
 			}
-
-		} else {
-
+		}
+		if(router.getState() == RobotState.GRABBALL){
+			balls.remove(router.dest);
 		}
 
 	}
@@ -229,7 +188,8 @@ public class TestMain extends Applet implements Runnable {
 	public void run() {
 		while (true) {
 
-			router.findPath(robot,balls, goalA, goalB, goalADelivery, frames, cross);
+			router.findPath(robot, balls, goalA, goalB, goalADelivery, frames,
+					cross);
 
 			updateComponents();
 

@@ -66,7 +66,6 @@ public class WindowApplet extends Applet implements Runnable {
 	public void init() {
 		System.out.println("window opened");
 		setLayout(new FlowLayout());
-		//backGroundImg = getImage(getCodeBase(), "test.jpg");
 		setFocusable(true);
 		setSize(640, 640);
 		Frame frame = (Frame) this.getParent().getParent();

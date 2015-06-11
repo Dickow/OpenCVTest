@@ -58,6 +58,10 @@ public class Robot {
 				(frontCord.getY() + backCord.getY()) / 2);
 	}
 	
+	public Coordinate toCoordinate(){
+		return new Coordinate(frontCord.getX(), frontCord.getY());
+	}
+	
 	public void rotateRobot(double rotationAngle) {
 		// code for rotation found on
 		// http://stackoverflow.com/questions/14842090/rotate-line-around-center-point-given-two-vertices
