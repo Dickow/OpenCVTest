@@ -21,13 +21,13 @@ public class TestMain extends Applet implements Runnable {
 
 	private static final long serialVersionUID = -5731219325204852230L;
 	private Goal goalA, goalB, goalADelivery;
-	private Coordinate safePoint;
 	private ObstacleFrame frames;
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private Pathfinder router;
 	private RotationState state;
 	private MiddleCross cross;
 	private Robot robot;
+	private final int robotRadius = 15;
 
 	public void init() {
 		setSize(640, 480);
@@ -73,21 +73,21 @@ public class TestMain extends Applet implements Runnable {
 				.getY()) / 2);
 
 		cross.setLeftCross(new Coordinate(cross.getCenterOfCross().getX()
-				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
-				cross.getCenterOfCross().getY()));
+				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18)-robotRadius,
+				cross.getCenterOfCross().getY()-robotRadius));
 
 		cross.setRightCross(new Coordinate(cross.getCenterOfCross().getX()
-				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
-				cross.getCenterOfCross().getY()));
+				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18)+robotRadius,
+				cross.getCenterOfCross().getY()-robotRadius));
 
-		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX(), cross
+		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX()-robotRadius, cross
 				.getCenterOfCross().getY()
-				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)-robotRadius));
 
 		cross.setBottomCross(new Coordinate(
-				cross.getCenterOfCross().getX(),
+				cross.getCenterOfCross().getX()-robotRadius,
 				cross.getCenterOfCross().getY()
-						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)+robotRadius));
 
 	}
 
@@ -112,14 +112,14 @@ public class TestMain extends Applet implements Runnable {
 		g.fillRect(
 				(int) cross.getLeftCross().getX(),
 				(int) cross.getLeftCross().getY() - 10,
-				(int) ((frames.topRight().getX() - frames.topLeft().getX()) / 18) * 2,
-				10);
+				(int) (((frames.topRight().getX() - frames.topLeft().getX()) / 18) * 2)+2*robotRadius,
+				10+2*robotRadius);
 
 		g.fillRect(
 				(int) cross.getTopCross().getX() - 10,
 				(int) cross.getTopCross().getY(),
-				10,
-				(int) ((frames.lowRight().getY() - frames.topRight().getY()) / 12) * 2);
+				10+2*robotRadius,
+				(int) (((frames.lowRight().getY() - frames.topRight().getY()) / 12) * 2)+2*robotRadius);
 
 		// paint the goals
 		g.setColor(Color.BLUE);
@@ -153,7 +153,6 @@ public class TestMain extends Applet implements Runnable {
 	}
 
 	public void updateComponents() {
-
 		if (robot.getState() == MoveState.ROTATING) {
 
 			state = RotationState.ZERO;
@@ -165,20 +164,20 @@ public class TestMain extends Applet implements Runnable {
 				repaint();
 				sleep();
 			}
-			
+
 		} else if (robot.getState() == MoveState.MOVING) {
 			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
 				double distance = router.lengthToDest / 10;
-				
+
 				robot.forward(distance, router.dest);
-				
+
 				repaint();
 				nextState();
 				sleep();
 			}
 		}
-		if(router.getState() == RobotState.GRABBALL){
+		if (router.getState() == RobotState.GRABBALL) {
 			balls.remove(router.dest);
 		}
 

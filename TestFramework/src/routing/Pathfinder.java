@@ -4,6 +4,9 @@ import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+
 import moveableObjects.Ball;
 import moveableObjects.Coordinate;
 import moveableObjects.MoveState;
@@ -29,69 +32,68 @@ public class Pathfinder {
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
- 
+
 		rotationAngle = 0;
 		lengthToDest = 0;
-		
+
 		// calculate and set the frame and obstacles of the course prior to
 		// routing
 		this.frames = frames;
 		this.cross = cross;
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
-		setObstacles(cross);
+		setObstacles(cross, robot.robotRadius);
 		robot.updateMiddleCord();
-		//System.out.println(robot);
+		// System.out.println(robot);
 
 		switch (destState) {
 		case NODEST:
-			//System.out.println(state);
-			//System.out.println(destState);
+			// System.out.println(state);
+			// System.out.println(destState);
 			// try to see if we can reach a ball
 			if (state == RobotState.NOBALL) {
-				//System.out.println("1");
+				// System.out.println("1");
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				dest = new Coordinate((goalA.getX()+cross.getLeftCross().getX())/4, goalA.getY());
-				//System.out.println("2");
+				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
+						.getX()) / 4, goalA.getY());
+				// System.out.println("2");
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				state = RobotState.HASBALL;
-				//System.out.println("3");
-				return; 
-			} 
-			else if(state == RobotState.SCOREBALL){
-				dest = goalA;  
-				//System.out.println("4"); 
-			}
-			else if(state == RobotState.SCORED){
-				// we scored now 
+				// System.out.println("3");
+				return;
+			} else if (state == RobotState.SCOREBALL) {
+				dest = goalA;
+				// System.out.println("4");
+			} else if (state == RobotState.SCORED) {
+				// we scored now
 				System.out.println("We scored!!!");
-				state = RobotState.NOBALL; 
-				return; 
+				state = RobotState.NOBALL;
+				return;
+			} else {
+
+				System.out.println("fejl i systemet");
 			}
-			else {
-			
-				//System.out.println("fejl i jeppes mor");
-			}
-			
+
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
-			
+
 			if (avoidObstacle(robot, dest, lengthToDest)) {
-				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint) && currentSafePoint == -1) {
+				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint)
+						&& currentSafePoint == -1) {
 					dest = safePoints[findSafePoint(robot.toCoordinate())];
 					currentSafePoint = findSafePoint(robot.toCoordinate());
-					//System.out.println("5");
+					// System.out.println("5");
 				} else {
 					currentSafePoint = nextSafePoint();
 					dest = safePoints[currentSafePoint];
-					//System.out.println("current safe point = " + currentSafePoint);
-					//System.out.println("6");
+					// System.out.println("current safe point = " +
+					// currentSafePoint);
+					// System.out.println("6");
 				}
-			}
-			else {
+			} else {
 				currentSafePoint = -1;
 			}
 			destState = DestState.HASDEST;
@@ -214,9 +216,9 @@ public class Pathfinder {
 		return false;
 	}
 
-	private void setObstacles(MiddleCross cross) {
-		setcrossHorizontalPart(crossHorizontalPart, cross);
-		setcrossVerticalPart(crossVerticalPart, cross);
+	private void setObstacles(MiddleCross cross, int radius) {
+		setcrossHorizontalPart(crossHorizontalPart, cross, radius);
+		setcrossVerticalPart(crossVerticalPart, cross, radius);
 	}
 
 	public Rectangle getcrossHorizontalPart() {
@@ -224,12 +226,12 @@ public class Pathfinder {
 	}
 
 	public void setcrossHorizontalPart(Rectangle crossHorizontalPart,
-			MiddleCross cross) {
+			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getLeftCross().getX();
 		int crossY = (int) cross.getLeftCross().getY() - 10;
-		int crossWidth = (int) ((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2;
-		int crossHeight = 10;
+		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
+				.getX()) / 18) * 2)+2*radius;
+		int crossHeight = 10+2*radius;
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -239,12 +241,12 @@ public class Pathfinder {
 	}
 
 	public void setcrossVerticalPart(Rectangle crossVerticalPart,
-			MiddleCross cross) {
+			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
 		int crossY = (int) cross.getTopCross().getY();
-		int crossWidth = 10;
-		int crossHeight = (int) ((frames.lowRight().getY() - frames.topRight()
-				.getY()) / 12) * 2;
+		int crossWidth = 10+2*radius;
+		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
+				.getY()) / 12) * 2)+2*radius;
 		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -276,7 +278,7 @@ public class Pathfinder {
 						.getY() + cross.getBottomCross().getY()) / 2);
 				break;
 			default:
-				//System.out.println("WTF happend");
+				// System.out.println("WTF happend");
 				break;
 
 			}

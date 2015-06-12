@@ -1,5 +1,7 @@
 package moveableObjects;
 
+import org.opencv.core.Rect;
+
 import utilities.Vector;
 
 public class Robot {
@@ -8,6 +10,7 @@ public class Robot {
 	private Coordinate backCord;
 	private Coordinate middleCord;
 	private MoveState state;
+	public final int robotRadius = 15;
 
 	public Robot(Coordinate front, Coordinate back) {
 		this.frontCord = front;
