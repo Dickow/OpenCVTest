@@ -2,6 +2,9 @@ package pathfinding;
 
 import geometry.Vector;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				dest = goalA;
+				dest = new Coordinate((goalA.getX()+cross.getLeftCross().getX())/4, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				state = RobotState.HASBALL;
