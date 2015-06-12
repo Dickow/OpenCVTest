@@ -102,12 +102,12 @@ public class Pathfinder {
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (rotationAngle > 2 && ! withinRobot(dest, robot)) {
+			if (rotationAngle > 1 && ! withinRobot(dest, robot)) {
 				robotController.rotateRobotLeft(rotationAngle);
 				System.out.println("rotation angle = " + rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			} else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-				robotController.robotForward(lengthToDest / calibrationLength);
+				robotController.robotForward(lengthToDest / (calibrationLength/360));
 				robot.setState(MoveState.MOVING);
 				System.out.println("trying to move");
 			} else {
