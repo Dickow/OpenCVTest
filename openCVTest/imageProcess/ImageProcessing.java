@@ -116,9 +116,12 @@ public class ImageProcessing {
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
 		}
-
+		
+		try{
 		backgroundImage = toBufferedImage(image);
-
+		}catch(Exception e){
+			System.out.println("error in image");
+		}
 		try {
 			pathfinder
 					.findPath(robot, balls, goalA, goalB, null, frames, cross);

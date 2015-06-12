@@ -59,9 +59,9 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				// calculate 
+				// calculate the goal delivery point coordinate
 				dest = new Coordinate((goalA.getX() + (cross.getLeftCross()
-						.getX()-robot.robotRadius)) / 4, goalA.getY());
+						.getX() - robot.robotRadius)) / 2, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				state = RobotState.HASBALL;
@@ -102,12 +102,21 @@ public class Pathfinder {
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (rotationAngle > 1 && ! withinRobot(dest, robot)) {
+			if (rotationAngle > 1 && !withinRobot(dest, robot)) {
+				
 				robotController.rotateRobotLeft(rotationAngle);
+//				if (rotationAngle > 0) {
+//					robotController.rotateRobotLeft(rotationAngle);
+//				}
+//				else{
+//					robotController.rotateRobotRight(Math.abs(rotationAngle));
+//				}
+
 				System.out.println("rotation angle = " + rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			} else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-				robotController.robotForward(lengthToDest / (calibrationLength/360));
+				robotController.robotForward(lengthToDest
+						/ (calibrationLength / 360));
 				robot.setState(MoveState.MOVING);
 				System.out.println("trying to move");
 			} else {
