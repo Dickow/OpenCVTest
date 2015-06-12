@@ -4,9 +4,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-
 import moveableObjects.Ball;
 import moveableObjects.Coordinate;
 import moveableObjects.MoveState;

@@ -10,6 +10,7 @@ public class Robot {
 	private Coordinate middleCord;
 	private MoveState state;
 	private Circle robotFrontArea, robotBackArea;
+	public int robotRadius;
 
 	public Robot(Coordinate front, Coordinate back) {
 		this.frontCord = front;
@@ -17,6 +18,7 @@ public class Robot {
 		double xMiddle = ((frontCord.getX() + backCord.getX()) / 2);
 		double yMiddle = ((frontCord.getY() + backCord.getY()) / 2);
 		this.middleCord = new Coordinate(xMiddle, yMiddle);
+		robotRadius = 0; 
 
 	}
 

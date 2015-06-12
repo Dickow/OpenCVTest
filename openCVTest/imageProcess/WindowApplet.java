@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Image;
-import java.awt.MediaTracker;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;

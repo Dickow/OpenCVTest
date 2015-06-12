@@ -2,13 +2,11 @@ package pathfinding;
 
 import geometry.Vector;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
+import javafx.scene.shape.Circle;
 import moveableObjects.Ball;
 import moveableObjects.Coordinate;
 import moveableObjects.MoveState;
@@ -51,7 +49,7 @@ public class Pathfinder {
 		this.cross = cross;
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
-		setObstacles(cross);
+		setObstacles(cross, robot.robotRadius);
 		robot.updateMiddleCord();
 
 		switch (destState) {
@@ -61,13 +59,18 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				dest = new Coordinate((goalA.getX()+cross.getLeftCross().getX())/4, goalA.getY());
+				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
+						.getX()) / 4, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				state = RobotState.HASBALL;
 				return;
 			} else if (state == RobotState.SCOREBALL) {
-				// do the score routine here but in the test we already scored
+				dest = goalA;
+				// System.out.println("4");
+			} else if (state == RobotState.SCORED) {
+				// we scored now
+				System.out.println("We scored!!!");
 				state = RobotState.NOBALL;
 				return;
 			} else {
@@ -98,12 +101,12 @@ public class Pathfinder {
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (rotationAngle > 2) {
+			if (rotationAngle > 2 && ! withinRobot(dest, robot)) {
 				robotController.rotateRobotLeft(rotationAngle);
 				System.out.println("rotation angle = " + rotationAngle);
 				robot.setState(MoveState.ROTATING);
-			} else if (lengthToDest > 4) {
-				robotController.robotForward(lengthToDest/calibrationLength);
+			} else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
+				robotController.robotForward(lengthToDest / calibrationLength);
 				robot.setState(MoveState.MOVING);
 				System.out.println("trying to move");
 			} else {
@@ -119,6 +122,13 @@ public class Pathfinder {
 			break;
 
 		}
+	}
+
+	private boolean withinRobot(Coordinate dest, Robot robot) {
+		Circle robotArea = new Circle(robot.getMiddleCord().getX(), robot
+				.getMiddleCord().getY(), robot.robotRadius * 2);
+
+		return robotArea.contains(dest.getX(), dest.getY()) ? true : false;
 	}
 
 	private int findClosestBall(ArrayList<Ball> balls, Robot robot) {
@@ -177,7 +187,7 @@ public class Pathfinder {
 			}
 			break;
 		case SCOREBALL:
-			state = RobotState.NOBALL;
+			state = RobotState.SCORED;
 			break;
 		default:
 			break;
@@ -216,9 +226,9 @@ public class Pathfinder {
 		return false;
 	}
 
-	private void setObstacles(MiddleCross cross) {
-		setcrossHorizontalPart(crossHorizontalPart, cross);
-		setcrossVerticalPart(crossVerticalPart, cross);
+	private void setObstacles(MiddleCross cross, int radius) {
+		setcrossHorizontalPart(crossHorizontalPart, cross, radius);
+		setcrossVerticalPart(crossVerticalPart, cross, radius);
 	}
 
 	public Rectangle getcrossHorizontalPart() {
@@ -226,12 +236,12 @@ public class Pathfinder {
 	}
 
 	public void setcrossHorizontalPart(Rectangle crossHorizontalPart,
-			MiddleCross cross) {
+			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getLeftCross().getX();
 		int crossY = (int) cross.getLeftCross().getY() - 10;
-		int crossWidth = (int) ((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2;
-		int crossHeight = 10;
+		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
+				.getX()) / 18) * 2) + 2 * radius;
+		int crossHeight = 10 + 2 * radius;
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -241,12 +251,12 @@ public class Pathfinder {
 	}
 
 	public void setcrossVerticalPart(Rectangle crossVerticalPart,
-			MiddleCross cross) {
+			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
 		int crossY = (int) cross.getTopCross().getY();
-		int crossWidth = 10;
-		int crossHeight = (int) ((frames.lowRight().getY() - frames.topRight()
-				.getY()) / 12) * 2;
+		int crossWidth = 10 + 2 * radius;
+		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
+				.getY()) / 12) * 2) + 2 * radius;
 		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}

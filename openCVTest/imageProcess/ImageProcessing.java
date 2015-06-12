@@ -3,7 +3,6 @@ package imageProcess;
 import imageCapture.ImageObject;
 
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
@@ -30,7 +28,7 @@ import pathfinding.Pathfinder;
 
 public class ImageProcessing {
 	private Pathfinder pathfinder = new Pathfinder();
-	public int ballSize = 5;
+	public int ballSize = 7;
 
 	public int iLowH = 16;
 	public int iLowHFront = 49;
@@ -59,6 +57,7 @@ public class ImageProcessing {
 	private ArrayList<Point> lineCoordinates;
 	private Mat image, frame, imgHSV, imageBlurr;
 	private Image backgroundImage;
+	private Rect fieldRect;
 
 	public void process() {
 
@@ -112,7 +111,7 @@ public class ImageProcessing {
 			System.out.println("error in finding balls");
 		}
 		try {
-			//ignoreBallInsideRobot();
+			// ignoreBallInsideRobot();
 			drawBalls();
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
@@ -121,8 +120,8 @@ public class ImageProcessing {
 		backgroundImage = toBufferedImage(image);
 
 		try {
-			 pathfinder
-			 .findPath(robot, balls, goalA, goalB, null, frames, cross);
+			pathfinder
+					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
@@ -185,22 +184,23 @@ public class ImageProcessing {
 				// calculate the position of the ball
 				double posX = dM10 / dArea;
 				double posY = dM01 / dArea;
-				
+
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-//					System.out.println("found robot back");
+					// System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
-					robot.setAreaBack(new Circle(posX, posY, 3 * Math
+					robot.setAreaBack(new Circle(posX, posY, 1.5*Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (3 * Math
+					Core.circle(image, new Point(posX, posY), (int) (1.5*Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 				} else {
-//					System.out.println("found robot front");
+					// System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
-					robot.setAreaFront(new Circle(posX, posY, 2.5 * Math
+					robot.setAreaFront(new Circle(posX, posY, 1.5*Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (2.5 * Math
+					Core.circle(image, new Point(posX, posY), (int) (1.5*Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
+					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
 				}
 			}
 
@@ -233,10 +233,12 @@ public class ImageProcessing {
 				if (!robot.getRobotFrontArea().contains(coordinate[0],
 						coordinate[1])
 						&& !robot.getRobotBackArea().contains(coordinate[0],
-								coordinate[1])) {
+								coordinate[1])
+						&& fieldRect.contains(new Point(coordinate[0],
+								coordinate[1]))) {
 					balls.add(new Ball(coordinate[0], coordinate[1]));
 					balls.get(balls.size() - 1).setRadius(coordinate[2]);
-//					System.out.println("found a ball");
+					// System.out.println("found a ball");
 				}
 			}
 		}
@@ -262,10 +264,9 @@ public class ImageProcessing {
 			Point end = new Point(x2, y2);
 			lineCoordinates.add(start);
 			lineCoordinates.add(end);
-			Core.line(image, start, start, new Scalar(140, 210, 40));
 
 		}
-//		System.out.println(lineCoordinates.size());
+		// System.out.println(lineCoordinates.size());
 		drawApproxLines();
 
 	}
@@ -349,6 +350,10 @@ public class ImageProcessing {
 		frames.setTopRight(new Coordinate(lineTopRight.x, lineTopRight.y));
 		frames.setLowRight(new Coordinate(lineBottomRight.x, lineBottomRight.y));
 		frames.setLowLeft(new Coordinate(lineBottomLeft.x, lineBottomLeft.y));
+		
+		// add the rectangle covering the field, to avoid getting unwanted balls
+		fieldRect = new Rect(new Point(lineTopLeft.x+ballSize, lineTopLeft.y+ballSize),
+				new Point(lineBottomRight.x-ballSize, lineBottomRight.y-ballSize));
 
 		// calculate the cross middle point
 		x = (int) ((frames.topLeft().getX() + frames.topRight().getX()) / 2);
@@ -356,22 +361,26 @@ public class ImageProcessing {
 
 		// Add the cross object and set all the points
 		cross = new MiddleCross(x, y);
+
 		cross.setLeftCross(new Coordinate(cross.getCenterOfCross().getX()
-				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
-				cross.getCenterOfCross().getY()));
+				- ((frames.topRight().getX() - frames.topLeft().getX()) / 18)
+				- robot.robotRadius, cross.getCenterOfCross().getY()
+				- robot.robotRadius));
 
 		cross.setRightCross(new Coordinate(cross.getCenterOfCross().getX()
-				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18),
-				cross.getCenterOfCross().getY()));
+				+ ((frames.topRight().getX() - frames.topLeft().getX()) / 18)
+				+ robot.robotRadius, cross.getCenterOfCross().getY()
+				- robot.robotRadius));
 
-		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX(), cross
-				.getCenterOfCross().getY()
-				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+		cross.setTopCross(new Coordinate(cross.getCenterOfCross().getX()
+				- robot.robotRadius, cross.getCenterOfCross().getY()
+				- ((frames.lowRight().getY() - frames.topRight().getY()) / 12)
+				- robot.robotRadius));
 
-		cross.setBottomCross(new Coordinate(
-				cross.getCenterOfCross().getX(),
-				cross.getCenterOfCross().getY()
-						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)));
+		cross.setBottomCross(new Coordinate(cross.getCenterOfCross().getX()
+				- robot.robotRadius, cross.getCenterOfCross().getY()
+				+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)
+				+ robot.robotRadius));
 
 		// add Goal points to the list of objects (where the robot )
 		goalA = new Goal(
@@ -399,22 +408,6 @@ public class ImageProcessing {
 		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
 				3);
 
-	}
-
-	/**
-	 * Method to remove balls that appears inside robot
-	 */
-	private void ignoreBallInsideRobot() {
-
-		// run through the list of objects to find balls
-		for (Ball ball : balls) {
-			// if x and y is between front and back of robot we remove the ball
-			if (robot.getRobotFrontArea().contains(ball.getX(), ball.getY())
-					|| robot.getRobotBackArea().contains(ball.getX(),
-							ball.getY())) {
-				balls.remove(ball);
-			}
-		}
 	}
 
 	/**
