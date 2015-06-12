@@ -59,8 +59,9 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
-						.getX()) / 4, goalA.getY());
+				// calculate 
+				dest = new Coordinate((goalA.getX() + (cross.getLeftCross()
+						.getX()-robot.robotRadius)) / 4, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				state = RobotState.HASBALL;

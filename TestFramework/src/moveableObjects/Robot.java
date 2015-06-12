@@ -1,6 +1,5 @@
 package moveableObjects;
 
-import org.opencv.core.Rect;
 
 import utilities.Vector;
 
