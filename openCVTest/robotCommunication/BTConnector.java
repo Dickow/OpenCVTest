@@ -91,6 +91,17 @@ public class BTConnector {
 	 * @param distance
 	 */
 	public void robotForward(double distance) {
+
+		// we want to move in smaller steps to avoid missing the destination
+		if (distance > 100) {
+			distance /= 4;
+		} else if (distance > 50) {
+			distance /= 2;
+		} else {
+			// it seems like we needed a little extra distance to acctually
+			// reach the target
+			distance += 5;
+		}
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(distance);
@@ -108,6 +119,17 @@ public class BTConnector {
 	 * @param distance
 	 */
 	public void robotBackwards(double distance) {
+
+		// we want to move in smaller steps to avoid missing the destination
+		if (distance > 100) {
+			distance /= 4;
+		} else if (distance > 50) {
+			distance /= 2;
+		} else {
+			// it seems like we needed a little extra distance to acctually
+			// reach the target
+			distance += 5;
+		}
 		try {
 			dos.writeInt(BACKWARDS);
 			dos.writeDouble(distance);
