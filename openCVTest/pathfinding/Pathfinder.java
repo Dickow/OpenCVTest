@@ -71,7 +71,7 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate(goalA.getX()+10, goalA.getY());
+				dest = new Coordinate(goalA.getX() + 10, goalA.getY());
 				// System.out.println("4");
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
@@ -131,13 +131,20 @@ public class Pathfinder {
 					&& rotationAngle >= -180) {
 				robotController.rotateRobotLeft(rotationAngle);
 				robot.setState(MoveState.ROTATING);
-			} 
+			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-				robotController.robotForward(lengthToDest
-						/ (calibrationLength / 360));
-				robot.setState(MoveState.MOVING);
-				System.out.println("trying to move");
+				if (state == RobotState.AWAYFROMGOAL) {
+					robotController.robotBackwards(lengthToDest
+							/ (calibrationLength / 360));
+					robot.setState(MoveState.MOVING);
+					System.out.println("trying to move");
+				} else {
+					robotController.robotForward(lengthToDest
+							/ (calibrationLength / 360));
+					robot.setState(MoveState.MOVING);
+					System.out.println("trying to move");
+				}
 			} else {
 				// arrived at dest routine
 				System.out.println("destination reached");
