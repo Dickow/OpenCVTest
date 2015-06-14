@@ -165,11 +165,9 @@ public class TestMain extends Applet implements Runnable {
 
 	public void updateComponents() {
 		if (robot.getState() == MoveState.ROTATINGLEFT) {
-
+			double rotationAngle = router.rotationAngle / 10;
 			state = RotationState.ZERO;
 			while (state != RotationState.TEN) {
-
-				double rotationAngle = router.rotationAngle / 10;
 				robot.rotateRobotLeft(rotationAngle);
 				nextState();
 				repaint();
@@ -179,20 +177,28 @@ public class TestMain extends Applet implements Runnable {
 		} else if (robot.getState() == MoveState.ROTATINGRIGHT) {
 
 			state = RotationState.ZERO;
+			double rotationAngle = router.rotationAngle / 10;
 			while (state != RotationState.TEN) {
-
-				double rotationAngle = router.rotationAngle / 10;
 				robot.rotateRobotRight(rotationAngle);
 				nextState();
 				repaint();
 				sleep();
 			}
-		} else if (robot.getState() == MoveState.MOVING) {
+		} else if (robot.getState() == MoveState.FORWARD) {
 			state = RotationState.ZERO;
+			double distance = router.lengthToDest / 10;
 			while (state != RotationState.TEN) {
-				double distance = router.lengthToDest / 10;
-
 				robot.forward(distance, router.dest);
+
+				repaint();
+				nextState();
+				sleep();
+			}
+		} else if (robot.getState() == MoveState.BACKWARDS) {
+			state = RotationState.ZERO;
+			double distance = (router.lengthToDest / 10);
+			while (state != RotationState.TEN) {
+				robot.backwards(distance, router.dest);
 
 				repaint();
 				nextState();

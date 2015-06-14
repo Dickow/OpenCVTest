@@ -53,6 +53,7 @@ public class Pathfinder {
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
+				// get to the goal delivery point
 				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
 						.getX()) / 4, goalA.getY());
 				// System.out.println("2");
@@ -67,8 +68,13 @@ public class Pathfinder {
 			} else if (state == RobotState.SCORED) {
 				// we scored now
 				System.out.println("We scored!!!");
-				state = RobotState.NOBALL;
+				state = RobotState.AWAYFROMGOAL;
 				return;
+			}
+			// move backwards from the goal
+			else if (state == RobotState.AWAYFROMGOAL) {
+				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
+						.getX()) / 4, goalA.getY());
 			} else {
 
 				System.out.println("fejl i systemet");
@@ -93,12 +99,21 @@ public class Pathfinder {
 			} else {
 				currentSafePoint = -1;
 			}
+			// we should have found a new destination now.
 			destState = DestState.HASDEST;
 
 		case HASDEST:
-			rotationAngle = findRotationAngle(robot, dest);
+			rotationAngle = findRotationAngle(robot.getFrontCord(),
+					robot.getMiddleCord(), dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
+			if (state == RobotState.AWAYFROMGOAL) {
+				// we do not need to rotate, we just need to drive backwards
+				rotationAngle = findRotationAngle(robot.getBackCord(),
+						robot.getMiddleCord(), dest);
+				lengthToDest = calcDifference(robot.getBackCord().getX(), robot
+						.getBackCord().getY(), dest.getX(), dest.getY());
+			}
 
 			// +180 : 0
 			if (rotationAngle > 1 && rotationAngle <= 180) {
@@ -107,8 +122,10 @@ public class Pathfinder {
 			// -180 : 0
 			else if (rotationAngle < -1 && rotationAngle >= -180) {
 				robot.setState(MoveState.ROTATINGLEFT);
-			} else if (lengthToDest > 1) {
-				robot.setState(MoveState.MOVING);
+			} else if (lengthToDest > 1 && state != RobotState.AWAYFROMGOAL) {
+				robot.setState(MoveState.FORWARD);
+			} else if (lengthToDest > 1 && state == RobotState.AWAYFROMGOAL) {
+				robot.setState(MoveState.BACKWARDS);
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
@@ -145,14 +162,14 @@ public class Pathfinder {
 		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 
-	private double findRotationAngle(Robot robot, Coordinate dest) {
+	private double findRotationAngle(Coordinate front, Coordinate middle,
+			Coordinate dest) {
 
-		Vector robotVect = new Vector(robot.getFrontCord().getX()
-				- robot.getMiddleCord().getX(), robot.getFrontCord().getY()
-				- robot.getMiddleCord().getY());
+		Vector robotVect = new Vector(front.getX() - middle.getX(),
+				front.getY() - middle.getY());
 
-		Vector destVect = new Vector((dest.getX() - robot.getMiddleCord()
-				.getX()), (dest.getY() - robot.getMiddleCord().getY()));
+		Vector destVect = new Vector((dest.getX() - middle.getX()),
+				(dest.getY() - middle.getY()));
 
 		double angRadians = Math.atan2(robotVect.dX * (destVect.dY)
 				- (robotVect.dY) * destVect.dX, robotVect.dX * destVect.dX
@@ -181,6 +198,8 @@ public class Pathfinder {
 		case SCOREBALL:
 			state = RobotState.SCORED;
 			break;
+		case AWAYFROMGOAL:
+			state = RobotState.NOBALL;
 		default:
 			break;
 

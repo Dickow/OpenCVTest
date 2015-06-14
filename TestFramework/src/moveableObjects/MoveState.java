@@ -2,6 +2,7 @@ package moveableObjects;
 
 public enum MoveState {
 	ROTATINGLEFT,
-	MOVING,
-	ROTATINGRIGHT
+	FORWARD,
+	ROTATINGRIGHT,
+	BACKWARDS
 }

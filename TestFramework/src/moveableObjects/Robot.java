@@ -147,6 +147,33 @@ public class Robot {
 		
 	}
 	
+	public void backwards(double distance, Coordinate dest){
+		// formula for calculation found at 
+		// http://math.stackexchange.com/questions/333350/moving-point-along-the-vector	
+		// instead of adding, we subtract to get the backward distance.
+		
+		double lengthToDest = calcDifference(frontCord.getX(), frontCord.getY(), dest.getX(), dest.getY());
+		
+		Vector frontVector = new Vector(frontCord.getX(),frontCord.getY());
+		Vector backVector = new Vector(backCord.getX(), backCord.getY());
+		Vector destination = new Vector(dest.getX(), dest.getY());
+		Vector directionVector = destination.sub(frontVector);
+		Vector newRobotVect = frontVector.add(directionVector.scale((distance)/(0.00000000001+lengthToDest)));
+	
+		frontCord.setX(newRobotVect.dX);
+		frontCord.setY(newRobotVect.dY);
+
+		newRobotVect = backVector.add(directionVector.scale((distance)/(0.00000000001+lengthToDest)));
+		backCord.setX(newRobotVect.dX);
+		backCord.setY(newRobotVect.dY);
+		
+		// calculate the new middle coordinate
+		double xMiddle = ((frontCord.getX() + backCord.getX()) / 2);
+		double yMiddle = ((frontCord.getY() + backCord.getY()) / 2);
+		middleCord.setX(xMiddle);
+		middleCord.setY(yMiddle);
+	}
+	
 	private double calcDifference(double x1, double y1, double x2, double y2) {
 		return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}

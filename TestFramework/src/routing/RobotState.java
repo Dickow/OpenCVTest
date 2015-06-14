@@ -5,5 +5,6 @@ public enum RobotState {
 	NOBALL,
 	GRABBALL,
 	SCOREBALL,
-	SCORED
+	SCORED,
+	AWAYFROMGOAL
 }
