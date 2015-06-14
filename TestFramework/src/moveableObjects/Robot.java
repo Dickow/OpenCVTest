@@ -64,7 +64,7 @@ public class Robot {
 		return new Coordinate(frontCord.getX(), frontCord.getY());
 	}
 	
-	public void rotateRobot(double rotationAngle) {
+	public void rotateRobotRight(double rotationAngle) {
 		// code for rotation found on
 		// http://stackoverflow.com/questions/14842090/rotate-line-around-center-point-given-two-vertices
 		double radianAngle = Math.toRadians(rotationAngle);
@@ -90,7 +90,34 @@ public class Robot {
 		backCord.setX(newX);
 		backCord.setY(newY);
 	}
-
+	
+	public void rotateRobotLeft(double rotationAngle) {
+		// code for rotation found on
+		// http://stackoverflow.com/questions/14842090/rotate-line-around-center-point-given-two-vertices
+		double radianAngle = Math.toRadians(rotationAngle);
+		double newX = (((frontCord.getX() - middleCord.getX())
+				* Math.cos(radianAngle) + (frontCord.getY() - middleCord
+				.getY()) * Math.sin(radianAngle)) + middleCord.getX());
+		
+		double newY = ((-(frontCord.getX() - middleCord.getX())
+				* Math.sin(radianAngle) + (frontCord.getY() - middleCord
+				.getY()) * Math.cos(radianAngle)) + middleCord.getY());
+		
+		frontCord.setX(newX);
+		frontCord.setY(newY);
+		
+		newX = (((backCord.getX() - middleCord.getX())
+				* Math.cos(radianAngle) + (backCord.getY() - middleCord
+				.getY()) * Math.sin(radianAngle)) + middleCord.getX());
+		
+		newY = ((-(backCord.getX() - middleCord.getX())
+				* Math.sin(radianAngle) + (backCord.getY() - middleCord
+				.getY()) * Math.cos(radianAngle)) + middleCord.getY());
+		
+		backCord.setX(newX);
+		backCord.setY(newY);
+	}
+	
 	public void forward(double distance, Coordinate dest) {
 		
 		// formula for calculation found at 

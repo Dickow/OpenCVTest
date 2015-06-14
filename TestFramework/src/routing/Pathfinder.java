@@ -100,8 +100,13 @@ public class Pathfinder {
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (rotationAngle > 1) {
-				robot.setState(MoveState.ROTATING);
+			// +180 : 0
+			if (rotationAngle > 1 && rotationAngle <= 180) {
+				robot.setState(MoveState.ROTATINGRIGHT);
+			}
+			// -180 : 0
+			else if (rotationAngle < -1 && rotationAngle >= -180) {
+				robot.setState(MoveState.ROTATINGLEFT);
 			} else if (lengthToDest > 1) {
 				robot.setState(MoveState.MOVING);
 			} else {
@@ -154,7 +159,7 @@ public class Pathfinder {
 				+ (robotVect.dY) * (destVect.dY));
 
 		double angDegrees = Math.toDegrees(angRadians);
-		return Math.abs(angDegrees);
+		return -angDegrees;
 
 	}
 
@@ -227,8 +232,8 @@ public class Pathfinder {
 		int crossX = (int) cross.getLeftCross().getX();
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2)+2*radius;
-		int crossHeight = 10+2*radius;
+				.getX()) / 18) * 2) + 2 * radius;
+		int crossHeight = 10 + 2 * radius;
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -241,9 +246,9 @@ public class Pathfinder {
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
 		int crossY = (int) cross.getTopCross().getY();
-		int crossWidth = 10+2*radius;
+		int crossWidth = 10 + 2 * radius;
 		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
-				.getY()) / 12) * 2)+2*radius;
+				.getY()) / 12) * 2) + 2 * radius;
 		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
