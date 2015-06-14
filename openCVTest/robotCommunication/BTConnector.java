@@ -172,7 +172,13 @@ public class BTConnector {
 	 * deliver the ball to the goal.
 	 */
 	public void deliverBall() {
-
+		try{
+			dos.writeInt(DELIVER);
+			dos.flush();
+			waitForRobot();
+		}catch(IOException e){
+			
+		}
 	}
 
 	public void robotCalibrate() {

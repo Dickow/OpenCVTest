@@ -16,7 +16,6 @@ import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import robotCommunication.BTConnector;
 
-
 public class Pathfinder {
 
 	private RobotState state = RobotState.NOBALL;
@@ -57,7 +56,8 @@ public class Pathfinder {
 		case NODEST:
 			// try to see if we can reach a ball
 			if (state == RobotState.NOBALL) {
-				// we try to open the arms, then we are ready to catch a new ball
+				// we try to open the arms, then we are ready to catch a new
+				// ball
 				robotController.openRobotArms();
 				dest = balls.get(findClosestBall(balls, robot));
 
@@ -70,11 +70,13 @@ public class Pathfinder {
 				state = RobotState.HASBALL;
 				return;
 			} else if (state == RobotState.SCOREBALL) {
-				dest = goalA;
+				// drive a little closer to the goal
+				dest = new Coordinate(goalA.getX()+10, goalA.getY());
 				// System.out.println("4");
 			} else if (state == RobotState.SCORED) {
-				// we scored now
+				// we try to score now
 				System.out.println("We scored!!!");
+				robotController.deliverBall();
 				state = RobotState.AWAYFROMGOAL;
 				return;
 			} // move backwards from the goal
@@ -121,17 +123,17 @@ public class Pathfinder {
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
 					&& rotationAngle <= 180) {
-
 				robotController.rotateRobotRight(rotationAngle);
-
-				System.out.println("rotation angle = " + rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
 					&& rotationAngle >= -180) {
 				robotController.rotateRobotLeft(rotationAngle);
-			} else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
+				robot.setState(MoveState.ROTATING);
+			} 
+			// move forward
+			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 				robotController.robotForward(lengthToDest
 						/ (calibrationLength / 360));
 				robot.setState(MoveState.MOVING);
@@ -194,6 +196,7 @@ public class Pathfinder {
 				+ (robotVect.dY) * (destVect.dY));
 
 		double angDegrees = Math.toDegrees(angRadians);
+		// invert the degrees to match the statements in the code
 		return -angDegrees;
 
 	}
