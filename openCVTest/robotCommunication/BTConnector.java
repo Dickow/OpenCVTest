@@ -98,7 +98,7 @@ public class BTConnector {
 		if (distance > 100) {
 			distance /= 2;
 		} else {
-			distance -= 1;
+			distance -= 2;
 		}
 		try {
 			dos.writeInt(FORWARD);

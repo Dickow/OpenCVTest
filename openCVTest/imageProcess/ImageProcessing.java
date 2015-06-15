@@ -27,7 +27,7 @@ import org.opencv.imgproc.Moments;
 import pathfinding.Pathfinder;
 
 public class ImageProcessing {
-	// private Pathfinder pathfinder = new Pathfinder();
+	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
 	public int iLowH = 16;
@@ -123,8 +123,8 @@ public class ImageProcessing {
 			System.out.println("error in image");
 		}
 		try {
-			// pathfinder
-			// .findPath(robot, balls, goalA, goalB, null, frames, cross);
+			 pathfinder
+			 .findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}

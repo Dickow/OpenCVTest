@@ -78,6 +78,7 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
+				System.out.println("driving to goal point with radius = " + robot.robotRadius);
 				dest = new Coordinate(goalA.getX() + robot.robotRadius,
 						goalA.getY());
 			} else if (state == RobotState.SCORED) {
