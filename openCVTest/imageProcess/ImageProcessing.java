@@ -36,13 +36,13 @@ public class ImageProcessing {
 	public int iHighH = 255;
 	public int iHighHFront = 97;
 
-	public int iLowS = 173;
+	public int iLowS = 96;
 	public int iLowSFront = 155;
 
 	public int iHighS = 255;
 	public int iHighSFront = 255;
 
-	public int iLowV = 119;
+	public int iLowV = 219;
 	public int iLowVFront = 0;
 
 	public int iHighV = 255;
@@ -222,7 +222,7 @@ public class ImageProcessing {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				10, 150, 11, 1, 7);
+				10, 150, 12, 1, 7);
 
 		if (!circles.empty()) {
 

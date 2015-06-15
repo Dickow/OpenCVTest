@@ -92,16 +92,7 @@ public class BTConnector {
 	 */
 	public void robotForward(double distance) {
 
-		// we want to move in smaller steps to avoid missing the destination
-		if (distance > 100) {
-			distance /= 4;
-		} else if (distance > 50) {
-			distance /= 2;
-		} else {
-			// it seems like we needed a little extra distance to acctually
-			// reach the target
-			distance += 5;
-		}
+
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(distance);
@@ -172,12 +163,12 @@ public class BTConnector {
 	 * deliver the ball to the goal.
 	 */
 	public void deliverBall() {
-		try{
+		try {
 			dos.writeInt(DELIVER);
 			dos.flush();
 			waitForRobot();
-		}catch(IOException e){
-			
+		} catch (IOException e) {
+
 		}
 	}
 

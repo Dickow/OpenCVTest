@@ -121,17 +121,16 @@ public class Pathfinder {
 			}
 
 			// rotate right
-			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180) {
-				robotController.rotateRobotRight(rotationAngle);
-				robot.setState(MoveState.ROTATING);
-			}
-			// rotate left
-			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180) {
+			if (rotationAngle > 1 && !withinRobot(dest, robot)) {
 				robotController.rotateRobotLeft(rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			}
+//			// rotate left
+//			else if (rotationAngle < -1 && !withinRobot(dest, robot)
+//					&& rotationAngle >= -180) {
+//				robotController.rotateRobotLeft(Math.abs(rotationAngle));
+//				robot.setState(MoveState.ROTATING);
+//			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 				if (state == RobotState.AWAYFROMGOAL) {
@@ -204,7 +203,7 @@ public class Pathfinder {
 
 		double angDegrees = Math.toDegrees(angRadians);
 		// invert the degrees to match the statements in the code
-		return -angDegrees;
+		return Math.abs(angDegrees);
 
 	}
 
