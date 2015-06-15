@@ -53,7 +53,7 @@ public class Pathfinder {
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
-		//projectRobot(robot);
+		projectRobot(robot);
 		robot.updateMiddleCord();
 
 		switch (destState) {
@@ -394,9 +394,12 @@ public class Pathfinder {
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());
 		System.out.println("robot before project " + robot.toString());
-		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera));
+		
+		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getX();
 
-		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera));
+		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getY();
 		
 		robot.getFrontCord().setX(newX);
 		robot.getFrontCord().setY(newY);
