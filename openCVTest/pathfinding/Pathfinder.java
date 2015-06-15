@@ -53,6 +53,7 @@ public class Pathfinder {
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
+		projectRobot(robot);
 		robot.updateMiddleCord();
 
 		switch (destState) {
@@ -62,6 +63,7 @@ public class Pathfinder {
 				// we try to open the arms, then we are ready to catch a new
 				// ball
 				if (currentSafePoint == -1) {
+					System.out.println("open arms");
 					robotController.openRobotArms();
 				}
 				dest = balls.get(findClosestBall(balls, robot));
@@ -384,6 +386,37 @@ public class Pathfinder {
 		default:
 			return 0;
 		}
+	}
+
+	private void projectRobot(Robot robot) {
+		double heightOfRobot = 19;
+		double heightOfCamera = 208.5;
+		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
+				.getX(), cross.getCenterOfCross().getY());
+
+		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * (heightOfRobot / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * (heightOfRobot / heightOfCamera))
+				+ centerOfCamera.getY();
+		
+		robot.getFrontCord().setX(newX);
+		robot.getFrontCord().setY(newY);
+		
+		// calculate the back of the robot
+		
+		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * (heightOfRobot / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * (heightOfRobot / heightOfCamera))
+				+ centerOfCamera.getY();
+		
+		robot.getBackCord().setX(newX);
+		robot.getBackCord().setY(newY);
+		
+		
+		
+		
 	}
 
 	private boolean calibrateRobot(Robot robot) {

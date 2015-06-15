@@ -24,6 +24,7 @@ public class ImageCapturer implements Runnable {
 		while (true) {
 
 			videoCapture.read(img);
+			videoCapture.read(img);
 			ImageObject.getInstance().setImg(img);
 			Highgui.imwrite("image.jpg", img);
 			try {
