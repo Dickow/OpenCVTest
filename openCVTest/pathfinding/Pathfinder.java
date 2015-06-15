@@ -53,6 +53,7 @@ public class Pathfinder {
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
+		// make sure the coordinates of the robot are correct
 		projectRobot(robot);
 		robot.updateMiddleCord();
 
@@ -78,7 +79,8 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate((goalA.getX() + (2*robot.robotRadius)), goalA.getY());
+				dest = new Coordinate((goalA.getX() + robot.robotRadius),
+						goalA.getY());
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
@@ -130,7 +132,7 @@ public class Pathfinder {
 			} else if (state == RobotState.HASBALL) {
 				lengthToDest = calcDifference(robot.getMiddleCord().getX(),
 						robot.getMiddleCord().getY(), dest.getX(), dest.getY());
-			}
+			} 
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
@@ -289,9 +291,11 @@ public class Pathfinder {
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getLeftCross().getX() - radius;
 		int crossY = (int) cross.getLeftCross().getY() - 10;
+		
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + 2 * radius;
-		int crossHeight = 10 + 2 * radius;
+				.getX()) / 18) * 2) + (4 * radius);
+		int crossHeight = 10 + (2 * radius);
+		
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -304,9 +308,11 @@ public class Pathfinder {
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
 		int crossY = (int) cross.getTopCross().getY() - radius;
-		int crossWidth = 10 + 2 * radius;
+		
+		int crossWidth = 10 + (2 * radius);
 		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
-				.getY()) / 12) * 2) + 2 * radius;
+				.getY()) / 12) * 2) + (4 * radius);
+		
 		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
