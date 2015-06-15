@@ -98,10 +98,13 @@ public class Pathfinder {
 
 				System.out.println("Error in system");
 			}
-
-			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
-					.getFrontCord().getY(), dest.getX(), dest.getY());
-
+			if (state == RobotState.HASBALL) {
+				lengthToDest = calcDifference(robot.getMiddleCord().getX(),
+						robot.getMiddleCord().getY(), dest.getX(), dest.getY());
+			} else {
+				lengthToDest = calcDifference(robot.getFrontCord().getX(),
+						robot.getFrontCord().getY(), dest.getX(), dest.getY());
+			}
 			if (avoidObstacle(robot, dest, lengthToDest)) {
 				if ((findSafePoint(robot.toCoordinate()) != currentSafePoint)
 						&& currentSafePoint == -1) {
