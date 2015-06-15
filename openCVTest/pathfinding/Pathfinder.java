@@ -40,6 +40,9 @@ public class Pathfinder {
 			// we are not yet done calibrating, so just return
 			return;
 		}
+
+		// try to set it all the time
+		robotController.calibration = calibrationLength;
 		rotationAngle = 0;
 		lengthToDest = 0;
 
@@ -58,7 +61,9 @@ public class Pathfinder {
 			if (state == RobotState.NOBALL) {
 				// we try to open the arms, then we are ready to catch a new
 				// ball
-				robotController.openRobotArms();
+				if (currentSafePoint == -1) {
+					robotController.openRobotArms();
+				}
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
@@ -85,7 +90,7 @@ public class Pathfinder {
 						.getX()) / 4, goalA.getY());
 			} else {
 
-				System.out.println("fejl i jeppes mor");
+				System.out.println("Error in system");
 			}
 
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
@@ -121,28 +126,29 @@ public class Pathfinder {
 			}
 
 			// rotate right
-			if (rotationAngle > 1 && !withinRobot(dest, robot)) {
-				robotController.rotateRobotLeft(rotationAngle);
+			if (rotationAngle > 1 && !withinRobot(dest, robot)
+					&& rotationAngle <= 180) {
+				System.out.println("rotating right " + rotationAngle);
+				robotController.rotateRobotRight(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
-//			// rotate left
-//			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-//					&& rotationAngle >= -180) {
-//				robotController.rotateRobotLeft(Math.abs(rotationAngle));
-//				robot.setState(MoveState.ROTATING);
-//			}
+			// rotate left
+			else if (rotationAngle < -1 && !withinRobot(dest, robot)
+					&& rotationAngle >= -180) {
+				System.out.println("rotating left " + rotationAngle);
+				robotController.rotateRobotLeft(Math.abs(rotationAngle));
+				robot.setState(MoveState.ROTATING);
+			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 				if (state == RobotState.AWAYFROMGOAL) {
-					robotController.robotBackwards(lengthToDest
-							/ (calibrationLength / 360));
+					robotController.robotBackwards(lengthToDest);
 					robot.setState(MoveState.MOVING);
-					System.out.println("trying to move");
+					System.out.println("moving backwards");
 				} else {
-					robotController.robotForward(lengthToDest
-							/ (calibrationLength / 360));
+					robotController.robotForward(lengthToDest);
 					robot.setState(MoveState.MOVING);
-					System.out.println("trying to move");
+					System.out.println("moving forward");
 				}
 			} else {
 				// arrived at dest routine
@@ -203,7 +209,7 @@ public class Pathfinder {
 
 		double angDegrees = Math.toDegrees(angRadians);
 		// invert the degrees to match the statements in the code
-		return Math.abs(angDegrees);
+		return angDegrees;
 
 	}
 

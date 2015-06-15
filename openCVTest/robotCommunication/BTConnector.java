@@ -8,6 +8,9 @@ import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
 public class BTConnector {
+
+	public double calibration;
+
 	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
 			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
 			FINISHED = 10;
@@ -92,10 +95,14 @@ public class BTConnector {
 	 */
 	public void robotForward(double distance) {
 
-
+		if (distance > 100) {
+			distance /= 2;
+		} 
 		try {
 			dos.writeInt(FORWARD);
-			dos.writeDouble(distance);
+			System.out.println("distance after calc = " + distance
+					/ (calibration / 360));
+			dos.writeDouble(distance / (calibration / 360));
 			dos.flush();
 
 			waitForRobot();
