@@ -53,7 +53,7 @@ public class Pathfinder {
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
-		projectRobot(robot);
+		//projectRobot(robot);
 		robot.updateMiddleCord();
 
 		switch (destState) {
@@ -390,25 +390,23 @@ public class Pathfinder {
 
 	private void projectRobot(Robot robot) {
 		double heightOfRobot = 19;
-		double heightOfCamera = 208.5;
+		double heightOfCamera = 177; //TODO make sure this is correct before running
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());
 		System.out.println("robot before project " + robot.toString());
-		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * (heightOfRobot / heightOfCamera))
-				+ centerOfCamera.getX();
+		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera));
 
-		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * (heightOfRobot / heightOfCamera))
-				+ centerOfCamera.getY();
+		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera));
 		
 		robot.getFrontCord().setX(newX);
 		robot.getFrontCord().setY(newY);
 		
 		// calculate the back of the robot
 		
-		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * (heightOfRobot / heightOfCamera))
+		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getX();
 
-		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * (heightOfRobot / heightOfCamera))
+		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getY();
 		
 		robot.getBackCord().setX(newX);
