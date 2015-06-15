@@ -97,11 +97,11 @@ public class BTConnector {
 
 		if (distance > 100) {
 			distance /= 2;
-		} 
+		} else {
+			distance -= 1;
+		}
 		try {
 			dos.writeInt(FORWARD);
-			System.out.println("distance after calc = " + distance
-					/ (calibration / 360));
 			dos.writeDouble(distance / (calibration / 360));
 			dos.flush();
 
@@ -118,16 +118,6 @@ public class BTConnector {
 	 */
 	public void robotBackwards(double distance) {
 
-		// we want to move in smaller steps to avoid missing the destination
-		if (distance > 100) {
-			distance /= 4;
-		} else if (distance > 50) {
-			distance /= 2;
-		} else {
-			// it seems like we needed a little extra distance to acctually
-			// reach the target
-			distance += 5;
-		}
 		try {
 			dos.writeInt(BACKWARDS);
 			dos.writeDouble(distance);

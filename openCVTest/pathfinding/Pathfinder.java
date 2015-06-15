@@ -78,18 +78,21 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate(goalA.getX() + 10, goalA.getY());
+				dest = new Coordinate(goalA.getX() + robot.robotRadius, goalA.getY());
 				// System.out.println("4");
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
 				robotController.deliverBall();
-				state = RobotState.AWAYFROMGOAL;
+				state = RobotState.NOBALL;
 				return;
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
-				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
-						.getX()) / 4, goalA.getY());
+				System.out.println("go away from goal");
+//				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
+//						.getX()) / 2, goalA.getY());
+				state = RobotState.NOBALL;
+				return; 
 			} else {
 
 				System.out.println("Error in system");
@@ -113,7 +116,6 @@ public class Pathfinder {
 			destState = DestState.HASDEST;
 
 		case HASDEST:
-			System.out.println(state);
 			rotationAngle = findRotationAngle(robot.getFrontCord(),
 					robot.getMiddleCord(), dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
@@ -285,7 +287,7 @@ public class Pathfinder {
 
 	public void setcrossHorizontalPart(Rectangle crossHorizontalPart,
 			MiddleCross cross, int radius) {
-		int crossX = (int) cross.getLeftCross().getX();
+		int crossX = (int) cross.getLeftCross().getX()-radius;
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
 				.getX()) / 18) * 2) + 2 * radius;
