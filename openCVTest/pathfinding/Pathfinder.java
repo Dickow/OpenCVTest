@@ -393,7 +393,7 @@ public class Pathfinder {
 		double heightOfCamera = 208.5;
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());
-
+		System.out.println("robot before project " + robot.toString());
 		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * (heightOfRobot / heightOfCamera))
 				+ centerOfCamera.getX();
 
@@ -413,6 +413,8 @@ public class Pathfinder {
 		
 		robot.getBackCord().setX(newX);
 		robot.getBackCord().setY(newY);
+		
+		System.out.println("robot after project " + robot.toString());
 		
 		
 		
