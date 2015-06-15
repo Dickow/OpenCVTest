@@ -63,7 +63,6 @@ public class Pathfinder {
 				// we try to open the arms, then we are ready to catch a new
 				// ball
 				if (currentSafePoint == -1) {
-					System.out.println("open arms");
 					robotController.openRobotArms();
 				}
 				dest = balls.get(findClosestBall(balls, robot));
@@ -74,25 +73,27 @@ public class Pathfinder {
 						.getX() - robot.robotRadius)) / 2, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
+				robotController.closeRobotArms();
 				state = RobotState.HASBALL;
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate(goalA.getX() + robot.robotRadius, goalA.getY());
-				// System.out.println("4");
+				dest = new Coordinate(goalA.getX() + robot.robotRadius,
+						goalA.getY());
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
 				robotController.deliverBall();
 				state = RobotState.NOBALL;
+				destState = DestState.NODEST;
 				return;
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
 				System.out.println("go away from goal");
-//				dest = new Coordinate((goalA.getX() + cross.getLeftCross()
-//						.getX()) / 2, goalA.getY());
+				// dest = new Coordinate((goalA.getX() + cross.getLeftCross()
+				// .getX()) / 2, goalA.getY());
 				state = RobotState.NOBALL;
-				return; 
+				return;
 			} else {
 
 				System.out.println("Error in system");
@@ -132,14 +133,12 @@ public class Pathfinder {
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
 					&& rotationAngle <= 180) {
-				System.out.println("rotating right " + rotationAngle);
 				robotController.rotateRobotRight(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
 					&& rotationAngle >= -180) {
-				System.out.println("rotating left " + rotationAngle);
 				robotController.rotateRobotLeft(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
@@ -230,7 +229,6 @@ public class Pathfinder {
 		case NOBALL:
 			if (currentSafePoint == -1) {
 				// lets try closing the robot arms
-				robotController.closeRobotArms();
 				state = RobotState.GRABBALL;
 			}
 			break;
@@ -287,7 +285,7 @@ public class Pathfinder {
 
 	public void setcrossHorizontalPart(Rectangle crossHorizontalPart,
 			MiddleCross cross, int radius) {
-		int crossX = (int) cross.getLeftCross().getX()-radius;
+		int crossX = (int) cross.getLeftCross().getX() - radius;
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
 				.getX()) / 18) * 2) + 2 * radius;
@@ -303,7 +301,7 @@ public class Pathfinder {
 	public void setcrossVerticalPart(Rectangle crossVerticalPart,
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
-		int crossY = (int) cross.getTopCross().getY();
+		int crossY = (int) cross.getTopCross().getY() - radius;
 		int crossWidth = 10 + 2 * radius;
 		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
 				.getY()) / 12) * 2) + 2 * radius;
@@ -392,36 +390,31 @@ public class Pathfinder {
 
 	private void projectRobot(Robot robot) {
 		double heightOfRobot = 19;
-		double heightOfCamera = 177; //TODO make sure this is correct before running
+		double heightOfCamera = 177; // TODO make sure this is correct before
+										// running
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());
-		System.out.println("robot before project " + robot.toString());
-		
-		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+
+		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getX();
 
-		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getY();
-		
+
 		robot.getFrontCord().setX(newX);
 		robot.getFrontCord().setY(newY);
-		
+
 		// calculate the back of the robot
-		
-		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+
+		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getX();
 
-		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera-heightOfRobot) / heightOfCamera))
+		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
 				+ centerOfCamera.getY();
-		
+
 		robot.getBackCord().setX(newX);
 		robot.getBackCord().setY(newY);
-		
-		System.out.println("robot after project " + robot.toString());
-		
-		
-		
-		
+
 	}
 
 	private boolean calibrateRobot(Robot robot) {
