@@ -193,16 +193,16 @@ public class ImageProcessing {
 				if (j == 0) {
 					// System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
-					robot.setAreaBack(new Circle(posX, posY, 1.5 * Math
+					robot.setAreaBack(new Circle(posX, posY, 2 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (1.5 * Math
+					Core.circle(image, new Point(posX, posY), (int) (2 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 				} else {
 					// System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
-					robot.setAreaFront(new Circle(posX, posY, 1.5 * Math
+					robot.setAreaFront(new Circle(posX, posY, 2 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (1.5 * Math
+					Core.circle(image, new Point(posX, posY), (int) (2 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
 				}
@@ -373,9 +373,10 @@ public class ImageProcessing {
 					.lowLeft().getY()) / 2));
 		}
 		// add the rectangle covering the field, to avoid getting unwanted balls
-		fieldRect = new Rect(new Point(frames.topLeft().getX() + ballSize, frames.topLeft().getY()
-				+ ballSize), new Point(frames.lowRight().getX() - ballSize,
-				frames.lowRight().getY() - ballSize));
+		fieldRect = new Rect(new Point(frames.topLeft().getX() + ballSize,
+				frames.topLeft().getY() + ballSize), new Point(frames
+				.lowRight().getX() - ballSize, frames.lowRight().getY()
+				- ballSize));
 
 		// calculate the cross middle point
 		x = (int) ((frames.topLeft().getX() + frames.topRight().getX()) / 2);
@@ -422,12 +423,18 @@ public class ImageProcessing {
 				new Scalar(0, 0, 255), 6);
 
 		// draw lines
-		Core.line(image, lineTopLeft, lineTopRight, new Scalar(0, 0, 255), 3);
-		Core.line(image, lineTopLeft, lineBottomLeft, new Scalar(0, 0, 255), 3);
-		Core.line(image, lineBottomLeft, lineBottomRight,
-				new Scalar(0, 0, 255), 3);
-		Core.line(image, lineTopRight, lineBottomRight, new Scalar(0, 0, 255),
-				3);
+		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
+				.getY()), new Point(frames.topRight().getX(), frames.topRight()
+				.getY()), new Scalar(0, 0, 255), 3);
+		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
+				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+				.getY()), new Scalar(0, 0, 255), 3);
+		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
+				.getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
+				.getY()), new Scalar(0, 0, 255), 3);
+		Core.line(image, new Point(frames.topRight().getX(), frames.topRight()
+				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+				.getY()), new Scalar(0, 0, 255), 3);
 
 	}
 
