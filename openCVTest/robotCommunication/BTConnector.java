@@ -95,10 +95,8 @@ public class BTConnector {
 	 */
 	public void robotForward(double distance) {
 
-		if (distance > 100) {
+		if (distance > 50) {
 			distance /= 2;
-		} else {
-			distance -= 2;
 		}
 		try {
 			dos.writeInt(FORWARD);

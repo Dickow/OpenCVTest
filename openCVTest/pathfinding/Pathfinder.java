@@ -71,7 +71,7 @@ public class Pathfinder {
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
 				dest = new Coordinate((goalA.getX() + (cross.getLeftCross()
-						.getX() - robot.robotRadius)) / 2, goalA.getY());
+						.getX())) / 1.5, goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
@@ -79,15 +79,33 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate((goalA.getX() + robot.robotRadius),
+				dest = new Coordinate((goalA.getX() + (2 * robot.robotRadius)),
 						goalA.getY());
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
-				robotController.deliverBall();
-				state = RobotState.NOBALL;
-				destState = DestState.NODEST;
-				return;
+
+				rotationAngle = findRotationAngle(robot.getFrontCord(),
+						robot.getMiddleCord(), goalA);
+				// rotate right
+				if (rotationAngle > 1 && !withinRobot(dest, robot)
+						&& rotationAngle <= 180) {
+					robotController.rotateRobotRight(Math.abs(rotationAngle));
+					robot.setState(MoveState.ROTATING);
+					return;
+				}
+				// rotate left
+				else if (rotationAngle < -1 && !withinRobot(dest, robot)
+						&& rotationAngle >= -180) {
+					robotController.rotateRobotLeft(Math.abs(rotationAngle));
+					robot.setState(MoveState.ROTATING);
+					return;
+				} else {
+					robotController.deliverBall();
+					state = RobotState.NOBALL;
+					destState = DestState.NODEST;
+					return;
+				}
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
 				System.out.println("go away from goal");
@@ -108,9 +126,11 @@ public class Pathfinder {
 						&& currentSafePoint == -1) {
 					dest = safePoints[findSafePoint(robot.toCoordinate())];
 					currentSafePoint = findSafePoint(robot.toCoordinate());
+					System.out.println("new safepoint");
 				} else {
 					currentSafePoint = nextSafePoint();
 					dest = safePoints[currentSafePoint];
+					System.out.println("next safepoint");
 				}
 			} else {
 				currentSafePoint = -1;
@@ -130,9 +150,9 @@ public class Pathfinder {
 				lengthToDest = calcDifference(robot.getBackCord().getX(), robot
 						.getBackCord().getY(), dest.getX(), dest.getY());
 			} else if (state == RobotState.HASBALL) {
-				lengthToDest = calcDifference(robot.getMiddleCord().getX(),
-						robot.getMiddleCord().getY(), dest.getX(), dest.getY());
-			} 
+				lengthToDest = calcDifference(robot.getMiddleCord().getX(), robot
+						.getMiddleCord().getY(), dest.getX(), dest.getY());
+			}
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
@@ -147,19 +167,16 @@ public class Pathfinder {
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
-			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
+			else if (lengthToDest > 1 && !withinRobot(dest, robot)) {
 				if (state == RobotState.AWAYFROMGOAL) {
 					robotController.robotBackwards(lengthToDest);
 					robot.setState(MoveState.MOVING);
-					System.out.println("moving backwards");
 				} else {
 					robotController.robotForward(lengthToDest);
 					robot.setState(MoveState.MOVING);
-					System.out.println("moving forward");
 				}
 			} else {
 				// arrived at dest routine
-				System.out.println("destination reached");
 				destState = DestState.NODEST;
 				destReached();
 			}
@@ -291,11 +308,11 @@ public class Pathfinder {
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getLeftCross().getX() - radius;
 		int crossY = (int) cross.getLeftCross().getY() - 10;
-		
+
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
 				.getX()) / 18) * 2) + (4 * radius);
 		int crossHeight = 10 + (2 * radius);
-		
+
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -308,11 +325,11 @@ public class Pathfinder {
 			MiddleCross cross, int radius) {
 		int crossX = (int) cross.getTopCross().getX() - 10;
 		int crossY = (int) cross.getTopCross().getY() - radius;
-		
+
 		int crossWidth = 10 + (2 * radius);
 		int crossHeight = (int) (((frames.lowRight().getY() - frames.topRight()
 				.getY()) / 12) * 2) + (4 * radius);
-		
+
 		this.crossVerticalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
 	}
@@ -397,8 +414,8 @@ public class Pathfinder {
 	}
 
 	private void projectRobot(Robot robot) {
-		double heightOfRobot = 19;
-		double heightOfCamera = 177; // TODO make sure this is correct before
+		double heightOfRobot = 20;
+		double heightOfCamera = 220; // TODO make sure this is correct before
 										// running
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());

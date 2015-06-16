@@ -28,6 +28,8 @@ import pathfinding.Pathfinder;
 
 public class ImageProcessing {
 	private boolean foundWallsBefore = false;
+	private int imgCaptures = 1;
+	private Coordinate topLeft, topRight, lowLeft, lowRight;
 	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
@@ -124,8 +126,7 @@ public class ImageProcessing {
 			System.out.println("error in image");
 		}
 		try {
-			pathfinder
-					.findPath(robot, balls, goalA, goalB, null, frames, cross);
+			pathfinder.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
@@ -193,18 +194,19 @@ public class ImageProcessing {
 				if (j == 0) {
 					// System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
-					robot.setAreaBack(new Circle(posX, posY, 2 * Math
+					robot.setAreaBack(new Circle(posX, posY, 3 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (2 * Math
+					Core.circle(image, new Point(posX, posY), (int) (3 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
+					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
 				} else {
 					// System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
-					robot.setAreaFront(new Circle(posX, posY, 2 * Math
+					robot.setAreaFront(new Circle(posX, posY, 3 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (2 * Math
+					Core.circle(image, new Point(posX, posY), (int) (3 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
-					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
+
 				}
 			}
 
@@ -223,7 +225,7 @@ public class ImageProcessing {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				10, 150, 12, 1, 7);
+				10, 50, 15, 1, 15);
 
 		if (!circles.empty()) {
 
@@ -353,6 +355,11 @@ public class ImageProcessing {
 		// add the corners to the list of objects that we have to take into
 		// consideration
 		if (!foundWallsBefore) {
+			lowLeft = new Coordinate(lineBottomLeft.x, lineBottomLeft.y);
+			lowRight = new Coordinate(lineBottomRight.x, lineBottomRight.y);
+			topLeft = new Coordinate(lineTopLeft.x, lineTopLeft.y);
+			topRight = new Coordinate(lineTopRight.x, lineTopRight.y);
+
 			frames.setTopLeft(new Coordinate(lineTopLeft.x, lineTopLeft.y));
 			frames.setTopRight(new Coordinate(lineTopRight.x, lineTopRight.y));
 			frames.setLowRight(new Coordinate(lineBottomRight.x,
@@ -360,17 +367,23 @@ public class ImageProcessing {
 			frames.setLowLeft(new Coordinate(lineBottomLeft.x, lineBottomLeft.y));
 			foundWallsBefore = true;
 		} else {
-			frames.setTopLeft(new Coordinate((lineTopLeft.x + frames.topLeft()
-					.getX()) / 2, (lineTopLeft.y + frames.topLeft().getY()) / 2));
-			frames.setTopRight(new Coordinate((lineTopRight.x + frames
-					.topRight().getX()) / 2, (lineTopRight.y + frames
-					.topRight().getY()) / 2));
-			frames.setLowRight(new Coordinate((lineBottomRight.x + frames
-					.lowRight().getX()) / 2, (lineBottomRight.y + frames
-					.lowRight().getY()) / 2));
-			frames.setLowLeft(new Coordinate((lineBottomLeft.x + frames
-					.lowLeft().getX()) / 2, (lineBottomLeft.y + frames
-					.lowLeft().getY()) / 2));
+			lowLeft.setX(lowLeft.getX() + lineBottomLeft.x);
+			lowLeft.setY(lowLeft.getY() + lineBottomLeft.y);
+			lowRight.setX(lowRight.getX() + lineBottomRight.x);
+			lowRight.setY(lowRight.getY() + lineBottomRight.y);
+			topLeft.setX(topLeft.getX() + lineTopLeft.x);
+			topLeft.setY(topLeft.getY() + lineTopLeft.y);
+			topRight.setX(topRight.getX() + lineTopRight.x);
+			topRight.setY(topRight.getY() + lineTopRight.y);
+
+			frames.setTopLeft(new Coordinate(topLeft.getX() / imgCaptures,
+					topLeft.getY() / imgCaptures));
+			frames.setTopRight(new Coordinate(topRight.getX() / imgCaptures,
+					topRight.getY() / imgCaptures));
+			frames.setLowRight(new Coordinate(lowRight.getX() / imgCaptures,
+					lowRight.getY() / imgCaptures));
+			frames.setLowLeft(new Coordinate(lowLeft.getX() / imgCaptures,
+					lowLeft.getY() / imgCaptures));
 		}
 		// add the rectangle covering the field, to avoid getting unwanted balls
 		fieldRect = new Rect(new Point(frames.topLeft().getX() + ballSize,
@@ -407,7 +420,7 @@ public class ImageProcessing {
 		// add Goal points to the list of objects (where the robot )
 		goalA = new Goal(
 				((frames.topLeft().getX() + frames.lowLeft().getX()) / 2),
-				(frames.topLeft().getY() + frames.lowLeft().getY()) / 2);
+				((frames.topLeft().getY() + frames.lowLeft().getY()) / 2));
 		goalB = new Goal(
 				((frames.topRight().getX() + frames.lowRight().getX()) / 2),
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
@@ -429,13 +442,13 @@ public class ImageProcessing {
 		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
 				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
 				.getY()), new Scalar(0, 0, 255), 3);
-		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
+		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
 				.getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
 				.getY()), new Scalar(0, 0, 255), 3);
 		Core.line(image, new Point(frames.topRight().getX(), frames.topRight()
 				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
 				.getY()), new Scalar(0, 0, 255), 3);
-
+		imgCaptures++;
 	}
 
 	/**
