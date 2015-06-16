@@ -27,6 +27,7 @@ import org.opencv.imgproc.Moments;
 import pathfinding.Pathfinder;
 
 public class ImageProcessing {
+	private boolean foundWallsBefore = false;
 	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
@@ -123,8 +124,8 @@ public class ImageProcessing {
 			System.out.println("error in image");
 		}
 		try {
-			 pathfinder
-			 .findPath(robot, balls, goalA, goalB, null, frames, cross);
+			pathfinder
+					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
@@ -315,7 +316,9 @@ public class ImageProcessing {
 		}
 		x /= count;
 		y /= count;
+
 		lineTopRight = new Point(x, y);
+
 		x = 0;
 		y = 0;
 		count = 0;
@@ -349,15 +352,30 @@ public class ImageProcessing {
 
 		// add the corners to the list of objects that we have to take into
 		// consideration
-		frames.setTopLeft(new Coordinate(lineTopLeft.x, lineTopLeft.y));
-		frames.setTopRight(new Coordinate(lineTopRight.x, lineTopRight.y));
-		frames.setLowRight(new Coordinate(lineBottomRight.x, lineBottomRight.y));
-		frames.setLowLeft(new Coordinate(lineBottomLeft.x, lineBottomLeft.y));
-
+		if (!foundWallsBefore) {
+			frames.setTopLeft(new Coordinate(lineTopLeft.x, lineTopLeft.y));
+			frames.setTopRight(new Coordinate(lineTopRight.x, lineTopRight.y));
+			frames.setLowRight(new Coordinate(lineBottomRight.x,
+					lineBottomRight.y));
+			frames.setLowLeft(new Coordinate(lineBottomLeft.x, lineBottomLeft.y));
+			foundWallsBefore = true;
+		} else {
+			frames.setTopLeft(new Coordinate((lineTopLeft.x + frames.topLeft()
+					.getX()) / 2, (lineTopLeft.y + frames.topLeft().getY()) / 2));
+			frames.setTopRight(new Coordinate((lineTopRight.x + frames
+					.topRight().getX()) / 2, (lineTopRight.y + frames
+					.topRight().getY()) / 2));
+			frames.setLowRight(new Coordinate((lineBottomRight.x + frames
+					.lowRight().getX()) / 2, (lineBottomRight.y + frames
+					.lowRight().getY()) / 2));
+			frames.setLowLeft(new Coordinate((lineBottomLeft.x + frames
+					.lowLeft().getX()) / 2, (lineBottomLeft.y + frames
+					.lowLeft().getY()) / 2));
+		}
 		// add the rectangle covering the field, to avoid getting unwanted balls
-		fieldRect = new Rect(new Point(lineTopLeft.x + ballSize, lineTopLeft.y
-				+ ballSize), new Point(lineBottomRight.x - ballSize,
-				lineBottomRight.y - ballSize));
+		fieldRect = new Rect(new Point(frames.topLeft().getX() + ballSize, frames.topLeft().getY()
+				+ ballSize), new Point(frames.lowRight().getX() - ballSize,
+				frames.lowRight().getY() - ballSize));
 
 		// calculate the cross middle point
 		x = (int) ((frames.topLeft().getX() + frames.topRight().getX()) / 2);
