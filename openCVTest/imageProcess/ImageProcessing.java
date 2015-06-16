@@ -194,17 +194,17 @@ public class ImageProcessing {
 				if (j == 0) {
 					// System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
-					robot.setAreaBack(new Circle(posX, posY, 3 * Math
+					robot.setAreaBack(new Circle(posX, posY, 4 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (3 * Math
+					Core.circle(image, new Point(posX, posY), (int) (4 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
 				} else {
 					// System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
-					robot.setAreaFront(new Circle(posX, posY, 3 * Math
+					robot.setAreaFront(new Circle(posX, posY, 4 * Math
 							.sqrt(dArea / 3.14)));
-					Core.circle(image, new Point(posX, posY), (int) (3 * Math
+					Core.circle(image, new Point(posX, posY), (int) (4 * Math
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 
 				}

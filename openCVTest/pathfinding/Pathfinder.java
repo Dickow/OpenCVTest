@@ -70,8 +70,9 @@ public class Pathfinder {
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
-				dest = new Coordinate((goalA.getX() + (cross.getLeftCross()
-						.getX())) / 1.5, goalA.getY());
+				dest = new Coordinate(
+						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
+						goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
@@ -79,38 +80,20 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate((goalA.getX() + (2 * robot.robotRadius)),
+				dest = new Coordinate((goalA.getX() + (3 * robot.robotRadius)),
 						goalA.getY());
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
+				robotController.deliverBall();
+				state = RobotState.AWAYFROMGOAL;
+				destState = DestState.NODEST; 
+				return;
 
-				rotationAngle = findRotationAngle(robot.getFrontCord(),
-						robot.getMiddleCord(), goalA);
-				// rotate right
-				if (rotationAngle > 1 && !withinRobot(dest, robot)
-						&& rotationAngle <= 180) {
-					robotController.rotateRobotRight(Math.abs(rotationAngle));
-					robot.setState(MoveState.ROTATING);
-					return;
-				}
-				// rotate left
-				else if (rotationAngle < -1 && !withinRobot(dest, robot)
-						&& rotationAngle >= -180) {
-					robotController.rotateRobotLeft(Math.abs(rotationAngle));
-					robot.setState(MoveState.ROTATING);
-					return;
-				} else {
-					robotController.deliverBall();
-					state = RobotState.NOBALL;
-					destState = DestState.NODEST;
-					return;
-				}
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
 				System.out.println("go away from goal");
-				// dest = new Coordinate((goalA.getX() + cross.getLeftCross()
-				// .getX()) / 2, goalA.getY());
+				robotController.robotBackwards(50);
 				state = RobotState.NOBALL;
 				return;
 			} else {
@@ -143,15 +126,10 @@ public class Pathfinder {
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
 					.getFrontCord().getY(), dest.getX(), dest.getY());
 
-			if (state == RobotState.AWAYFROMGOAL) {
-				// we do not need to rotate, we just need to drive backwards
-				rotationAngle = findRotationAngle(robot.getBackCord(),
-						robot.getMiddleCord(), dest);
-				lengthToDest = calcDifference(robot.getBackCord().getX(), robot
-						.getBackCord().getY(), dest.getX(), dest.getY());
-			} else if (state == RobotState.HASBALL) {
-				lengthToDest = calcDifference(robot.getMiddleCord().getX(), robot
-						.getMiddleCord().getY(), dest.getX(), dest.getY());
+			// if we have the ball we must get to the goal scoring coordinate
+			if (state == RobotState.HASBALL) {
+				lengthToDest = calcDifference(robot.getMiddleCord().getX(),
+						robot.getMiddleCord().getY(), dest.getX(), dest.getY());
 			}
 
 			// rotate right
@@ -167,7 +145,7 @@ public class Pathfinder {
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
-			else if (lengthToDest > 1 && !withinRobot(dest, robot)) {
+			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 				if (state == RobotState.AWAYFROMGOAL) {
 					robotController.robotBackwards(lengthToDest);
 					robot.setState(MoveState.MOVING);
