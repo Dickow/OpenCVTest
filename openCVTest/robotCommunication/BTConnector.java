@@ -98,6 +98,9 @@ public class BTConnector {
 		if (distance > 50) {
 			distance /= 2;
 		}
+		else {
+			distance -= 2; 
+		}
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(distance / (calibration / 360));
@@ -118,7 +121,7 @@ public class BTConnector {
 
 		try {
 			dos.writeInt(BACKWARDS);
-			dos.writeDouble(distance);
+			dos.writeDouble(distance/(calibration/360));
 			dos.flush();
 			waitForRobot();
 		} catch (IOException e) {

@@ -93,8 +93,9 @@ public class Pathfinder {
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
 				System.out.println("go away from goal");
-				robotController.robotBackwards(50);
+			//	robotController.robotBackwards(10);
 				state = RobotState.NOBALL;
+				destState = DestState.NODEST; 
 				return;
 			} else {
 
