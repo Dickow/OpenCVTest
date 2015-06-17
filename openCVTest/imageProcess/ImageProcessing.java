@@ -115,7 +115,7 @@ public class ImageProcessing {
 		}
 		try {
 			// ignoreBallInsideRobot();
-			drawBalls();
+			// drawBalls();
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
 		}
@@ -458,33 +458,33 @@ public class ImageProcessing {
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
 		// Draw cross
-		Core.line(image, new Point(cross.getLeftCross().getX(), cross
-				.getLeftCross().getY()), new Point(
-				cross.getRightCross().getX(), cross.getRightCross().getY()),
-				new Scalar(0, 0, 255), 6);
-		Core.line(image, new Point(cross.getTopCross().getX(), cross
-				.getTopCross().getY()), new Point(
-				cross.getBottomCross().getX(), cross.getBottomCross().getY()),
-				new Scalar(0, 0, 255), 6);
+//		Core.line(image, new Point(cross.getLeftCross().getX(), cross
+//				.getLeftCross().getY()), new Point(
+//				cross.getRightCross().getX(), cross.getRightCross().getY()),
+//				new Scalar(0, 0, 255), 6);
+//		Core.line(image, new Point(cross.getTopCross().getX(), cross
+//				.getTopCross().getY()), new Point(
+//				cross.getBottomCross().getX(), cross.getBottomCross().getY()),
+//				new Scalar(0, 0, 255), 6);
 
 		// draw a rectangle around the cross
-		Core.rectangle(image, new Point(cross.getLeftCross().getX(), cross
-				.getTopCross().getY()), new Point(cross.getRightCross().getX(),
-				cross.getBottomCross().getY()), new Scalar(0, 0, 255));
-
-		// draw lines
-		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
-				.getY()), new Point(frames.topRight().getX(), frames.topRight()
-				.getY()), new Scalar(0, 0, 255), 3);
-		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
-				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
-				.getY()), new Scalar(0, 0, 255), 3);
-		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
-				.getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
-				.getY()), new Scalar(0, 0, 255), 3);
-		Core.line(image, new Point(frames.topRight().getX(), frames.topRight()
-				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
-				.getY()), new Scalar(0, 0, 255), 3);
+//		Core.rectangle(image, new Point(cross.getLeftCross().getX(), cross
+//				.getTopCross().getY()), new Point(cross.getRightCross().getX(),
+//				cross.getBottomCross().getY()), new Scalar(0, 0, 255));
+//
+//		// draw lines
+//		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
+//				.getY()), new Point(frames.topRight().getX(), frames.topRight()
+//				.getY()), new Scalar(0, 0, 255), 3);
+//		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
+//				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+//				.getY()), new Scalar(0, 0, 255), 3);
+//		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
+//				.getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
+//				.getY()), new Scalar(0, 0, 255), 3);
+//		Core.line(image, new Point(frames.topRight().getX(), frames.topRight()
+//				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+//				.getY()), new Scalar(0, 0, 255), 3);
 		imgCaptures++;
 	}
 
