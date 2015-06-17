@@ -31,7 +31,7 @@ public class ImageProcessing {
 	private boolean foundWallsBefore = false;
 	private int imgCaptures = 1;
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
-	private Pathfinder pathfinder = new Pathfinder();
+	//private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
 	public int iLowH = 16;
@@ -129,15 +129,15 @@ public class ImageProcessing {
 		projectAllCoordinates();
 		
 		try {
-			pathfinder
-					.findPath(robot, balls, goalA, goalB, null, frames, cross);
+		//	pathfinder
+		//			.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
 	}
 	
 	private void projectAllCoordinates(){
-		double heightOfRobot = 20; 
+		double heightOfRobot = 10; 
 		double heightOfBall = 4; 
 		double heightOfGoal = 7; 
 		projectCoordinate(robot.getFrontCord(), heightOfRobot);

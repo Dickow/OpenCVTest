@@ -55,7 +55,7 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 
 		// try to make the balls by the walls accessible for the robot
-		adjustBallsAtWalls(balls);
+		//adjustBallsAtWalls(balls);
 
 		switch (destState) {
 		case NODEST:

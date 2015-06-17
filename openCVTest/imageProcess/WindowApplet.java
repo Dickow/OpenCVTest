@@ -55,20 +55,6 @@ public class WindowApplet extends Applet implements Runnable {
 			backGroundImg = processing.getBackgroundImage();
 			drawer.setBackGroundImg(backGroundImg);
 
-			try {
-				Robot robot = processing.getRobot();
-				MiddleCross cross = processing.getCross();
-				Goal goalA = processing.getGoalA();
-				projectRobot(robot, cross);
-				projectGoal(goalA, cross);
-				robot.updateMiddleCord();
-				drawer.setRobot(robot);
-				drawer.setCross(cross);
-				drawer.setGoalA(goalA);
-
-			} catch (Exception e) {
-				// do nothing
-			}
 			drawer.repaint();
 
 			// sleep for a bit
