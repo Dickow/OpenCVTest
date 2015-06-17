@@ -55,11 +55,11 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 		// make sure the coordinates of the robot are correct
 		projectRobot(robot);
-		
+
 		// make sure the goal coordinates are correct aswell
 		projectGoal(goalA);
 		robot.updateMiddleCord();
-		
+
 		// try to make the balls by the walls accessible for the robot
 		adjustBallsAtWalls(balls);
 
@@ -426,7 +426,7 @@ public class Pathfinder {
 		robot.getBackCord().setY(newY);
 
 	}
-	
+
 	private void projectGoal(Goal goalA) {
 		double heightOfWall = 7;
 		double heightOfCamera = 212;
@@ -464,11 +464,12 @@ public class Pathfinder {
 
 	/**
 	 * Method to make the balls accessible to the robot, instead of making it
-	 * drive into the wall because it thinks it cannot reach the ball 
+	 * drive into the wall because it thinks it cannot reach the ball
+	 * 
 	 * @param balls
 	 */
 	private void adjustBallsAtWalls(ArrayList<Ball> balls) {
-		//TODO adjust this value if necessary 
+		// TODO adjust this value if necessary
 		double maxDifFromWall = 5;
 
 		double topYAvg = (frames.topLeft().getY() + frames.topRight().getY()) / 2;
@@ -479,22 +480,22 @@ public class Pathfinder {
 		for (Ball ball : balls) {
 
 			// check for top wall
-			if (Math.abs((ball.getY() - ball.getRadius()) - topYAvg) < maxDifFromWall) {
-				ball.setY(ball.getY() + ball.getRadius());
+			if ((ball.getY() - 2 * ball.getRadius()) + topYAvg < maxDifFromWall) {
+				ball.setY(ball.getY() + 2 * ball.getRadius());
 			}
 
 			// check for right wall
-			else if (Math.abs((ball.getX() + ball.getRadius()) - rightXAvg) < maxDifFromWall) {
-				ball.setX(ball.getX() - ball.getRadius());
+			else if (rightXAvg - (ball.getX() + 2 * ball.getRadius()) < maxDifFromWall) {
+				ball.setX(ball.getX() - 2 * ball.getRadius());
 			}
 
 			// check for bottom wall
-			else if (Math.abs((ball.getY() + ball.getRadius()) - bottomYAvg) < maxDifFromWall) {
-				ball.setY(ball.getY() - ball.getRadius());
+			else if ((ball.getY() + 2 * ball.getRadius()) - bottomYAvg < maxDifFromWall) {
+				ball.setY(ball.getY() - 2 * ball.getRadius());
 			}
 			// check for left wall
-			else if (Math.abs((ball.getX() - ball.getRadius()) - leftXAvg) < maxDifFromWall) {
-				ball.setX(ball.getX() + ball.getRadius());
+			else if ((ball.getX() - 2 * ball.getRadius()) + leftXAvg < maxDifFromWall) {
+				ball.setX(ball.getX() + 2 * ball.getRadius());
 			}
 		}
 
