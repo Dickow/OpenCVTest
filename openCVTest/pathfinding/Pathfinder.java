@@ -55,6 +55,9 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 		// make sure the coordinates of the robot are correct
 		projectRobot(robot);
+		
+		// make sure the goal coordinates are correct aswell
+		projectGoal(goalA);
 		robot.updateMiddleCord();
 		
 		// try to make the balls by the walls accessible for the robot
@@ -422,6 +425,23 @@ public class Pathfinder {
 		robot.getBackCord().setX(newX);
 		robot.getBackCord().setY(newY);
 
+	}
+	
+	private void projectGoal(Goal goalA) {
+		double heightOfWall = 7;
+		double heightOfCamera = 212;
+
+		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
+				.getX(), cross.getCenterOfCross().getY());
+
+		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getY();
+
+		goalA.setX(newX);
+		goalA.setY(newY);
 	}
 
 	private boolean calibrateRobot(Robot robot) {
