@@ -13,6 +13,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import obstacles.Goal;
 import obstacles.MiddleCross;
 import moveableObjects.Coordinate;
 import moveableObjects.Robot;
@@ -35,15 +36,14 @@ public class WindowApplet extends Applet implements Runnable {
 
 		// start the processing thread
 		// start the img capture thread
-		 ImageCapturer capturer = new ImageCapturer();
-		 Thread capThread = new Thread(capturer);
-		 capThread.start();
+		ImageCapturer capturer = new ImageCapturer();
+		Thread capThread = new Thread(capturer);
+		capThread.start();
 
 		while (true) {
 
 			// process a new image
 			processing.process();
-			
 
 			// get the newly process objects in the image
 			drawer.setBalls(processing.getBalls());
@@ -54,8 +54,23 @@ public class WindowApplet extends Applet implements Runnable {
 			drawer.setRobot(processing.getRobot());
 			backGroundImg = processing.getBackgroundImage();
 			drawer.setBackGroundImg(backGroundImg);
+
+			try {
+				Robot robot = processing.getRobot();
+				MiddleCross cross = processing.getCross();
+				Goal goalA = processing.getGoalA();
+				projectRobot(robot, cross);
+				projectGoal(goalA, cross);
+				robot.updateMiddleCord();
+				drawer.setRobot(robot);
+				drawer.setCross(cross);
+				drawer.setGoalA(goalA);
+
+			} catch (Exception e) {
+				// do nothing
+			}
 			drawer.repaint();
-			
+
 			// sleep for a bit
 			sleep();
 		}
@@ -77,12 +92,12 @@ public class WindowApplet extends Applet implements Runnable {
 		processing = new ImageProcessing();
 		backGroundImg = processing.getBackgroundImage();
 		drawer = new ScreenDrawing();
-		drawer.setPreferredSize(new Dimension(640,480));
-		
+		drawer.setPreferredSize(new Dimension(640, 480));
+
 		// add the canvas
 		add(drawer);
-		
-		// create all the sliders 
+
+		// create all the sliders
 		SlideListener slideListener = new SlideListener();
 		// set the Labels
 		lowerH = new JLabel("lower H Back : " + processing.iLowH);
@@ -109,7 +124,7 @@ public class WindowApplet extends Applet implements Runnable {
 		lowerVSlider.addChangeListener(slideListener);
 		upperVSlider = new JSlider(0, 255, processing.iHighV);
 		upperVSlider.addChangeListener(slideListener);
-		
+
 		// add all the components to the panel
 
 		add(lowerH);
@@ -126,7 +141,7 @@ public class WindowApplet extends Applet implements Runnable {
 		add(lowerVSlider);
 		add(upperV);
 		add(upperVSlider);
-		
+
 		// set the Labels of the blue color find
 		lowerH2 = new JLabel("lower H Front: " + processing.iLowHFront);
 		upperH2 = new JLabel("upper H Front: " + processing.iHighHFront);
@@ -171,7 +186,7 @@ public class WindowApplet extends Applet implements Runnable {
 		add(upperVSlider2);
 
 	}
-	
+
 	private void sleep() {
 		try {
 			Thread.sleep(100);
@@ -227,7 +242,7 @@ public class WindowApplet extends Applet implements Runnable {
 		}
 
 	}
-	
+
 	private void projectRobot(Robot robot, MiddleCross cross) {
 		double heightOfRobot = 24;
 		double heightOfCamera = 212; // TODO make sure this is correct before
@@ -255,5 +270,22 @@ public class WindowApplet extends Applet implements Runnable {
 		robot.getBackCord().setX(newX);
 		robot.getBackCord().setY(newY);
 
+	}
+
+	private void projectGoal(Goal goalA, MiddleCross cross) {
+		double heightOfWall = 7;
+		double heightOfCamera = 212;
+
+		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
+				.getX(), cross.getCenterOfCross().getY());
+
+		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getY();
+
+		goalA.setX(newX);
+		goalA.setY(newY);
 	}
 }

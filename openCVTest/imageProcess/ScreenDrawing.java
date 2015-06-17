@@ -26,6 +26,15 @@ public class ScreenDrawing extends Canvas {
 		try {
 			g.drawImage(backGroundImg, 0, 0, 640, 480, getParent());
 
+			// paint the coordinates of the robot
+			g.setColor(Color.MAGENTA);
+			g.drawOval((int) robot.getFrontCord().getX(), (int) robot
+					.getFrontCord().getY(), 5, 5);
+			g.drawOval((int) robot.getMiddleCord().getX(), (int) robot
+					.getMiddleCord().getY(), 5, 5);
+			g.drawOval((int) robot.getBackCord().getX(), (int) robot
+					.getBackCord().getY(), 5, 5);
+
 			// paint the frame
 			// g.setColor(Color.RED);
 			//
