@@ -153,7 +153,7 @@ public class Pathfinder {
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
-			else if (lengthToDest > 1 && !withinRobot(dest, robot)) {
+			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 
 				robotController.robotForward(lengthToDest);
 				robot.setState(MoveState.MOVING);
@@ -397,8 +397,8 @@ public class Pathfinder {
 	}
 
 	private void projectRobot(Robot robot) {
-		double heightOfRobot = 24;
-		double heightOfCamera = 220; // TODO make sure this is correct before
+		double heightOfRobot = 20;
+		double heightOfCamera = 212; // TODO make sure this is correct before
 										// running
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());
@@ -427,7 +427,7 @@ public class Pathfinder {
 
 	private void projectGoal(Goal goalA) {
 		double heightOfWall = 7;
-		double heightOfCamera = 220;
+		double heightOfCamera = 212;
 
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
 				.getX(), cross.getCenterOfCross().getY());

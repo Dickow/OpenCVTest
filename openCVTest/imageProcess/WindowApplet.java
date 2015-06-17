@@ -13,6 +13,10 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import obstacles.MiddleCross;
+import moveableObjects.Coordinate;
+import moveableObjects.Robot;
+
 public class WindowApplet extends Applet implements Runnable {
 	private static final long serialVersionUID = -695085763165967408L;
 
@@ -39,6 +43,7 @@ public class WindowApplet extends Applet implements Runnable {
 
 			// process a new image
 			processing.process();
+			
 
 			// get the newly process objects in the image
 			drawer.setBalls(processing.getBalls());
@@ -220,6 +225,35 @@ public class WindowApplet extends Applet implements Runnable {
 			}
 
 		}
+
+	}
+	
+	private void projectRobot(Robot robot, MiddleCross cross) {
+		double heightOfRobot = 24;
+		double heightOfCamera = 212; // TODO make sure this is correct before
+										// running
+		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
+				.getX(), cross.getCenterOfCross().getY());
+
+		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getY();
+
+		robot.getFrontCord().setX(newX);
+		robot.getFrontCord().setY(newY);
+
+		// calculate the back of the robot
+
+		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
+				+ centerOfCamera.getY();
+
+		robot.getBackCord().setX(newX);
+		robot.getBackCord().setY(newY);
 
 	}
 }

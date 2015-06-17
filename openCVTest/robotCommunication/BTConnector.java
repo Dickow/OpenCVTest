@@ -100,7 +100,7 @@ public class BTConnector {
 			distance /= 2;
 		}
 		else {
-			distance -= 2; 
+			distance += 4; 
 		}
 		try {
 			dos.writeInt(FORWARD);
