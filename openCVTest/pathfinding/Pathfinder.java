@@ -55,11 +55,8 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 		// make sure the coordinates of the robot are correct
 		projectRobot(robot);
-
-		// make sure the goal coordinate is correct aswell
-		projectGoal(goalA);
 		robot.updateMiddleCord();
-
+		
 		// try to make the balls by the walls accessible for the robot
 		adjustBallsAtWalls(balls);
 
@@ -148,16 +145,18 @@ public class Pathfinder {
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
 					&& rotationAngle >= -180) {
-
 				robotController.rotateRobotLeft(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-
-				robotController.robotForward(lengthToDest);
-				robot.setState(MoveState.MOVING);
-
+				if (state == RobotState.AWAYFROMGOAL) {
+					robotController.robotBackwards(lengthToDest);
+					robot.setState(MoveState.MOVING);
+				} else {
+					robotController.robotForward(lengthToDest);
+					robot.setState(MoveState.MOVING);
+				}
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
@@ -425,23 +424,6 @@ public class Pathfinder {
 
 	}
 
-	private void projectGoal(Goal goalA) {
-		double heightOfWall = 7;
-		double heightOfCamera = 212;
-
-		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
-				.getX(), cross.getCenterOfCross().getY());
-
-		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		goalA.setX(newX);
-		goalA.setY(newY);
-	}
-
 	private boolean calibrateRobot(Robot robot) {
 		// this is the first time we enter calibration
 		if (calibrationStep == 0) {
@@ -462,12 +444,11 @@ public class Pathfinder {
 
 	/**
 	 * Method to make the balls accessible to the robot, instead of making it
-	 * drive into the wall because it thinks it cannot reach the ball
-	 * 
+	 * drive into the wall because it thinks it cannot reach the ball 
 	 * @param balls
 	 */
 	private void adjustBallsAtWalls(ArrayList<Ball> balls) {
-		// TODO adjust this value if necessary
+		//TODO adjust this value if necessary 
 		double maxDifFromWall = 5;
 
 		double topYAvg = (frames.topLeft().getY() + frames.topRight().getY()) / 2;
@@ -478,22 +459,22 @@ public class Pathfinder {
 		for (Ball ball : balls) {
 
 			// check for top wall
-			if ((ball.getY() - 2 * ball.getRadius()) + topYAvg < maxDifFromWall) {
-				ball.setY(ball.getY() + 2 * ball.getRadius());
+			if (Math.abs((ball.getY() - ball.getRadius()) - topYAvg) < maxDifFromWall) {
+				ball.setY(ball.getY() + ball.getRadius());
 			}
 
 			// check for right wall
-			else if (rightXAvg - (ball.getX() + 2 * ball.getRadius()) < maxDifFromWall) {
-				ball.setX(ball.getX() - 2 * ball.getRadius());
+			else if (Math.abs((ball.getX() + ball.getRadius()) - rightXAvg) < maxDifFromWall) {
+				ball.setX(ball.getX() - ball.getRadius());
 			}
 
 			// check for bottom wall
-			else if ((ball.getY() + 2 * ball.getRadius()) - bottomYAvg < maxDifFromWall) {
-				ball.setY(ball.getY() - 2 * ball.getRadius());
+			else if (Math.abs((ball.getY() + ball.getRadius()) - bottomYAvg) < maxDifFromWall) {
+				ball.setY(ball.getY() - ball.getRadius());
 			}
 			// check for left wall
-			else if ((ball.getX() - 2 * ball.getRadius()) + leftXAvg < maxDifFromWall) {
-				ball.setX(ball.getX() + 2 * ball.getRadius());
+			else if (Math.abs((ball.getX() - ball.getRadius()) - leftXAvg) < maxDifFromWall) {
+				ball.setX(ball.getX() + ball.getRadius());
 			}
 		}
 
