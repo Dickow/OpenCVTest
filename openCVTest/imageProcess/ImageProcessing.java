@@ -21,6 +21,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
@@ -78,7 +79,7 @@ public class ImageProcessing {
 		if (frame == null) {
 			return;
 		}
-		// Highgui.imwrite("test.jpg", frame);
+		Highgui.imwrite("testImage.jpg", frame);
 		// frame = Highgui.imread("test.jpg");
 		// Consider the image for processing Imgproc.COLOR_BGR2GRAY
 
@@ -96,7 +97,6 @@ public class ImageProcessing {
 			System.out.println("frame was empty returning");
 
 		}
-
 		// this is bad practice
 		try {
 			findRobotFrontAndBack();

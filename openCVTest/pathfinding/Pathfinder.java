@@ -15,6 +15,7 @@ import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import robotCommunication.BTConnector;
+import robotCommunication.BTConnector2;
 
 public class Pathfinder {
 
@@ -28,7 +29,7 @@ public class Pathfinder {
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
-	private BTConnector robotController = new BTConnector();
+	private BTConnector2 robotController = new BTConnector2();
 	private int calibrationStep = 0;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
@@ -36,13 +37,13 @@ public class Pathfinder {
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
-		if (!calibrateRobot(robot)) {
-			// we are not yet done calibrating, so just return
-			return;
-		}
+		// if (!calibrateRobot(robot)) {
+		// // we are not yet done calibrating, so just return
+		// return;
+		// }
 
 		// try to set it all the time
-		robotController.calibration = calibrationLength;
+		// robotController.calibration = calibrationLength;
 		rotationAngle = 0;
 		lengthToDest = 0;
 
@@ -55,6 +56,9 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 		// make sure the coordinates of the robot are correct
 		projectRobot(robot);
+
+		// make sure the goal coordinate is correct aswell
+		projectGoal(goalA);
 		robot.updateMiddleCord();
 
 		// try to make the balls by the walls accessible for the robot
@@ -138,28 +142,29 @@ public class Pathfinder {
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180) {
-				robotController.rotateRobotRight(Math.abs(rotationAngle));
+					&& rotationAngle <= 180
+					&& robot.getState() != MoveState.MOVING) {
+				robotController.rotateRobot(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180) {
-				robotController.rotateRobotLeft(Math.abs(rotationAngle));
+					&& rotationAngle >= -180
+					&& robot.getState() != MoveState.MOVING) {
+
+				robotController.rotateRobot(rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
-			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-				if (state == RobotState.AWAYFROMGOAL) {
-					robotController.robotBackwards(lengthToDest);
-					robot.setState(MoveState.MOVING);
-				} else {
-					robotController.robotForward(lengthToDest);
-					robot.setState(MoveState.MOVING);
-				}
+			else if (lengthToDest > 1 && !withinRobot(dest, robot)) {
+
+				robotController.robotForward(lengthToDest, rotationAngle);
+				robot.setState(MoveState.MOVING);
+
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
+				robot.setState(MoveState.ROTATING);
 				destReached();
 			}
 
@@ -396,7 +401,7 @@ public class Pathfinder {
 	}
 
 	private void projectRobot(Robot robot) {
-		double heightOfRobot = 20;
+		double heightOfRobot = 24;
 		double heightOfCamera = 220; // TODO make sure this is correct before
 										// running
 		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
@@ -424,6 +429,23 @@ public class Pathfinder {
 
 	}
 
+	private void projectGoal(Goal goalA) {
+		double heightOfWall = 7;
+		double heightOfCamera = 220;
+
+		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
+				.getX(), cross.getCenterOfCross().getY());
+
+		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getX();
+
+		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
+				+ centerOfCamera.getY();
+
+		goalA.setX(newX);
+		goalA.setY(newY);
+	}
+
 	private boolean calibrateRobot(Robot robot) {
 		// this is the first time we enter calibration
 		if (calibrationStep == 0) {
@@ -431,7 +453,7 @@ public class Pathfinder {
 			xCalibrate = robot.getFrontCord().getX();
 			yCalibrate = robot.getFrontCord().getY();
 
-			robotController.robotCalibrate();
+			// robotController.robotCalibrate();
 			calibrationStep++;
 			return false;
 		} else if (calibrationStep == 1) {
