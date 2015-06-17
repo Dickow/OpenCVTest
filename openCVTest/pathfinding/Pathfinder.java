@@ -29,7 +29,7 @@ public class Pathfinder {
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
-	private BTConnector2 robotController = new BTConnector2();
+	private BTConnector robotController = new BTConnector();
 	private int calibrationStep = 0;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
@@ -37,10 +37,10 @@ public class Pathfinder {
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
-		// if (!calibrateRobot(robot)) {
-		// // we are not yet done calibrating, so just return
-		// return;
-		// }
+		 if (!calibrateRobot(robot)) {
+		 // we are not yet done calibrating, so just return
+		 return;
+		 }
 
 		// try to set it all the time
 		// robotController.calibration = calibrationLength;
@@ -142,23 +142,21 @@ public class Pathfinder {
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180
-					&& robot.getState() != MoveState.MOVING) {
-				robotController.rotateRobot(Math.abs(rotationAngle));
+					&& rotationAngle <= 180) {
+				robotController.rotateRobotRight(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180
-					&& robot.getState() != MoveState.MOVING) {
+					&& rotationAngle >= -180) {
 
-				robotController.rotateRobot(rotationAngle);
+				robotController.rotateRobotLeft(rotationAngle);
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
 			else if (lengthToDest > 1 && !withinRobot(dest, robot)) {
 
-				robotController.robotForward(lengthToDest, rotationAngle);
+				robotController.robotForward(lengthToDest);
 				robot.setState(MoveState.MOVING);
 
 			} else {

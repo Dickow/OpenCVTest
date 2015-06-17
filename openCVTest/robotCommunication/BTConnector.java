@@ -58,6 +58,7 @@ public class BTConnector {
 	 * @param angle
 	 */
 	public void rotateRobotRight(double angle) {
+		
 		try {
 			dos.writeInt(TURNRIGHT);
 			dos.writeInt((int) angle);
