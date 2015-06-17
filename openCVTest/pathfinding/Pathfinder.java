@@ -36,10 +36,10 @@ public class Pathfinder {
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
-		 if (!calibrateRobot(robot)) {
-		 // we are not yet done calibrating, so just return
-		 return;
-		 }
+		if (!calibrateRobot(robot)) {
+			// we are not yet done calibrating, so just return
+			return;
+		}
 
 		// try to set it all the time
 		robotController.calibration = calibrationLength;
