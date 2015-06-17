@@ -125,12 +125,37 @@ public class ImageProcessing {
 		} catch (Exception e) {
 			System.out.println("error in image");
 		}
+		
+		projectAllCoordinates();
+		
 		try {
 			pathfinder
 					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
+	}
+	
+	private void projectAllCoordinates(){
+		double heightOfRobot = 20; 
+		double heightOfBall = 4; 
+		double heightOfGoal = 7; 
+		projectCoordinate(robot.getFrontCord(), heightOfRobot);
+		projectCoordinate(robot.getBackCord(), heightOfRobot);
+		robot.updateMiddleCord();
+		
+		for (Ball ball : balls) {
+			projectCoordinate(ball, heightOfBall);
+		}
+		
+		projectCoordinate(goalA, heightOfGoal);
+		projectCoordinate(goalB, heightOfGoal);
+		
+		projectCoordinate(frames.topLeft(), heightOfGoal);
+		projectCoordinate(frames.topRight(), heightOfGoal);
+		projectCoordinate(frames.lowLeft(), heightOfGoal);
+		projectCoordinate(frames.lowRight(), heightOfGoal);
+		
 	}
 
 	private void findRobotFrontAndBack() {
@@ -483,6 +508,22 @@ public class ImageProcessing {
 		System.arraycopy(b, 0, targetPixels, 0, b.length);
 		return image;
 
+	}
+	
+	private void projectCoordinate(Coordinate cord, double heightOfTarget){
+		double heightOfCamera = 235;
+		
+		double centerX = frame.width()/2;
+		double  centerY = frame.height()/2;
+		
+		double newX = ((cord.getX() - centerX) * ((heightOfCamera - heightOfTarget) / heightOfCamera))
+				+ centerX;
+		double newY = ((cord.getY() - centerY) * ((heightOfCamera - heightOfTarget) / heightOfCamera))
+				+ centerY;
+		
+		cord.setX(newX);
+		cord.setY(newY);
+		
 	}
 
 	private void drawBalls() {

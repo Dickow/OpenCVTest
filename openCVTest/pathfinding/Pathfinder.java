@@ -53,12 +53,6 @@ public class Pathfinder {
 		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
-		// make sure the coordinates of the robot are correct
-		projectRobot(robot);
-
-		// make sure the goal coordinates are correct aswell
-		projectGoal(goalA);
-		robot.updateMiddleCord();
 
 		// try to make the balls by the walls accessible for the robot
 		adjustBallsAtWalls(balls);
@@ -396,52 +390,6 @@ public class Pathfinder {
 		default:
 			return 0;
 		}
-	}
-
-	private void projectRobot(Robot robot) {
-		double heightOfRobot = 20;
-		double heightOfCamera = 212; // TODO make sure this is correct before
-										// running
-		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
-				.getX(), cross.getCenterOfCross().getY());
-
-		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		robot.getFrontCord().setX(newX);
-		robot.getFrontCord().setY(newY);
-
-		// calculate the back of the robot
-
-		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		robot.getBackCord().setX(newX);
-		robot.getBackCord().setY(newY);
-
-	}
-
-	private void projectGoal(Goal goalA) {
-		double heightOfWall = 7;
-		double heightOfCamera = 212;
-
-		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
-				.getX(), cross.getCenterOfCross().getY());
-
-		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		goalA.setX(newX);
-		goalA.setY(newY);
 	}
 
 	private boolean calibrateRobot(Robot robot) {
