@@ -60,7 +60,7 @@ public class ImageProcessing {
 	private ArrayList<Point> lineCoordinates;
 	private Mat image, frame, imgHSV, imageBlurr;
 	private Image backgroundImage;
-	private Rect fieldRect;
+	private Rect fieldRect, crossRect;
 
 	public void process() {
 
@@ -126,7 +126,8 @@ public class ImageProcessing {
 			System.out.println("error in image");
 		}
 		try {
-			pathfinder.findPath(robot, balls, goalA, goalB, null, frames, cross);
+			pathfinder
+					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}
@@ -241,6 +242,8 @@ public class ImageProcessing {
 						&& !robot.getRobotBackArea().contains(coordinate[0],
 								coordinate[1])
 						&& fieldRect.contains(new Point(coordinate[0],
+								coordinate[1]))
+						&& !crossRect.contains(new Point(coordinate[0],
 								coordinate[1]))) {
 					balls.add(new Ball(coordinate[0], coordinate[1]));
 					balls.get(balls.size() - 1).setRadius(coordinate[2]);
@@ -276,7 +279,7 @@ public class ImageProcessing {
 		drawApproxLines();
 
 	}
-	
+
 	private void drawApproxLines() {
 
 		Rect topLeftRect = new Rect(new Point(0, 0), new Point(200, 200));
@@ -417,6 +420,10 @@ public class ImageProcessing {
 						+ ((frames.lowRight().getY() - frames.topRight().getY()) / 12)
 						+ robot.robotRadius));
 
+		// create a rectangle around the cross to ignore all the balls there.
+		crossRect = new Rect(new Point(cross.getLeftCross().getX(), cross
+				.getTopCross().getY()), new Point(cross.getRightCross().getX(),
+				cross.getBottomCross().getY()));
 		// add Goal points to the list of objects (where the robot )
 		goalA = new Goal(
 				((frames.topLeft().getX() + frames.lowLeft().getX()) / 2),
@@ -434,6 +441,11 @@ public class ImageProcessing {
 				.getTopCross().getY()), new Point(
 				cross.getBottomCross().getX(), cross.getBottomCross().getY()),
 				new Scalar(0, 0, 255), 6);
+
+		// draw a rectangle around the cross
+		Core.rectangle(image, new Point(cross.getLeftCross().getX(), cross
+				.getTopCross().getY()), new Point(cross.getRightCross().getX(),
+				cross.getBottomCross().getY()), new Scalar(0, 0, 255));
 
 		// draw lines
 		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()

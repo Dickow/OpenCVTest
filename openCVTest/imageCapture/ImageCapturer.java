@@ -14,7 +14,7 @@ public class ImageCapturer implements Runnable {
 		// Load the library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// get a picture from the webcam and save it VideoCapture
-		videoCapture = new VideoCapture(0);
+		videoCapture = new VideoCapture(1);
 		if (!videoCapture.isOpened()) {
 			System.out.println("could not find video ");
 		} else {
