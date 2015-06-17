@@ -162,7 +162,6 @@ public class Pathfinder {
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
-				robot.setState(MoveState.ROTATING);
 				destReached();
 			}
 
@@ -451,7 +450,7 @@ public class Pathfinder {
 			xCalibrate = robot.getFrontCord().getX();
 			yCalibrate = robot.getFrontCord().getY();
 
-			// robotController.robotCalibrate();
+			robotController.robotCalibrate();
 			calibrationStep++;
 			return false;
 		} else if (calibrationStep == 1) {
