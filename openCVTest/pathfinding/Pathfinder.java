@@ -43,7 +43,7 @@ public class Pathfinder {
 		 }
 
 		// try to set it all the time
-		// robotController.calibration = calibrationLength;
+		robotController.calibration = calibrationLength;
 		rotationAngle = 0;
 		lengthToDest = 0;
 
