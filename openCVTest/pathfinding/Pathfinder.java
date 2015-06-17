@@ -15,7 +15,6 @@ import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import robotCommunication.BTConnector;
-import robotCommunication.BTConnector2;
 
 public class Pathfinder {
 
@@ -150,7 +149,7 @@ public class Pathfinder {
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
 					&& rotationAngle >= -180) {
 
-				robotController.rotateRobotLeft(rotationAngle);
+				robotController.rotateRobotLeft(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
