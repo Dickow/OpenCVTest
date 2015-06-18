@@ -15,7 +15,7 @@ public class BTConnector2 {
 	private DataOutputStream dos;
 	private DataInputStream din;
 	private final double KP = 5;
-	private final int SPEED = 350;
+	private final int SPEED = 400;
 	public double calibration;
 
 	public BTConnector2() {
@@ -131,8 +131,8 @@ public class BTConnector2 {
 		motorASpeed = SPEED + (pGain);
 		motorBSpeed = SPEED - (pGain);
 		
-		System.out.println("motorA " + motorASpeed);
-		System.out.println("motorB " + motorBSpeed);
+//		System.out.println("motorA " + motorASpeed);
+//		System.out.println("motorB " + motorBSpeed);
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(motorASpeed);

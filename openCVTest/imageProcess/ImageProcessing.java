@@ -496,7 +496,7 @@ public class ImageProcessing {
 	}
 
 	private void projectCoordinate(Coordinate cord, double heightOfTarget) {
-		double heightOfCamera = 214;
+		double heightOfCamera = 212;
 
 		double centerX = frame.width() / 2;
 		double centerY = frame.height() / 2;

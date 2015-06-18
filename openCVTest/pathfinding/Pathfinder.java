@@ -69,6 +69,7 @@ public class Pathfinder {
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
+				
 				dest = new Coordinate(
 						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
 						goalA.getY());
@@ -79,8 +80,12 @@ public class Pathfinder {
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				dest = new Coordinate((goalA.getX() + (2 * robot.robotRadius)),
+				
+				dest = new Coordinate((goalA.getX() + (3 * robot.robotRadius)),
 						goalA.getY());
+				
+				//dest = new Coordinate(x, y);
+				
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
@@ -292,8 +297,8 @@ public class Pathfinder {
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + (4 * radius);
-		int crossHeight = 10 + (2 * radius);
+				.getX()) / 18) * 2) + (4 * radius) + 10;  //TODO changed to + 10 for bigger cross
+		int crossHeight = 10 + (2 * radius) + 10; 		//TODO changed to + 10 for bigger cross
 
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
@@ -344,19 +349,19 @@ public class Pathfinder {
 				break;
 			// safepoint in straight line with cross	
 			case 4:
-				safePoints[4] = new Coordinate(safePoints[3].getX(), (safePoints[3].getY() + safePoints[0].getY() / 2));
+				safePoints[4] = new Coordinate(safePoints[3].getX(), ((safePoints[3].getY() + safePoints[0].getY()) / 2));
 				break;
 			case 5:
-				safePoints[5] = new Coordinate(safePoints[3].getY(), (safePoints[3].getX() + safePoints[0].getX() / 2));
+				safePoints[5] = new Coordinate(((safePoints[1].getX() + safePoints[0].getX()) / 2), safePoints[1].getY());
 				break;
 			case 6:
-				safePoints[6] = new Coordinate(safePoints[1].getX(), (safePoints[2].getY() + safePoints[1].getY() / 2));
+				safePoints[6] = new Coordinate(safePoints[1].getX(), ((safePoints[2].getY() + safePoints[1].getY()) / 2));
 				break;
 			case 7:
-				safePoints[7] = new Coordinate(safePoints[1].getX(), (safePoints[2].getY() + safePoints[3].getY() / 2));
+				safePoints[7] = new Coordinate( ((safePoints[2].getX() + safePoints[3].getX()) / 2), safePoints[2].getY());
 				break;
 			default:
-				System.out.println("WTF happend");
+				System.out.println("WTF happened");
 				break;
 
 			}
@@ -401,7 +406,7 @@ public class Pathfinder {
 
 		case 3:
 
-			return 0;
+			return 4;
 			
 		case 4:
 
@@ -414,7 +419,7 @@ public class Pathfinder {
 			return 2;
 		case 7:
 
-			return 4;
+			return 3;
 
 		default:
 			return 0;
