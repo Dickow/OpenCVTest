@@ -14,8 +14,8 @@ public class BTConnector2 {
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
-	private final double KP = 7;
-	private final int SPEED = 200;
+	private final double KP = 5;
+	private final int SPEED = 350;
 	public double calibration;
 
 	public BTConnector2() {
