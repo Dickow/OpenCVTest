@@ -139,9 +139,19 @@ public class BTConnector2 {
 			dos.flush();
 
 			waitForRobot();
-//			System.out.println("forward " + distance);
+			// System.out.println("forward " + distance);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void stopRobot() {
+		try {
+			dos.writeInt(STOP);
+			dos.flush();
+			waitForRobot();
+		} catch (Exception e) {
+			System.out.println("why errror");
 		}
 	}
 

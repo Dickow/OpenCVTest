@@ -33,7 +33,7 @@ public class ImageProcessing {
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
 	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
-	
+
 	public int iLowH = 16;
 	public int iLowHFront = 49;
 
@@ -100,40 +100,17 @@ public class ImageProcessing {
 		// this is bad practice
 		try {
 			findRobotFrontAndBack();
-		} catch (Exception e) {
-			System.out.println("error in finding robot");
-			return;
-		}
-		try {
-			identifyLines();
-		} catch (Exception e) {
-			System.out.println("error in line finding");
-			return;
-		}
-		try {
-			findBallsInImage();
-		} catch (Exception e) {
-			System.out.println("error in finding balls");
-			return;
-		}
-		try {
-			// ignoreBallInsideRobot();
-			// drawBalls();
-			projectAllCoordinates();
-		} catch (Exception e) {
-			System.out.println("error in ignore balls method");
-			return;
-		}
 
-		try {
+			identifyLines();
+			findBallsInImage();
+			projectAllCoordinates();
+
 			backgroundImage = toBufferedImage(image);
 		} catch (Exception e) {
-			System.out.println("error in image");
-			return;
+			System.out.println("error occured stop the robot!");
+			pathfinder.stopAllCommands();
 		}
-		
-		
-		
+
 		try {
 			pathfinder
 					.findPath(robot, balls, goalA, goalB, null, frames, cross);
@@ -142,27 +119,27 @@ public class ImageProcessing {
 			return;
 		}
 	}
-	
-	private void projectAllCoordinates(){
-		double heightOfRobot = 20; 
-		double heightOfBall = 4; 
-		double heightOfGoal = 7; 
+
+	private void projectAllCoordinates() {
+		double heightOfRobot = 20;
+		double heightOfBall = 4;
+		double heightOfGoal = 7;
 		projectCoordinate(robot.getFrontCord(), heightOfRobot);
 		projectCoordinate(robot.getBackCord(), heightOfRobot);
 		robot.updateMiddleCord();
-		
+
 		for (Ball ball : balls) {
 			projectCoordinate(ball, heightOfBall);
 		}
-		
+
 		projectCoordinate(goalA, heightOfGoal);
 		projectCoordinate(goalB, heightOfGoal);
-		
+
 		projectCoordinate(frames.topLeft(), heightOfGoal);
 		projectCoordinate(frames.topRight(), heightOfGoal);
 		projectCoordinate(frames.lowLeft(), heightOfGoal);
 		projectCoordinate(frames.lowRight(), heightOfGoal);
-		
+
 	}
 
 	private void findRobotFrontAndBack() {
@@ -465,33 +442,34 @@ public class ImageProcessing {
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
 
 		// Draw cross
-//		Core.line(image, new Point(cross.getLeftCross().getX(), cross
-//				.getLeftCross().getY()), new Point(
-//				cross.getRightCross().getX(), cross.getRightCross().getY()),
-//				new Scalar(0, 0, 255), 6);
-//		Core.line(image, new Point(cross.getTopCross().getX(), cross
-//				.getTopCross().getY()), new Point(
-//				cross.getBottomCross().getX(), cross.getBottomCross().getY()),
-//				new Scalar(0, 0, 255), 6);
+		// Core.line(image, new Point(cross.getLeftCross().getX(), cross
+		// .getLeftCross().getY()), new Point(
+		// cross.getRightCross().getX(), cross.getRightCross().getY()),
+		// new Scalar(0, 0, 255), 6);
+		// Core.line(image, new Point(cross.getTopCross().getX(), cross
+		// .getTopCross().getY()), new Point(
+		// cross.getBottomCross().getX(), cross.getBottomCross().getY()),
+		// new Scalar(0, 0, 255), 6);
 
 		// draw a rectangle around the cross
-//		Core.rectangle(image, new Point(cross.getLeftCross().getX(), cross
-//				.getTopCross().getY()), new Point(cross.getRightCross().getX(),
-//				cross.getBottomCross().getY()), new Scalar(0, 0, 255));
-//
-//		// draw lines
-//		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
-//				.getY()), new Point(frames.topRight().getX(), frames.topRight()
-//				.getY()), new Scalar(0, 0, 255), 3);
-//		Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
-//				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
-//				.getY()), new Scalar(0, 0, 255), 3);
-//		Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
-//				.getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
-//				.getY()), new Scalar(0, 0, 255), 3);
-//		Core.line(image, new Point(frames.topRight().getX(), frames.topRight()
-//				.getY()), new Point(frames.lowRight().getX(), frames.lowRight()
-//				.getY()), new Scalar(0, 0, 255), 3);
+		// Core.rectangle(image, new Point(cross.getLeftCross().getX(), cross
+		// .getTopCross().getY()), new Point(cross.getRightCross().getX(),
+		// cross.getBottomCross().getY()), new Scalar(0, 0, 255));
+		//
+		// // draw lines
+		// Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
+		// .getY()), new Point(frames.topRight().getX(), frames.topRight()
+		// .getY()), new Scalar(0, 0, 255), 3);
+		// Core.line(image, new Point(frames.lowLeft().getX(), frames.lowLeft()
+		// .getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+		// .getY()), new Scalar(0, 0, 255), 3);
+		// Core.line(image, new Point(frames.topLeft().getX(), frames.topLeft()
+		// .getY()), new Point(frames.lowLeft().getX(), frames.lowLeft()
+		// .getY()), new Scalar(0, 0, 255), 3);
+		// Core.line(image, new Point(frames.topRight().getX(),
+		// frames.topRight()
+		// .getY()), new Point(frames.lowRight().getX(), frames.lowRight()
+		// .getY()), new Scalar(0, 0, 255), 3);
 		imgCaptures++;
 	}
 
@@ -516,21 +494,21 @@ public class ImageProcessing {
 		return image;
 
 	}
-	
-	private void projectCoordinate(Coordinate cord, double heightOfTarget){
+
+	private void projectCoordinate(Coordinate cord, double heightOfTarget) {
 		double heightOfCamera = 214;
-		
-		double centerX = frame.width()/2;
-		double  centerY = frame.height()/2;
-		
+
+		double centerX = frame.width() / 2;
+		double centerY = frame.height() / 2;
+
 		double newX = ((cord.getX() - centerX) * ((heightOfCamera - heightOfTarget) / heightOfCamera))
 				+ centerX;
 		double newY = ((cord.getY() - centerY) * ((heightOfCamera - heightOfTarget) / heightOfCamera))
 				+ centerY;
-			
+
 		cord.setX(newX);
 		cord.setY(newY);
-		
+
 	}
 
 	public Image getBackgroundImage() {
