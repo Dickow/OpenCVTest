@@ -14,7 +14,7 @@ public class BTConnector2 {
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
-	private final double KP = 0.3;
+	private final double KP = 0.8;
 	private final int SPEED = 50;
 	public double calibration; 
 
@@ -139,11 +139,11 @@ public class BTConnector2 {
 		}
 
 		if (angle < 0) {
-			motorASpeed = KP * distance * SPEED + (2 * pGain);
-			motorBSpeed = KP * distance * SPEED - (2 * pGain);
+			motorASpeed = KP * distance * SPEED + (pGain);
+			motorBSpeed = KP * distance * SPEED - (pGain);
 		} else {
-			motorASpeed = KP * distance * SPEED + (2 * pGain);
-			motorBSpeed = KP * distance * SPEED - (2 * pGain);
+			motorASpeed = KP * distance * SPEED + (pGain);
+			motorBSpeed = KP * distance * SPEED - (pGain);
 		}
 
 		try {

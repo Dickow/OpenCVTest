@@ -29,7 +29,7 @@ public class Pathfinder {
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
-	private BTConnector robotController = new BTConnector();
+	private BTConnector2 robotController = new BTConnector2();
 	private int calibrationStep = 0;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
@@ -136,20 +136,21 @@ public class Pathfinder {
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180) {
+					&& rotationAngle <= 180
+					&& robot.getState() != MoveState.MOVING) {
 				robotController.rotateRobotRight(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180) {
+					&& rotationAngle >= -180 && robot.getState() != MoveState.MOVING) {
 				robotController.rotateRobotLeft(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 
-				robotController.robotForward(lengthToDest);
+				robotController.robotForward(lengthToDest, rotationAngle);
 				robot.setState(MoveState.MOVING);
 
 			} else {
