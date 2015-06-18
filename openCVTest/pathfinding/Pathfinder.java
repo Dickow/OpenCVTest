@@ -69,7 +69,8 @@ public class Pathfinder {
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
-				dest = new Coordinate(goalA.getX() - (5 * robot.robotRadius),
+				dest = new Coordinate(
+						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
 						goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
