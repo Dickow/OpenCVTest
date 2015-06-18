@@ -29,7 +29,7 @@ public class Pathfinder {
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
 	private BTConnector2 robotController = new BTConnector2();
-	private int calibrationStep = 0;
+	private int calibrationStep = 0, ballsOnMap, ballsAfterGrab;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
@@ -46,6 +46,8 @@ public class Pathfinder {
 		rotationAngle = 0;
 		lengthToDest = 0;
 
+		// update how many balls are present on the map
+		ballsOnMap = balls.size();
 		// calculate and set the frame and obstacles of the course prior to
 		// routing
 		this.frames = frames;
@@ -64,28 +66,30 @@ public class Pathfinder {
 				// ball
 				if (currentSafePoint == -1) {
 					robotController.openRobotArms();
+					ballsAfterGrab = ballsOnMap;
 				}
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
-				
+
 				dest = new Coordinate(
 						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
 						goalA.getY());
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
+
+				// decrease balls on the map
+				ballsAfterGrab--;
 				state = RobotState.HASBALL;
 				return;
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				
+
 				dest = new Coordinate((goalA.getX() + (3 * robot.robotRadius)),
 						goalA.getY());
-				
-				//dest = new Coordinate(x, y);
-				
+
 			} else if (state == RobotState.SCORED) {
 				// we try to score now
 				System.out.println("We scored!!!");
@@ -97,7 +101,6 @@ public class Pathfinder {
 			} // move backwards from the goal
 			else if (state == RobotState.AWAYFROMGOAL) {
 				System.out.println("go away from goal");
-				;
 				state = RobotState.NOBALL;
 				destState = DestState.NODEST;
 				return;
@@ -126,6 +129,11 @@ public class Pathfinder {
 			destState = DestState.HASDEST;
 
 		case HASDEST:
+
+			if (ballsOnMap > ballsAfterGrab) {
+				destState = DestState.NODEST;
+				return;
+			}
 			rotationAngle = findRotationAngle(robot.getFrontCord(),
 					robot.getMiddleCord(), dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
@@ -137,20 +145,6 @@ public class Pathfinder {
 						robot.getMiddleCord().getY(), dest.getX(), dest.getY());
 			}
 
-			// rotate right
-			// if (rotationAngle > 1 && !withinRobot(dest, robot)
-			// && rotationAngle <= 180
-			// && robot.getState() != MoveState.MOVING) {
-			// robotController.rotateRobotRight(Math.abs(rotationAngle));
-			// robot.setState(MoveState.ROTATING);
-			// }
-			// // rotate left
-			// else if (rotationAngle < -1 && !withinRobot(dest, robot)
-			// && rotationAngle >= -180 && robot.getState() != MoveState.MOVING)
-			// {
-			// robotController.rotateRobotLeft(Math.abs(rotationAngle));
-			// robot.setState(MoveState.ROTATING);
-			// }
 			// move forward
 			if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 
@@ -170,6 +164,10 @@ public class Pathfinder {
 			break;
 
 		}
+	}
+
+	private void isBallRemoved() {
+
 	}
 
 	private boolean withinRobot(Coordinate dest, Robot robot) {
@@ -297,8 +295,10 @@ public class Pathfinder {
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + (4 * radius) + 10;  //TODO changed to + 10 for bigger cross
-		int crossHeight = 10 + (2 * radius) + 10; 		//TODO changed to + 10 for bigger cross
+				.getX()) / 18) * 2) + (4 * radius) + 10; // TODO changed to + 10
+															// for bigger cross
+		int crossHeight = 10 + (2 * radius) + 10; // TODO changed to + 10 for
+													// bigger cross
 
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
@@ -347,18 +347,24 @@ public class Pathfinder {
 						.getCenterOfCross().getX()) / 2, (frames.lowLeft()
 						.getY() + cross.getBottomCross().getY()) / 2);
 				break;
-			// safepoint in straight line with cross	
+			// safepoint in straight line with cross
 			case 4:
-				safePoints[4] = new Coordinate(safePoints[3].getX(), ((safePoints[3].getY() + safePoints[0].getY()) / 2));
+				safePoints[4] = new Coordinate(safePoints[3].getX(),
+						((safePoints[3].getY() + safePoints[0].getY()) / 2));
 				break;
 			case 5:
-				safePoints[5] = new Coordinate(((safePoints[1].getX() + safePoints[0].getX()) / 2), safePoints[1].getY());
+				safePoints[5] = new Coordinate(
+						((safePoints[1].getX() + safePoints[0].getX()) / 2),
+						safePoints[1].getY());
 				break;
 			case 6:
-				safePoints[6] = new Coordinate(safePoints[1].getX(), ((safePoints[2].getY() + safePoints[1].getY()) / 2));
+				safePoints[6] = new Coordinate(safePoints[1].getX(),
+						((safePoints[2].getY() + safePoints[1].getY()) / 2));
 				break;
 			case 7:
-				safePoints[7] = new Coordinate( ((safePoints[2].getX() + safePoints[3].getX()) / 2), safePoints[2].getY());
+				safePoints[7] = new Coordinate(
+						((safePoints[2].getX() + safePoints[3].getX()) / 2),
+						safePoints[2].getY());
 				break;
 			default:
 				System.out.println("WTF happened");
@@ -407,7 +413,7 @@ public class Pathfinder {
 		case 3:
 
 			return 4;
-			
+
 		case 4:
 
 			return 0;
