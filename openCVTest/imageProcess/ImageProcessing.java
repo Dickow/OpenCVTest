@@ -130,8 +130,8 @@ public class ImageProcessing {
 		
 		
 		try {
-		//	pathfinder
-		//			.findPath(robot, balls, goalA, goalB, null, frames, cross);
+			pathfinder
+					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 		}

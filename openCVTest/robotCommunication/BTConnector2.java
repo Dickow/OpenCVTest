@@ -14,7 +14,7 @@ public class BTConnector2 {
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
-	private final double KP = 0.4;
+	private final double KP = 0.3;
 	private final int SPEED = 50;
 	public double calibration; 
 
@@ -73,7 +73,7 @@ public class BTConnector2 {
 		double motorBSpeed;
 
 		motorASpeed = SPEED + pGain;
-		motorBSpeed = -(SPEED - pGain);
+		motorBSpeed = SPEED + pGain;
 
 		try {
 			dos.writeInt(TURNLEFT);
@@ -100,7 +100,7 @@ public class BTConnector2 {
 		double motorASpeed;
 		double motorBSpeed;
 
-		motorASpeed = -(SPEED - pGain);
+		motorASpeed = SPEED + pGain;
 		motorBSpeed = SPEED + pGain;
 
 		try {
