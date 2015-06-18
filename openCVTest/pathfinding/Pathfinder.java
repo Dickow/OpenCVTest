@@ -23,7 +23,7 @@ public class Pathfinder {
 	private MiddleCross cross;
 	public double rotationAngle = 0, lengthToDest = 0;
 	public Coordinate dest;
-	private Coordinate[] safePoints = new Coordinate[4];
+	private Coordinate[] safePoints = new Coordinate[8];
 	private int currentSafePoint = -1;
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
@@ -342,6 +342,19 @@ public class Pathfinder {
 						.getCenterOfCross().getX()) / 2, (frames.lowLeft()
 						.getY() + cross.getBottomCross().getY()) / 2);
 				break;
+			// safepoint in straight line with cross	
+			case 4:
+				safePoints[4] = new Coordinate(safePoints[3].getX(), (safePoints[3].getY() + safePoints[0].getY() / 2));
+				break;
+			case 5:
+				safePoints[5] = new Coordinate(safePoints[3].getY(), (safePoints[3].getX() + safePoints[0].getX() / 2));
+				break;
+			case 6:
+				safePoints[6] = new Coordinate(safePoints[1].getX(), (safePoints[2].getY() + safePoints[1].getY() / 2));
+				break;
+			case 7:
+				safePoints[7] = new Coordinate(safePoints[1].getX(), (safePoints[2].getY() + safePoints[3].getY() / 2));
+				break;
 			default:
 				System.out.println("WTF happend");
 				break;
@@ -377,18 +390,31 @@ public class Pathfinder {
 		switch (currentSafePoint) {
 		case 0:
 
-			return 1;
+			return 5;
 
 		case 1:
 
-			return 2;
+			return 6;
 		case 2:
 
-			return 3;
+			return 7;
 
 		case 3:
 
 			return 0;
+			
+		case 4:
+
+			return 0;
+		case 5:
+
+			return 1;
+		case 6:
+
+			return 2;
+		case 7:
+
+			return 4;
 
 		default:
 			return 0;
