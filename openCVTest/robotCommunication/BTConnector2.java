@@ -8,12 +8,15 @@ import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
 public class BTConnector2 {
-	private final int FINISHED = 10;
+	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
+			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
+			FINISHED = 10;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
 	private final double KP = 0.4;
 	private final int SPEED = 50;
+	public double calibration; 
 
 	public BTConnector2() {
 		conn = new NXTConnector();
@@ -46,31 +49,64 @@ public class BTConnector2 {
 	}
 
 	/**
+	 * calibrate the robot
+	 */
+	public void robotCalibrate() {
+		try {
+			dos.writeInt(CALIBRATE);
+			dos.flush();
+			waitForRobot();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * rotate the robot
 	 * 
 	 * @param angle
 	 */
-	public void rotateRobot(double angle) {
+	public void rotateRobotLeft(double angle) {
 
 		double pGain = KP * angle;
 		double motorASpeed;
 		double motorBSpeed;
-		double motorCAngle;
 
-		if (angle < 0) {
-			motorASpeed = SPEED + pGain;
-			motorBSpeed = -(SPEED - pGain);
-			motorCAngle = 0;
-		} else {
-			motorASpeed = -(SPEED - pGain);
-			motorBSpeed = SPEED + pGain;
-			motorCAngle = 0;
-		}
+		motorASpeed = SPEED + pGain;
+		motorBSpeed = -(SPEED - pGain);
 
 		try {
+			dos.writeInt(TURNLEFT);
 			dos.writeDouble(motorASpeed);
 			dos.writeDouble(motorBSpeed);
-			dos.writeDouble(motorCAngle);
+			dos.flush();
+			waitForRobot();
+			System.out.println("rotate " + angle);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * rotate the robot
+	 * 
+	 * @param angle
+	 */
+	public void rotateRobotRight(double angle) {
+
+		double pGain = KP * angle;
+		double motorASpeed;
+		double motorBSpeed;
+
+		motorASpeed = -(SPEED - pGain);
+		motorBSpeed = SPEED + pGain;
+
+		try {
+			dos.writeInt(TURNRIGHT);
+			dos.writeDouble(motorASpeed);
+			dos.writeDouble(motorBSpeed);
 			dos.flush();
 			waitForRobot();
 			System.out.println("rotate " + angle);
@@ -91,31 +127,29 @@ public class BTConnector2 {
 		double pGain = KP * angle;
 		double motorASpeed;
 		double motorBSpeed;
-		double motorCAngle = 0;
-		
-		
+
 		if (distance > 100) {
 			distance /= 5;
 		} else if (distance > 50) {
 			distance /= 4;
 		} else if (distance > 20) {
 			distance /= 3;
-		}else{
-			distance /= 2; 
-		}
-		
-		if (angle < 0) {
-			motorASpeed = KP * distance * SPEED + (pGain);
-			motorBSpeed = KP * distance * SPEED - (pGain);
 		} else {
-			motorASpeed = KP * distance * SPEED + (pGain);
-			motorBSpeed = KP * distance * SPEED - (pGain);
+			distance /= 2;
+		}
+
+		if (angle < 0) {
+			motorASpeed = KP * distance * SPEED + (2 * pGain);
+			motorBSpeed = KP * distance * SPEED - (2 * pGain);
+		} else {
+			motorASpeed = KP * distance * SPEED + (2 * pGain);
+			motorBSpeed = KP * distance * SPEED - (2 * pGain);
 		}
 
 		try {
+			dos.writeInt(FORWARD);
 			dos.writeDouble(-motorASpeed);
 			dos.writeDouble(-motorBSpeed);
-			dos.writeDouble(motorCAngle);
 			dos.flush();
 
 			waitForRobot();
@@ -130,14 +164,8 @@ public class BTConnector2 {
 	 */
 	public void openRobotArms() {
 
-		double motorASpeed = 0;
-		double motorBSpeed = 0;
-		double motorCAngle = 50;
-
 		try {
-			dos.writeDouble(-motorASpeed);
-			dos.writeDouble(-motorBSpeed);
-			dos.writeDouble(motorCAngle);
+			dos.writeInt(OPEN);
 			dos.flush();
 			waitForRobot();
 			System.out.println("open arms");
@@ -152,13 +180,8 @@ public class BTConnector2 {
 	 */
 	public void closeRobotArms() {
 
-		double motorASpeed = 0;
-		double motorBSpeed = 0;
-		double motorCAngle = -50;
 		try {
-			dos.writeDouble(-motorASpeed);
-			dos.writeDouble(-motorBSpeed);
-			dos.writeDouble(motorCAngle);
+			dos.writeInt(CLOSE);
 			dos.flush();
 			waitForRobot();
 			System.out.println("close arms");
@@ -173,19 +196,11 @@ public class BTConnector2 {
 	 */
 	public void deliverBall() {
 
-		double motorASpeed = KP * 30;
-		double motorBSpeed = KP * 30;
-		double motorCAngle = 80;
-
 		try {
-			dos.writeDouble(-motorASpeed);
-			dos.writeDouble(-motorBSpeed);
-			dos.writeDouble(motorCAngle);
+			dos.writeInt(DELIVER);
 			dos.flush();
 			waitForRobot();
-			dos.writeDouble(0);
-			dos.writeDouble(0);
-			dos.writeDouble(-(motorCAngle));
+
 			System.out.println("deliver");
 		} catch (IOException e) {
 

@@ -15,6 +15,7 @@ import obstacles.Goal;
 import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import robotCommunication.BTConnector;
+import robotCommunication.BTConnector2;
 
 public class Pathfinder {
 
@@ -28,7 +29,7 @@ public class Pathfinder {
 	private Rectangle crossHorizontalPart;
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
-	private BTConnector robotController = new BTConnector();
+	private BTConnector2 robotController = new BTConnector2();
 	private int calibrationStep = 0;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
@@ -55,7 +56,7 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 
 		// try to make the balls by the walls accessible for the robot
-		//adjustBallsAtWalls(balls);
+		// adjustBallsAtWalls(balls);
 
 		switch (destState) {
 		case NODEST:
@@ -135,28 +136,28 @@ public class Pathfinder {
 
 			// rotate right
 			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180) {
+					&& rotationAngle <= 180
+					&& robot.getState() != MoveState.MOVING) {
 				robotController.rotateRobotRight(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// rotate left
 			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180) {
+					&& rotationAngle >= -180
+					&& robot.getState() != MoveState.MOVING) {
 				robotController.rotateRobotLeft(Math.abs(rotationAngle));
 				robot.setState(MoveState.ROTATING);
 			}
 			// move forward
 			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
-				if (state == RobotState.AWAYFROMGOAL) {
-					robotController.robotBackwards(lengthToDest);
-					robot.setState(MoveState.MOVING);
-				} else {
-					robotController.robotForward(lengthToDest);
-					robot.setState(MoveState.MOVING);
-				}
+
+				robotController.robotForward(lengthToDest, rotationAngle);
+				robot.setState(MoveState.MOVING);
+
 			} else {
 				// arrived at dest routine
 				destState = DestState.NODEST;
+				robot.setState(MoveState.ROTATING);
 				destReached();
 			}
 
