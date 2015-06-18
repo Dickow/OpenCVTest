@@ -131,8 +131,7 @@ public class Pathfinder {
 		case HASDEST:
 
 			if (ballsOnMap > ballsAfterGrab) {
-				destState = DestState.NODEST;
-				return;
+				dest = safePoints[findSafePoint(robot.toCoordinate())];
 			}
 			rotationAngle = findRotationAngle(robot.getFrontCord(),
 					robot.getMiddleCord(), dest);
