@@ -31,7 +31,7 @@ public class ImageProcessing {
 	private boolean foundWallsBefore = false;
 	private int imgCaptures = 1;
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
-	//private Pathfinder pathfinder = new Pathfinder();
+	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
 	public int iLowH = 16;
@@ -116,6 +116,7 @@ public class ImageProcessing {
 		try {
 			// ignoreBallInsideRobot();
 			// drawBalls();
+			projectAllCoordinates();
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
 		}
@@ -126,7 +127,7 @@ public class ImageProcessing {
 			System.out.println("error in image");
 		}
 		
-		projectAllCoordinates();
+		
 		
 		try {
 		//	pathfinder
@@ -520,17 +521,10 @@ public class ImageProcessing {
 				+ centerX;
 		double newY = ((cord.getY() - centerY) * ((heightOfCamera - heightOfTarget) / heightOfCamera))
 				+ centerY;
-		
+			
 		cord.setX(newX);
 		cord.setY(newY);
 		
-	}
-
-	private void drawBalls() {
-		for (Ball ball : balls) {
-			Core.circle(image, new Point(ball.getX(), ball.getY()),
-					(int) ball.getRadius(), new Scalar(0, 0, 255));
-		}
 	}
 
 	public Image getBackgroundImage() {
