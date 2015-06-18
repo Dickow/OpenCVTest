@@ -109,6 +109,7 @@ public class ImageProcessing {
 		} catch (Exception e) {
 			System.out.println("error occured stop the robot!");
 			pathfinder.stopAllCommands();
+			return; 
 		}
 
 		try {
