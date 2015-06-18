@@ -16,7 +16,7 @@ public class BTConnector2 {
 	private DataInputStream din;
 	private final double KP = 0.8;
 	private final int SPEED = 50;
-	public double calibration; 
+	public double calibration;
 
 	public BTConnector2() {
 		conn = new NXTConnector();
@@ -128,23 +128,8 @@ public class BTConnector2 {
 		double motorASpeed;
 		double motorBSpeed;
 
-		if (distance > 100) {
-			distance /= 5;
-		} else if (distance > 50) {
-			distance /= 4;
-		} else if (distance > 20) {
-			distance /= 3;
-		} else {
-			distance /= 2;
-		}
-
-		if (angle < 0) {
-			motorASpeed = KP * distance * SPEED + (pGain);
-			motorBSpeed = KP * distance * SPEED - (pGain);
-		} else {
-			motorASpeed = KP * distance * SPEED + (pGain);
-			motorBSpeed = KP * distance * SPEED - (pGain);
-		}
+		motorASpeed = SPEED + (pGain);
+		motorBSpeed = SPEED - (pGain);
 
 		try {
 			dos.writeInt(FORWARD);
