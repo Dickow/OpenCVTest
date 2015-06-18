@@ -33,7 +33,7 @@ public class ImageProcessing {
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
 	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
-
+	
 	public int iLowH = 16;
 	public int iLowHFront = 49;
 
@@ -95,23 +95,26 @@ public class ImageProcessing {
 			Imgproc.GaussianBlur(imgHSV, imageBlurr, new Size(3, 3), 0, 0);
 		} catch (Exception e) {
 			System.out.println("frame was empty returning");
-
+			return;
 		}
 		// this is bad practice
 		try {
 			findRobotFrontAndBack();
 		} catch (Exception e) {
 			System.out.println("error in finding robot");
+			return;
 		}
 		try {
 			identifyLines();
 		} catch (Exception e) {
 			System.out.println("error in line finding");
+			return;
 		}
 		try {
 			findBallsInImage();
 		} catch (Exception e) {
 			System.out.println("error in finding balls");
+			return;
 		}
 		try {
 			// ignoreBallInsideRobot();
@@ -119,12 +122,14 @@ public class ImageProcessing {
 			projectAllCoordinates();
 		} catch (Exception e) {
 			System.out.println("error in ignore balls method");
+			return;
 		}
 
 		try {
 			backgroundImage = toBufferedImage(image);
 		} catch (Exception e) {
 			System.out.println("error in image");
+			return;
 		}
 		
 		
@@ -134,11 +139,12 @@ public class ImageProcessing {
 					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
+			return;
 		}
 	}
 	
 	private void projectAllCoordinates(){
-		double heightOfRobot = 10; 
+		double heightOfRobot = 20; 
 		double heightOfBall = 4; 
 		double heightOfGoal = 7; 
 		projectCoordinate(robot.getFrontCord(), heightOfRobot);
@@ -512,7 +518,7 @@ public class ImageProcessing {
 	}
 	
 	private void projectCoordinate(Coordinate cord, double heightOfTarget){
-		double heightOfCamera = 235;
+		double heightOfCamera = 214;
 		
 		double centerX = frame.width()/2;
 		double  centerY = frame.height()/2;

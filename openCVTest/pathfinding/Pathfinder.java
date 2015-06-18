@@ -37,10 +37,10 @@ public class Pathfinder {
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
-		if (!calibrateRobot(robot)) {
-			// we are not yet done calibrating, so just return
-			return;
-		}
+//		if (!calibrateRobot(robot)) {
+//			// we are not yet done calibrating, so just return
+//			return;
+//		}
 
 		// try to set it all the time
 		robotController.calibration = calibrationLength;
@@ -51,7 +51,7 @@ public class Pathfinder {
 		// routing
 		this.frames = frames;
 		this.cross = cross;
-		setSafePoints();
+		setSafePoints(goalB);
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
 
@@ -71,9 +71,7 @@ public class Pathfinder {
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
-				dest = new Coordinate(
-						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
-						goalA.getY());
+				dest = goalA;
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
@@ -135,20 +133,20 @@ public class Pathfinder {
 			}
 
 			// rotate right
-			if (rotationAngle > 1 && !withinRobot(dest, robot)
-					&& rotationAngle <= 180
-					&& robot.getState() != MoveState.MOVING) {
-				robotController.rotateRobotRight(Math.abs(rotationAngle));
-				robot.setState(MoveState.ROTATING);
-			}
-			// rotate left
-			else if (rotationAngle < -1 && !withinRobot(dest, robot)
-					&& rotationAngle >= -180 && robot.getState() != MoveState.MOVING) {
-				robotController.rotateRobotLeft(Math.abs(rotationAngle));
-				robot.setState(MoveState.ROTATING);
-			}
+//			if (rotationAngle > 1 && !withinRobot(dest, robot)
+//					&& rotationAngle <= 180
+//					&& robot.getState() != MoveState.MOVING) {
+//				robotController.rotateRobotRight(Math.abs(rotationAngle));
+//				robot.setState(MoveState.ROTATING);
+//			}
+//			// rotate left
+//			else if (rotationAngle < -1 && !withinRobot(dest, robot)
+//					&& rotationAngle >= -180 && robot.getState() != MoveState.MOVING) {
+//				robotController.rotateRobotLeft(Math.abs(rotationAngle));
+//				robot.setState(MoveState.ROTATING);
+//			}
 			// move forward
-			else if (lengthToDest > 4 && !withinRobot(dest, robot)) {
+			if (lengthToDest > 4 && !withinRobot(dest, robot)) {
 
 				robotController.robotForward(lengthToDest, rotationAngle);
 				robot.setState(MoveState.MOVING);
@@ -313,31 +311,25 @@ public class Pathfinder {
 				crossHeight);
 	}
 
-	private void setSafePoints() {
+	private void setSafePoints(Goal goalB) {
 
 		for (int i = 0; i < safePoints.length; i++) {
 			switch (i) {
 			case 0:
-				safePoints[0] = new Coordinate((frames.topLeft().getX() + cross
-						.getCenterOfCross().getX()) / 2, (frames.topLeft()
-						.getY() + cross.getTopCross().getY()) / 2);
+//				safePoints[0] = new Coordinate(cross.getTopCross().getX(),cross.getTopCross().getY()-30);
+				safePoints[0] = goalB;
 				break;
 			case 1:
-				safePoints[1] = new Coordinate(
-						(frames.topRight().getX() + cross.getCenterOfCross()
-								.getX()) / 2, (frames.topRight().getY() + cross
-								.getTopCross().getY()) / 2);
+				safePoints[1] = new Coordinate(cross.getRightCross().getX()+30,cross.getRightCross().getY());
+				safePoints[1] = goalB;
 				break;
 			case 2:
-				safePoints[2] = new Coordinate(
-						(frames.lowRight().getX() + cross.getCenterOfCross()
-								.getX()) / 2, (frames.lowRight().getY() + cross
-								.getBottomCross().getY()) / 2);
+				safePoints[2] = new Coordinate(cross.getBottomCross().getX(), cross.getBottomCross().getY()+30);
+				safePoints[2] = goalB;
 				break;
 			case 3:
-				safePoints[3] = new Coordinate((frames.lowLeft().getX() + cross
-						.getCenterOfCross().getX()) / 2, (frames.lowLeft()
-						.getY() + cross.getBottomCross().getY()) / 2);
+				safePoints[3] = new Coordinate(cross.getLeftCross().getX()-30, cross.getLeftCross().getY());
+				safePoints[3] = goalB;
 				break;
 			default:
 				System.out.println("WTF happend");

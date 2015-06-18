@@ -14,8 +14,8 @@ public class BTConnector2 {
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
-	private final double KP = 0.8;
-	private final int SPEED = 50;
+	private final double KP = 7;
+	private final int SPEED = 230;
 	public double calibration;
 
 	public BTConnector2() {
@@ -128,6 +128,7 @@ public class BTConnector2 {
 		double motorASpeed;
 		double motorBSpeed;
 
+		System.out.println("Angle: " + angle);
 		motorASpeed = SPEED + (pGain);
 		motorBSpeed = SPEED - (pGain);
 
@@ -138,7 +139,7 @@ public class BTConnector2 {
 			dos.flush();
 
 			waitForRobot();
-			System.out.println("forward " + distance);
+//			System.out.println("forward " + distance);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
