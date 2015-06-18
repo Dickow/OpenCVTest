@@ -50,12 +50,11 @@ public class Pathfinder {
 		// routing
 		this.frames = frames;
 		this.cross = cross;
-		setSafePoints(goalB);
+		setSafePoints();
 		// makes sure the cross is seen as an obstacle
 		setObstacles(cross, robot.robotRadius);
 
 		// try to make the balls by the walls accessible for the robot
-		// adjustBallsAtWalls(balls);
 
 		switch (destState) {
 		case NODEST:
@@ -316,31 +315,31 @@ public class Pathfinder {
 				crossHeight);
 	}
 
-	private void setSafePoints(Goal goalB) {
+	private void setSafePoints() {
 
 		for (int i = 0; i < safePoints.length; i++) {
 			switch (i) {
 			case 0:
-				// top safepoint
-				safePoints[0] = new Coordinate(cross.getTopCross().getX(),
-						cross.getTopCross().getY() - 30);
+				safePoints[0] = new Coordinate((frames.topLeft().getX() + cross
+						.getCenterOfCross().getX()) / 2, (frames.topLeft()
+						.getY() + cross.getTopCross().getY()) / 2);
 				break;
 			case 1:
-				// right safepoint
 				safePoints[1] = new Coordinate(
-						cross.getRightCross().getX() + 30, cross
-								.getRightCross().getY());
+						(frames.topRight().getX() + cross.getCenterOfCross()
+								.getX()) / 2, (frames.topRight().getY() + cross
+								.getTopCross().getY()) / 2);
 				break;
 			case 2:
-				// bottom safepoint
-				safePoints[2] = new Coordinate(cross.getBottomCross().getX(),
-						cross.getBottomCross().getY() + 30);
+				safePoints[2] = new Coordinate(
+						(frames.lowRight().getX() + cross.getCenterOfCross()
+								.getX()) / 2, (frames.lowRight().getY() + cross
+								.getBottomCross().getY()) / 2);
 				break;
 			case 3:
-				// left safepoint
-				safePoints[3] = new Coordinate(
-						cross.getLeftCross().getX() - 30, cross.getLeftCross()
-								.getY());
+				safePoints[3] = new Coordinate((frames.lowLeft().getX() + cross
+						.getCenterOfCross().getX()) / 2, (frames.lowLeft()
+						.getY() + cross.getBottomCross().getY()) / 2);
 				break;
 			default:
 				System.out.println("WTF happend");

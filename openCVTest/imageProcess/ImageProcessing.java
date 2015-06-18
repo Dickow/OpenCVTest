@@ -80,7 +80,6 @@ public class ImageProcessing {
 			return;
 		}
 		Highgui.imwrite("testImage.jpg", frame);
-		// frame = Highgui.imread("test.jpg");
 		// Consider the image for processing Imgproc.COLOR_BGR2GRAY
 
 		try {
