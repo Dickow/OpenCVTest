@@ -29,25 +29,19 @@ public class Pathfinder {
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
 	private BTConnector2 robotController = new BTConnector2();
-	private int calibrationStep = 0, ballsOnMap, ballsAfterGrab;
+	private int calibrationStep = 0;
 	private double calibrationLength, xCalibrate, yCalibrate;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
 
-		// if (!calibrateRobot(robot)) {
-		// // we are not yet done calibrating, so just return
-		// return;
-		// }
 
 		// try to set it all the time
 		robotController.calibration = calibrationLength;
 		rotationAngle = 0;
 		lengthToDest = 0;
 
-		// update how many balls are present on the map
-		ballsOnMap = balls.size();
 		// calculate and set the frame and obstacles of the course prior to
 		// routing
 		this.frames = frames;
@@ -66,7 +60,6 @@ public class Pathfinder {
 				// ball
 				if (currentSafePoint == -1) {
 					robotController.openRobotArms();
-					ballsAfterGrab = ballsOnMap;
 				}
 				dest = balls.get(findClosestBall(balls, robot));
 
@@ -80,8 +73,6 @@ public class Pathfinder {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
 
-				// decrease balls on the map
-				ballsAfterGrab--;
 				state = RobotState.HASBALL;
 				return;
 			} else if (state == RobotState.SCOREBALL) {
@@ -130,9 +121,6 @@ public class Pathfinder {
 
 		case HASDEST:
 
-			if (ballsOnMap > ballsAfterGrab) {
-				dest = safePoints[findSafePoint(robot.toCoordinate())];
-			}
 			rotationAngle = findRotationAngle(robot.getFrontCord(),
 					robot.getMiddleCord(), dest);
 			lengthToDest = calcDifference(robot.getFrontCord().getX(), robot
@@ -294,9 +282,9 @@ public class Pathfinder {
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + (4 * radius) + 10; // TODO changed to + 10
+				.getX()) / 18) * 2) + (4 * radius) + radius/2; // TODO changed to + 10
 															// for bigger cross
-		int crossHeight = 10 + (2 * radius) + 10; // TODO changed to + 10 for
+		int crossHeight = 10 + (2 * radius) + radius/2; // TODO changed to + 10 for
 													// bigger cross
 
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
