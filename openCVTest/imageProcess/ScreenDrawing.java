@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
 
+import org.opencv.core.Point;
+
 import moveableObjects.Ball;
 import moveableObjects.Robot;
 import obstacles.Goal;
@@ -50,7 +52,23 @@ public class ScreenDrawing extends Canvas {
 			g.drawLine((int) frames.lowLeft().getX(), (int) frames.lowLeft()
 					.getY(), (int) frames.lowRight().getX(), (int) frames
 					.lowRight().getY());
+			
+			// paint goalRect for goal A
+			g.setColor(Color.PINK);
 
+			g.drawLine((int)goalA.getX() - robot.robotRadius*3 , (int) goalA.getY() - robot.robotRadius*3 , (int) goalA.getX() - robot.robotRadius*3 , (int) goalA.getY()
+					+ (robot.robotRadius)*3 );
+			
+			g.drawLine((int)goalA.getX() + robot.robotRadius*3 , (int) goalA.getY() + robot.robotRadius*3 , (int) goalA.getX() + robot.robotRadius*3 , (int) goalA.getY()
+					- (robot.robotRadius)*3 );
+			
+			g.drawLine((int)goalA.getX() - robot.robotRadius*3 , (int) goalA.getY() - robot.robotRadius*3 , (int) goalA.getX() + robot.robotRadius*3 , (int) goalA.getY()
+					- (robot.robotRadius)*3 );
+			
+			g.drawLine((int)goalA.getX() - robot.robotRadius*3 , (int) goalA.getY() + robot.robotRadius*3 , (int) goalA.getX() + robot.robotRadius*3 , (int) goalA.getY()
+					+ (robot.robotRadius)*3 );
+			
+			
 			// paint the cross
 			g.drawLine((int) cross.getTopCross().getX(), (int) cross
 					.getTopCross().getY(), (int) cross.getBottomCross().getX(),

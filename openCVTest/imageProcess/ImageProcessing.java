@@ -31,26 +31,26 @@ public class ImageProcessing {
 	private boolean foundWallsBefore = false;
 	private int imgCaptures = 1;
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
- 	private Pathfinder pathfinder = new Pathfinder(); // TODO
+	// private Pathfinder pathfinder = new Pathfinder(); // TODO
 	public int ballSize = 7;
 
 	public int iLowH = 16;
-	public int iLowHFront = 49;
+	public int iLowHFront = 33;
 
 	public int iHighH = 255;
-	public int iHighHFront = 97;
+	public int iHighHFront = 108;
 
 	public int iLowS = 96;
-	public int iLowSFront = 155;
+	public int iLowSFront = 47;
 
 	public int iHighS = 255;
 	public int iHighSFront = 255;
 
 	public int iLowV = 219;
-	public int iLowVFront = 0;
+	public int iLowVFront = 90;
 
 	public int iHighV = 255;
-	public int iHighVFront = 255;
+	public int iHighVFront = 184;
 
 	private ObstacleFrame frames = new ObstacleFrame();
 	private Robot robot = new Robot();
@@ -61,7 +61,7 @@ public class ImageProcessing {
 	private ArrayList<Point> lineCoordinates;
 	private Mat image, frame, imgHSV, imageBlurr;
 	private Image backgroundImage;
-	private Rect fieldRect, crossRect;
+	private Rect fieldRect, crossRect, goalRect;
 
 	public void process() {
 
@@ -107,13 +107,14 @@ public class ImageProcessing {
 			backgroundImage = toBufferedImage(image);
 		} catch (Exception e) {
 			System.out.println("error occured stop the robot!");
-			pathfinder.stopAllCommands(); // TODO
-			return; 
+			// pathfinder.stopAllCommands(); // TODO
+			return;
 		}
 
 		try {
-			pathfinder
-					.findPath(robot, balls, goalA, goalB, null, frames, cross); // TODO
+			// pathfinder
+			// .findPath(robot, balls, goalA, goalB, null, frames, cross); //
+			// TODO
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 			return;
@@ -253,6 +254,8 @@ public class ImageProcessing {
 						&& fieldRect.contains(new Point(coordinate[0],
 								coordinate[1]))
 						&& !crossRect.contains(new Point(coordinate[0],
+								coordinate[1]))
+						&& !goalRect.contains(new Point(coordinate[0],
 								coordinate[1]))) {
 					balls.add(new Ball(coordinate[0], coordinate[1]));
 					balls.get(balls.size() - 1).setRadius(coordinate[2]);
@@ -430,9 +433,11 @@ public class ImageProcessing {
 						+ robot.robotRadius));
 
 		// create a rectangle around the cross to ignore all the balls there.
-		crossRect = new Rect(new Point(cross.getLeftCross().getX() - robot.robotRadius, cross
-				.getTopCross().getY() - robot.robotRadius), new Point(cross.getRightCross().getX() - robot.robotRadius,
-				cross.getBottomCross().getY() - robot.robotRadius));
+		crossRect = new Rect(new Point(cross.getLeftCross().getX()
+				- robot.robotRadius, cross.getTopCross().getY()
+				- robot.robotRadius), new Point(cross.getRightCross().getX()
+				- robot.robotRadius, cross.getBottomCross().getY()
+				- robot.robotRadius));
 		// add Goal points to the list of objects (where the robot )
 		goalA = new Goal(
 				((frames.topLeft().getX() + frames.lowLeft().getX()) / 2),
@@ -440,6 +445,11 @@ public class ImageProcessing {
 		goalB = new Goal(
 				((frames.topRight().getX() + frames.lowRight().getX()) / 2),
 				(frames.topRight().getY() + frames.lowRight().getY()) / 2);
+
+		goalRect = new Rect(new Point(goalA.getX() - robot.robotRadius * 3,
+				goalA.getY() - robot.robotRadius * 3),
+				new Point(goalA.getX() + robot.robotRadius * 3, goalA.getY()
+						+ (robot.robotRadius) * 3));
 
 		// Draw cross
 		// Core.line(image, new Point(cross.getLeftCross().getX(), cross
