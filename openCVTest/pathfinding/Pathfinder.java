@@ -156,10 +156,6 @@ public class Pathfinder {
 		}
 	}
 
-	private void isBallRemoved() {
-
-	}
-
 	private boolean withinRobot(Coordinate dest, Robot robot) {
 		Circle robotArea = new Circle(robot.getMiddleCord().getX(), robot
 				.getMiddleCord().getY(), robot.robotRadius * 2);
