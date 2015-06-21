@@ -30,12 +30,11 @@ public class Pathfinder {
 	private DestState destState = DestState.NODEST;
 	private BTConnector2 robotController = new BTConnector2();
 	private int calibrationStep = 0;
-	private double calibrationLength, xCalibrate, yCalibrate;
+	private double calibrationLength, xCalibrate, yCalibrate, ballsAfterGrab;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
 			MiddleCross cross) {
-
 
 		// try to set it all the time
 		robotController.calibration = calibrationLength;
@@ -51,36 +50,45 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 
 		// try to make the balls by the walls accessible for the robot
-		
+
 		switch (destState) {
 		case NODEST:
 			// try to see if we can reach a ball
-			if (state == RobotState.NOBALL) {
+			if (state == RobotState.NOBALL && balls.size() > 0) {
 				// we try to open the arms, then we are ready to catch a new
 				// ball
-				
 				if (currentSafePoint == -1) {
 					robotController.openRobotArms();
+					ballsAfterGrab = balls.size();
 				}
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
 				// calculate the goal delivery point coordinate
+				if (balls.size() > ballsAfterGrab) {
+					System.out.println("too many balls left on the map");
+					state = RobotState.NOBALL;
+					destState = DestState.NODEST;
+					return;
+				} else {
+					dest = new Coordinate(
+							(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
+							goalA.getY());
 
-				dest = new Coordinate(
-						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
-						goalA.getY());
-				
+				}
+
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
-
+				ballsAfterGrab--;
+				// decrement the balls we should find on the map
 				state = RobotState.HASBALL;
+
 				return;
-				
+
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-
+				
 				dest = new Coordinate((goalA.getX() + (3 * robot.robotRadius)),
 						goalA.getY());
 
@@ -281,10 +289,14 @@ public class Pathfinder {
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + (4 * radius) + radius/2; // TODO changed to + 10
-															// for bigger cross
-		int crossHeight = 10 + (2 * radius) + radius/2; // TODO changed to + 10 for
-													// bigger cross
+				.getX()) / 18) * 2) + (4 * radius) + radius / 2; // TODO changed
+																	// to + 10
+																	// for
+																	// bigger
+																	// cross
+		int crossHeight = 10 + (2 * radius) + radius / 2; // TODO changed to +
+															// 10 for
+		// bigger cross
 
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);

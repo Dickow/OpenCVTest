@@ -236,7 +236,7 @@ public class ImageProcessing {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				10, 50, 15, 1, 15);
+				10, 100, 16, 1, 15);
 
 		if (!circles.empty()) {
 
@@ -477,7 +477,7 @@ public class ImageProcessing {
 	}
 
 	private void projectCoordinate(Coordinate cord, double heightOfTarget) {
-		double heightOfCamera = 212;
+		double heightOfCamera = 214;
 
 		double centerX = frame.width() / 2;
 		double centerY = frame.height() / 2;
