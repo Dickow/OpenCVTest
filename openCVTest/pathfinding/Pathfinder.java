@@ -59,28 +59,25 @@ public class Pathfinder {
 				// ball
 				if (currentSafePoint == -1) {
 					robotController.openRobotArms();
-					ballsAfterGrab = balls.size();
 				}
 				dest = balls.get(findClosestBall(balls, robot));
 
 			} else if (state == RobotState.HASBALL) {
-				// calculate the goal delivery point coordinate
-				if (balls.size() > ballsAfterGrab) {
-					System.out.println("too many balls left on the map");
-					state = RobotState.NOBALL;
-					destState = DestState.NODEST;
-					return;
-				} else {
-					dest = new Coordinate(
-							(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
-							goalA.getY());
 
-				}
+				dest = new Coordinate(
+						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
+						goalA.getY());
 
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
-				ballsAfterGrab--;
+				
+				// test to see if the sensor is working.
+				if(!robotController.ballPresent()){
+					state = RobotState.NOBALL;
+					destState = DestState.NODEST;
+					return; 
+				}
 				// decrement the balls we should find on the map
 				state = RobotState.HASBALL;
 
@@ -88,7 +85,7 @@ public class Pathfinder {
 
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
-				
+
 				dest = new Coordinate((goalA.getX() + (3 * robot.robotRadius)),
 						goalA.getY());
 

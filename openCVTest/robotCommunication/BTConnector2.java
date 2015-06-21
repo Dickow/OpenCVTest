@@ -10,7 +10,7 @@ import lejos.pc.comm.NXTConnector;
 public class BTConnector2 {
 	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
 			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
-			FINISHED = 10;
+			FINISHED = 10, HASBALL = 11, GOTBALL = 12, NOBALL = 13;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
@@ -130,9 +130,9 @@ public class BTConnector2 {
 
 		motorASpeed = SPEED + (pGain);
 		motorBSpeed = SPEED - (pGain);
-		
-//		System.out.println("motorA " + motorASpeed);
-//		System.out.println("motorB " + motorBSpeed);
+
+		// System.out.println("motorA " + motorASpeed);
+		// System.out.println("motorB " + motorBSpeed);
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(motorASpeed);
@@ -173,6 +173,31 @@ public class BTConnector2 {
 	}
 
 	/**
+	 * method to check if the robot grabbed a ball when the arms closed.
+	 * 
+	 * @return
+	 */
+	public boolean ballPresent() {
+		try {
+			dos.writeInt(HASBALL);
+			System.out.println("sending input to robot");
+			dos.flush();
+			if (waitForSensor()) {
+				System.out.println("ball in arms");
+				return true;
+			} else {
+				System.out.println("no balls in arms");
+				return false;
+			}
+
+		} catch (Exception e) {
+			System.out.println("error in sensing balls");
+		}
+		System.out.println("got to return");
+		return false;
+	}
+
+	/**
 	 * tell the robot to close it's arms
 	 */
 	public void closeRobotArms() {
@@ -203,6 +228,20 @@ public class BTConnector2 {
 
 		}
 
+	}
+
+	private boolean waitForSensor() {
+		try {
+			while (din.readInt() != FINISHED) {
+
+			}
+			int returnValue = din.readInt();
+			return returnValue == GOTBALL ? true : false;
+		} catch (Exception e) {
+			System.out.println("why did we end up here");
+		}
+		// if something weird occured just return false;
+		return false;
 	}
 
 	private void waitForRobot() {

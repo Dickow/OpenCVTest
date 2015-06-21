@@ -236,7 +236,7 @@ public class ImageProcessing {
 		 */
 		Mat circles = new Mat();
 		Imgproc.HoughCircles(imageBlurr, circles, Imgproc.CV_HOUGH_GRADIENT, 1,
-				10, 100, 16, 1, 15);
+				10, 90, 15, 1, 15);
 
 		if (!circles.empty()) {
 
