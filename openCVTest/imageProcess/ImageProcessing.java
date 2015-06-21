@@ -31,7 +31,7 @@ public class ImageProcessing {
 	private boolean foundWallsBefore = false;
 	private int imgCaptures = 1;
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
-	// private Pathfinder pathfinder = new Pathfinder(); // TODO
+	private Pathfinder pathfinder = new Pathfinder(); // TODO
 	public int ballSize = 7;
 
 	public int iLowH = 16;
@@ -107,13 +107,13 @@ public class ImageProcessing {
 			backgroundImage = toBufferedImage(image);
 		} catch (Exception e) {
 			System.out.println("error occured stop the robot!");
-			// pathfinder.stopAllCommands(); // TODO
+			 pathfinder.stopAllCommands(); // TODO
 			return;
 		}
 
 		try {
-			// pathfinder
-			// .findPath(robot, balls, goalA, goalB, null, frames, cross); //
+			 pathfinder
+			 .findPath(robot, balls, goalA, goalB, null, frames, cross); //
 			// TODO
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");

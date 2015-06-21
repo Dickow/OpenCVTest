@@ -51,13 +51,14 @@ public class Pathfinder {
 		setObstacles(cross, robot.robotRadius);
 
 		// try to make the balls by the walls accessible for the robot
-
+		
 		switch (destState) {
 		case NODEST:
 			// try to see if we can reach a ball
 			if (state == RobotState.NOBALL) {
 				// we try to open the arms, then we are ready to catch a new
 				// ball
+				
 				if (currentSafePoint == -1) {
 					robotController.openRobotArms();
 				}
@@ -69,12 +70,14 @@ public class Pathfinder {
 				dest = new Coordinate(
 						(goalA.getX() + (cross.getLeftCross().getX())) / 1.5,
 						goalA.getY());
+				
 			} else if (state == RobotState.GRABBALL) {
 				// grab the ball here, but in the test we already got it
 				robotController.closeRobotArms();
 
 				state = RobotState.HASBALL;
 				return;
+				
 			} else if (state == RobotState.SCOREBALL) {
 				// drive a little closer to the goal
 
