@@ -16,6 +16,13 @@ import obstacles.MiddleCross;
 import obstacles.ObstacleFrame;
 import robotCommunication.BTConnector2;
 
+/**
+ * The pathfinding class, this class finds the next path the robot should take,
+ * and issues the commands for the robot.
+ * 
+ * @author Group 1
+ *
+ */
 public class Pathfinder {
 
 	private RobotState state = RobotState.NOBALL;
@@ -29,8 +36,7 @@ public class Pathfinder {
 	private Rectangle crossVerticalPart;
 	private DestState destState = DestState.NODEST;
 	private BTConnector2 robotController = new BTConnector2();
-	private int calibrationStep = 0;
-	private double calibrationLength, xCalibrate, yCalibrate, ballsAfterGrab;
+	private double calibrationLength;
 
 	public void findPath(Robot robot, ArrayList<Ball> balls, Goal goalA,
 			Goal goalB, Goal goalADelivery, ObstacleFrame frames,
@@ -69,16 +75,16 @@ public class Pathfinder {
 						goalA.getY());
 
 			} else if (state == RobotState.GRABBALL) {
-				// grab the ball here, but in the test we already got it
+				// grab the ball here
 				robotController.closeRobotArms();
-				
+
 				// test to see if the sensor is working.
-				if(!robotController.ballPresent()){
-					state = RobotState.NOBALL;
-					destState = DestState.NODEST;
-					return; 
-				}
-				// decrement the balls we should find on the map
+				// if(!robotController.ballPresent()){
+				// state = RobotState.NOBALL;
+				// destState = DestState.NODEST;
+				// return;
+				// }
+				
 				state = RobotState.HASBALL;
 
 				return;
@@ -285,15 +291,11 @@ public class Pathfinder {
 		int crossX = (int) cross.getLeftCross().getX() - radius;
 		int crossY = (int) cross.getLeftCross().getY() - 10;
 
+		// changed to + 10 for bigger cross
 		int crossWidth = (int) (((frames.topRight().getX() - frames.topLeft()
-				.getX()) / 18) * 2) + (4 * radius) + radius / 2; // TODO changed
-																	// to + 10
-																	// for
-																	// bigger
-																	// cross
-		int crossHeight = 10 + (2 * radius) + radius / 2; // TODO changed to +
-															// 10 for
-		// bigger cross
+				.getX()) / 18) * 2) + (4 * radius) + radius / 2;
+		// changed to +10 for bigger cross
+		int crossHeight = 10 + (2 * radius) + radius / 2;
 
 		this.crossHorizontalPart = new Rectangle(crossX, crossY, crossWidth,
 				crossHeight);
@@ -427,60 +429,4 @@ public class Pathfinder {
 		}
 	}
 
-	private boolean calibrateRobot(Robot robot) {
-		// this is the first time we enter calibration
-		if (calibrationStep == 0) {
-			// save our x and y values so we can see how far we move
-			xCalibrate = robot.getFrontCord().getX();
-			yCalibrate = robot.getFrontCord().getY();
-
-			robotController.robotCalibrate();
-			calibrationStep++;
-			return false;
-		} else if (calibrationStep == 1) {
-			calibrationLength = calcDifference(xCalibrate, yCalibrate, robot
-					.getFrontCord().getX(), robot.getFrontCord().getY());
-			calibrationStep++;
-		}
-		return true;
-	}
-
-	/**
-	 * Method to make the balls accessible to the robot, instead of making it
-	 * drive into the wall because it thinks it cannot reach the ball
-	 * 
-	 * @param balls
-	 */
-	private void adjustBallsAtWalls(ArrayList<Ball> balls) {
-		// TODO adjust this value if necessary
-		double maxDifFromWall = 5;
-
-		double topYAvg = (frames.topLeft().getY() + frames.topRight().getY()) / 2;
-		double rightXAvg = (frames.topRight().getX() + frames.lowRight().getX()) / 2;
-		double bottomYAvg = (frames.lowLeft().getY() + frames.lowRight().getY()) / 2;
-		double leftXAvg = (frames.topLeft().getX() + frames.lowLeft().getX()) / 2;
-
-		for (Ball ball : balls) {
-
-			// check for top wall
-			if ((ball.getY() - 2 * ball.getRadius()) + topYAvg < maxDifFromWall) {
-				ball.setY(ball.getY() + 2 * ball.getRadius());
-			}
-
-			// check for right wall
-			else if (rightXAvg - (ball.getX() + 2 * ball.getRadius()) < maxDifFromWall) {
-				ball.setX(ball.getX() - 2 * ball.getRadius());
-			}
-
-			// check for bottom wall
-			else if ((ball.getY() + 2 * ball.getRadius()) - bottomYAvg < maxDifFromWall) {
-				ball.setY(ball.getY() - 2 * ball.getRadius());
-			}
-			// check for left wall
-			else if ((ball.getX() - 2 * ball.getRadius()) + leftXAvg < maxDifFromWall) {
-				ball.setX(ball.getX() + 2 * ball.getRadius());
-			}
-		}
-
-	}
 }

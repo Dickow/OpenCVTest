@@ -7,13 +7,19 @@ import java.io.IOException;
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
+/**
+ * Outdated connector class, this was used in the beginning before the
+ * P-controller was used.
+ * 
+ * @author Group 1
+ *
+ */
 public class BTConnector {
 
 	public double calibration;
 
 	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
-			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
-			FINISHED = 10;
+			OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9, FINISHED = 10;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
@@ -82,7 +88,6 @@ public class BTConnector {
 			waitForRobot();
 			System.out.println("written to robot");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -97,9 +102,8 @@ public class BTConnector {
 
 		if (distance > 50) {
 			distance /= 2;
-		}
-		else {
-			distance -= 2; 
+		} else {
+			distance -= 2;
 		}
 		try {
 			dos.writeInt(FORWARD);
@@ -121,7 +125,7 @@ public class BTConnector {
 
 		try {
 			dos.writeInt(BACKWARDS);
-			dos.writeDouble(distance/(calibration/360));
+			dos.writeDouble(distance / (calibration / 360));
 			dos.flush();
 			waitForRobot();
 		} catch (IOException e) {

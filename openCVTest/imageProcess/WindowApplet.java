@@ -13,11 +13,13 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import obstacles.Goal;
-import obstacles.MiddleCross;
-import moveableObjects.Coordinate;
-import moveableObjects.Robot;
-
+/**
+ * Main class of our robot system. This class handles the graphical part of our
+ * Autonomous robot implementation.
+ * 
+ * @author Group 1
+ *
+ */
 public class WindowApplet extends Applet implements Runnable {
 	private static final long serialVersionUID = -695085763165967408L;
 
@@ -227,51 +229,5 @@ public class WindowApplet extends Applet implements Runnable {
 
 		}
 
-	}
-
-	private void projectRobot(Robot robot, MiddleCross cross) {
-		double heightOfRobot = 24;
-		double heightOfCamera = 212; // TODO make sure this is correct before
-										// running
-		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
-				.getX(), cross.getCenterOfCross().getY());
-
-		double newX = ((robot.getFrontCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		double newY = ((robot.getFrontCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		robot.getFrontCord().setX(newX);
-		robot.getFrontCord().setY(newY);
-
-		// calculate the back of the robot
-
-		newX = ((robot.getBackCord().getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		newY = ((robot.getBackCord().getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfRobot) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		robot.getBackCord().setX(newX);
-		robot.getBackCord().setY(newY);
-
-	}
-
-	private void projectGoal(Goal goalA, MiddleCross cross) {
-		double heightOfWall = 7;
-		double heightOfCamera = 212;
-
-		Coordinate centerOfCamera = new Coordinate(cross.getCenterOfCross()
-				.getX(), cross.getCenterOfCross().getY());
-
-		double newX = ((goalA.getX() - centerOfCamera.getX()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getX();
-
-		double newY = ((goalA.getY() - centerOfCamera.getY()) * ((heightOfCamera - heightOfWall) / heightOfCamera))
-				+ centerOfCamera.getY();
-
-		goalA.setX(newX);
-		goalA.setY(newY);
 	}
 }

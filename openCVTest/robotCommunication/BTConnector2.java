@@ -6,11 +6,15 @@ import java.io.IOException;
 
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
-
+/**
+ * The actual robot connection class, this class supports the P-controller that was used in the robot design.
+ * @author Group 1
+ *
+ */
 public class BTConnector2 {
-	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3, BACKWARDS = 4,
+	private final int TURNLEFT = 1, TURNRIGHT = 2, FORWARD = 3,
 			STOP = 5, OPEN = 6, CLOSE = 7, DELIVER = 8, CALIBRATE = 9,
-			FINISHED = 10, HASBALL = 11, GOTBALL = 12, NOBALL = 13;
+			FINISHED = 10, HASBALL = 11, GOTBALL = 12;
 	private NXTConnector conn;
 	private DataOutputStream dos;
 	private DataInputStream din;
@@ -83,7 +87,6 @@ public class BTConnector2 {
 			waitForRobot();
 			System.out.println("rotate " + angle);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -111,7 +114,6 @@ public class BTConnector2 {
 			waitForRobot();
 			System.out.println("rotate " + angle);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -131,8 +133,6 @@ public class BTConnector2 {
 		motorASpeed = SPEED + (pGain);
 		motorBSpeed = SPEED - (pGain);
 
-		// System.out.println("motorA " + motorASpeed);
-		// System.out.println("motorB " + motorBSpeed);
 		try {
 			dos.writeInt(FORWARD);
 			dos.writeDouble(motorASpeed);
@@ -140,7 +140,6 @@ public class BTConnector2 {
 			dos.flush();
 
 			waitForRobot();
-			// System.out.println("forward " + distance);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

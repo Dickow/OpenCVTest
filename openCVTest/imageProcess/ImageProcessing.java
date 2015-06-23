@@ -28,10 +28,12 @@ import org.opencv.imgproc.Moments;
 import pathfinding.Pathfinder;
 
 public class ImageProcessing {
+	// constant for camera
+	private final double heightOfCamera = 217;
 	private boolean foundWallsBefore = false;
 	private int imgCaptures = 1;
 	private Coordinate topLeft, topRight, lowLeft, lowRight;
-	private Pathfinder pathfinder = new Pathfinder(); // TODO
+	private Pathfinder pathfinder = new Pathfinder();
 	public int ballSize = 7;
 
 	public int iLowH = 16;
@@ -41,13 +43,13 @@ public class ImageProcessing {
 	public int iHighHFront = 108;
 
 	public int iLowS = 96;
-	public int iLowSFront = 67;
+	public int iLowSFront = 71;
 
 	public int iHighS = 255;
 	public int iHighSFront = 255;
 
 	public int iLowV = 219;
-	public int iLowVFront = 90;
+	public int iLowVFront = 77;
 
 	public int iHighV = 255;
 	public int iHighVFront = 184;
@@ -107,14 +109,13 @@ public class ImageProcessing {
 			backgroundImage = toBufferedImage(image);
 		} catch (Exception e) {
 			System.out.println("error occured stop the robot!");
-			 pathfinder.stopAllCommands(); // TODO
+			pathfinder.stopAllCommands();
 			return;
 		}
 
 		try {
-			 pathfinder
-			 .findPath(robot, balls, goalA, goalB, null, frames, cross); //
-			// TODO
+			pathfinder
+					.findPath(robot, balls, goalA, goalB, null, frames, cross);
 		} catch (Exception e) {
 			System.out.println("Error happened in pathfinding");
 			return;
@@ -122,9 +123,11 @@ public class ImageProcessing {
 	}
 
 	private void projectAllCoordinates() {
+		// constants that were measured
 		double heightOfRobot = 20;
 		double heightOfBall = 4;
 		double heightOfGoal = 7;
+
 		projectCoordinate(robot.getFrontCord(), heightOfRobot);
 		projectCoordinate(robot.getBackCord(), heightOfRobot);
 		robot.updateMiddleCord();
@@ -203,7 +206,6 @@ public class ImageProcessing {
 
 				// add the robot objects to the ArrayList for pathfinding
 				if (j == 0) {
-					// System.out.println("found robot back");
 					robot.setBackCord(new Coordinate(posX, posY));
 					robot.setAreaBack(new Circle(posX, posY, 3.5 * Math
 							.sqrt(dArea / 3.14)));
@@ -211,7 +213,6 @@ public class ImageProcessing {
 							.sqrt(dArea / 3.14)), new Scalar(255, 255, 255));
 					robot.robotRadius = (int) Math.sqrt(dArea / 3.14);
 				} else {
-					// System.out.println("found robot front");
 					robot.setFrontCord(new Coordinate(posX, posY));
 					robot.setAreaFront(new Circle(posX, posY, 3.5 * Math
 							.sqrt(dArea / 3.14)));
@@ -225,7 +226,6 @@ public class ImageProcessing {
 
 		robotMats[0].copyTo(robotMats[1], robotMats[0]);
 		// convert the mats to one mat and convert it to an Image
-		// backgroundImage = toBufferedImage(robotMats[1]);
 		robot.updateMiddleCord();
 
 	}
@@ -246,7 +246,10 @@ public class ImageProcessing {
 				if (coordinate == null) {
 					break;
 				}
-
+				/*
+				 * only let the ball be visible if is not within any of the
+				 * prohibited areas of the field
+				 */
 				if (!robot.getRobotFrontArea().contains(coordinate[0],
 						coordinate[1])
 						&& !robot.getRobotBackArea().contains(coordinate[0],
@@ -259,7 +262,6 @@ public class ImageProcessing {
 								coordinate[1]))) {
 					balls.add(new Ball(coordinate[0], coordinate[1]));
 					balls.get(balls.size() - 1).setRadius(coordinate[2]);
-					// System.out.println("found a ball");
 				}
 			}
 		}
@@ -287,7 +289,7 @@ public class ImageProcessing {
 			lineCoordinates.add(end);
 
 		}
-		// System.out.println(lineCoordinates.size());
+		// approximate how the field acctually looks.
 		drawApproxLines();
 
 	}
@@ -477,7 +479,6 @@ public class ImageProcessing {
 	}
 
 	private void projectCoordinate(Coordinate cord, double heightOfTarget) {
-		double heightOfCamera = 214;
 
 		double centerX = frame.width() / 2;
 		double centerY = frame.height() / 2;
@@ -492,11 +493,12 @@ public class ImageProcessing {
 
 	}
 
+	// standard getters and setters used by other classes
+
 	public Image getBackgroundImage() {
 		return this.backgroundImage;
 	}
 
-	// shitty java does not have pointers....
 	public ArrayList<Ball> getBalls() {
 		return this.balls;
 	}

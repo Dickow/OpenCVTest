@@ -2,6 +2,10 @@ package geometry;
 
 import java.lang.Math;
 
+/**
+ *This Vector class was found on the Internet. 
+ *It was free to use, and therefore we used it instead of writing our own.
+ */
 public class Vector {
 
 	public double dX;

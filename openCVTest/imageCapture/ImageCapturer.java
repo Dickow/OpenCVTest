@@ -5,6 +5,13 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 
+/**
+ * This class takes care of reading images from the camera and saving them in a
+ * separate class
+ * 
+ * @author Group 1
+ *
+ */
 public class ImageCapturer implements Runnable {
 	private VideoCapture videoCapture;
 
